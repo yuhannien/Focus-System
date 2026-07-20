@@ -1231,7 +1231,7 @@ const App = (function(){
   // ★ 設定完 Google Apps Script 後，把「網頁應用程式」網址貼在這裡（雙引號中間），
   //    例如："https://script.google.com/macros/s/AKfycb.../exec"
   //    留空字串 "" 代表不啟用雲端同步，資料只會存在使用者自己的裝置上。
-  const SHEET_WEBHOOK_URL = "";
+  const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx07C9pJSP_d4V4TjZNvZAiPQFzaYevHWRvdUCuFSedklWMfXq1YsU005JaFQOYr3uq/exec";
 
   function sendToSheet(record){
     if (!SHEET_WEBHOOK_URL) return; // 尚未設定後台網址，略過雲端同步
