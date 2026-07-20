@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧型專注力分析與改善系統</title>
+<style>
+/* =========================================================
+   全站共用主題：水果攤／木箱風格
+   ========================================================= */
+:root{
+  --wood-dark:#5c3a1e;
+  --wood-mid:#7a4a24;
+  --wood-light:#a9713f;
+  --wood-deepest:#3f2a15;
+  --kraft-bg:#fdf3dd;
+  --kraft-bg2:#f3e0b8;
+  --kraft-border:#7a4a24;
+  --kraft-border-light:#c9974f;
+  --vine-green:#3f7a2a;
+  --vine-green-light:#6fae3f;
+  --vine-green-dark:#2f5c1f;
+  --text-dark:#5c3a1e;
+  --text-mid:#6b4423;
+  --text-soft:#8a6a44;
+  --accent-red:#c0392b;
+  --accent-gold:#c9974f;
+  --tier-good:#3f7a2a;
+  --tier-good-bg:#d9f0c8;
+  --tier-mid:#a9720c;
+  --tier-mid-bg:#fdeec7;
+  --tier-low:#c0392b;
+  --tier-low-bg:#fbd6d1;
+}
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html,body{ height:100%; margin:0; }
+
+body{
+  font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--text-dark);
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 26px),
+    linear-gradient(180deg, var(--wood-light) 0%, var(--wood-mid) 55%, var(--wood-deepest) 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ---------- Header ---------- */
+.site-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 28px;
+  background:linear-gradient(180deg, rgba(93,58,26,0.92), rgba(63,42,21,0.92));
+  border-bottom:4px solid var(--kraft-border-light);
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  position:sticky;
+  top:0;
+  z-index:100;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.logo-area{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  user-select:none;
+  padding:4px 8px;
+  border-radius:12px;
+  transition:box-shadow .15s ease, transform .15s ease;
+}
+.logo-area:hover{
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  transform:translateY(-1px);
+}
+.logo-icon{
+  font-size:30px;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,0.35));
+}
+.logo-svg{
+  flex-shrink:0;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+  transition:transform .2s ease;
+}
+.logo-area:hover .logo-svg{ transform:rotate(8deg); }
+.logo-text{
+  font-size:17px;
+  font-weight:bold;
+  color:#fdf3dd;
+  letter-spacing:0.5px;
+}
+.logo-text small{
+  display:block;
+  font-size:11px;
+  font-weight:normal;
+  color:#e2cfa0;
+}
+
+.site-nav{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.site-nav a{
+  color:#fdf3dd;
+  text-decoration:none;
+  font-size:14.5px;
+  font-weight:bold;
+  padding:9px 16px;
+  border-radius:20px;
+  cursor:pointer;
+  border:1px solid rgba(253,243,221,0.25);
+  transition:box-shadow .15s ease, background .15s ease, transform .15s ease;
+}
+.site-nav a:hover{
+  box-shadow:0 6px 16px rgba(0,0,0,0.4);
+  background:rgba(253,243,221,0.12);
+  transform:translateY(-1px);
+}
+.site-nav a.active{
+  background:var(--vine-green);
+  border-color:var(--vine-green-light);
+}
+
+/* ---------- Layout ---------- */
+main{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  padding:28px 16px 48px;
+}
+.page{ display:none; width:100%; max-width:900px; }
+.page.active{ display:block; animation:fadeIn .35s ease; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+/* ---------- 木箱卡片 (crate card) ---------- */
+.crate-card{
+  background:var(--kraft-bg);
+  border:6px solid var(--wood-mid);
+  border-radius:20px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.45), inset 0 0 0 3px var(--kraft-border-light);
+  padding:28px 30px;
+  position:relative;
+}
+.crate-card + .crate-card{ margin-top:22px; }
+
+.crate-card h1{
+  color:var(--wood-dark);
+  font-size:26px;
+  margin:0 0 6px;
+  text-align:center;
+}
+.crate-card h2{
+  color:var(--wood-dark);
+  font-size:21px;
+  margin:0 0 14px;
+}
+.crate-card p{
+  line-height:1.85;
+  color:var(--text-mid);
+  font-size:15px;
+}
+
+/* ---------- 首頁 ---------- */
+#page-home .crate-card{ text-align:center; }
+.home-sub{
+  text-align:center;
+  color:var(--text-soft);
+  font-size:13.5px;
+  margin-bottom:18px;
+}
+.home-lead-box{
+  background:var(--kraft-bg2);
+  border:2px dashed var(--kraft-border-light);
+  border-radius:16px;
+  padding:20px 22px;
+  margin:18px 0 24px;
+  text-align:left;
+}
+.home-lead-box p{ margin:0; }
+
+.fruit-row-decor{
+  font-size:34px;
+  text-align:center;
+  margin:10px 0 6px;
+  letter-spacing:6px;
+}
+
+/* ---------- 首頁裝飾背景（水果元素，僅首頁） ---------- */
+#page-home{ position:relative; }
+#page-home .crate-card{ position:relative; z-index:1; }
+.home-fruit-bg{
+  position:absolute; inset:-20px -16px;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+.home-fruit-bg span{
+  position:absolute;
+  opacity:0.28;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
+
+/* ---------- 首頁獨立 CTA（不與介紹框同一個框） ---------- */
+.home-cta{
+  text-align:center;
+  margin-top:28px;
+  position:relative;
+  z-index:1;
+}
+.btn-cta{
+  font-size:19px;
+  padding:18px 46px;
+  box-shadow:0 12px 30px rgba(63,122,42,0.55);
+  animation:ctaPulse 2.4s ease-in-out infinite;
+}
+@keyframes ctaPulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.045); }
+}
+
+/* ---------- 姓名／年齡輸入表單 ---------- */
+.player-form{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:18px 0 8px;
+}
+.player-form label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:13px;
+  color:var(--text-soft);
+  font-weight:bold;
+}
+.player-form input{
+  font-family:inherit;
+  font-size:15px;
+  padding:10px 14px;
+  border:2px solid var(--kraft-border-light);
+  border-radius:14px;
+  background:#fffaf0;
+  color:var(--text-dark);
+  width:180px;
+}
+.player-form input:focus{ outline:none; border-color:var(--wood-mid); }
+.player-form-error{
+  color:var(--accent-red);
+  font-size:13px;
+  text-align:center;
+  min-height:18px;
+  margin-bottom:4px;
+}
+
+/* ---------- 按鈕（藤綠色系） ---------- */
+.btn-primary, .btn-secondary, .btn-outline{
+  font-family:inherit;
+  font-size:16px;
+  font-weight:bold;
+  border:none;
+  border-radius:30px;
+  padding:14px 34px;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(135deg, var(--vine-green-light), var(--vine-green));
+  box-shadow:0 8px 20px rgba(63,122,42,0.4);
+  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+  margin:6px;
+}
+.btn-primary:hover, .btn-secondary:hover, .btn-outline:hover{
+  transform:translateY(-2px) scale(1.02);
+  box-shadow:0 12px 26px rgba(63,122,42,0.5);
+}
+.btn-primary:active, .btn-secondary:active, .btn-outline:active{ transform:translateY(0) scale(0.98); }
+.btn-primary:disabled{ background:#ccc; box-shadow:none; cursor:not-allowed; opacity:.7; transform:none; }
+
+.btn-secondary{
+  background:linear-gradient(135deg, #c9974f, #a9713f);
+  box-shadow:0 8px 20px rgba(169,113,63,0.4);
+}
+.btn-outline{
+  background:transparent;
+  color:var(--wood-dark);
+  border:2px solid var(--kraft-border-light);
+  box-shadow:none;
+}
+.btn-outline:hover{ background:var(--kraft-bg2); box-shadow:0 6px 14px rgba(0,0,0,0.15); }
+
+.btn-row{ display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:16px; }
+
+/* ---------- 說明用標籤 ---------- */
+.tag{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:bold;
+  margin-left:6px;
+}
+.tag-click{ background:#d9f0c8; color:var(--vine-green-dark); }
+.tag-noclick{ background:#f0e4cb; color:var(--text-soft); }
+
+/* ---------- 測驗頁面 ---------- */
+#page-quiz .level-container{ display:none; }
+#page-quiz .level-container.active{ display:block; }
+
+.quiz-progress{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:16px;
+}
+.quiz-progress .dot{
+  width:14px; height:14px; border-radius:50%;
+  background:rgba(253,243,221,0.3);
+  border:2px solid var(--kraft-border-light);
+  transition:background .2s ease, transform .2s ease;
+}
+.quiz-progress .dot.done{ background:var(--vine-green-light); }
+.quiz-progress .dot.current{ background:#fff; transform:scale(1.25); }
+
+/* ---------- 關卡完成 recap 覆蓋層 ---------- */
+.recap-overlay{
+  position:fixed; inset:0;
+  background:rgba(63,42,21,0.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+  padding:16px;
+}
+.recap-overlay.show{ display:flex; }
+.recap-box{
+  background:var(--kraft-bg);
+  border:6px solid var(--wood-mid);
+  border-radius:20px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px var(--kraft-border-light);
+  padding:26px 28px;
+  width:460px;
+  max-width:92vw;
+  max-height:86vh;
+  overflow-y:auto;
+  text-align:center;
+  animation:bounceIn .4s ease;
+}
+@keyframes bounceIn{ 0%{transform:scale(.7);opacity:0;} 60%{transform:scale(1.05);opacity:1;} 100%{transform:scale(1);} }
+.recap-box h2{ color:var(--vine-green-dark); font-size:22px; margin:0 0 4px; }
+.recap-box .recap-sub{ color:var(--text-soft); font-size:13px; margin-bottom:14px; }
+.recap-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:14px 0;
+  text-align:left;
+}
+.recap-stat{
+  background:var(--kraft-bg2);
+  border-radius:12px;
+  padding:10px 12px;
+  border:1px solid var(--kraft-border-light);
+}
+.recap-stat .label{ font-size:12px; color:var(--text-soft); }
+.recap-stat .value{ font-size:18px; font-weight:bold; color:var(--wood-dark); }
+.recap-score{
+  font-size:15px;
+  background:#eaf3df;
+  border:1px solid #8fb96a;
+  border-radius:14px;
+  padding:12px 14px;
+  margin-top:10px;
+  color:var(--vine-green-dark);
+  font-weight:bold;
+}
+
+/* ---------- 結果雷達頁 ---------- */
+.results-card{ text-align:center; }
+#radarCanvas{ max-width:100%; margin:0 auto; display:block; }
+.radar-hint{ font-size:12.5px; color:var(--text-soft); margin-top:2px; }
+.score-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:20px 0 6px;
+  text-align:left;
+}
+.score-item{
+  background:var(--kraft-bg2);
+  border:1px solid var(--kraft-border-light);
+  border-radius:14px;
+  padding:12px 14px;
+}
+.score-item .label{ font-size:12.5px; color:var(--text-soft); }
+.score-item .value{ font-size:22px; font-weight:bold; color:var(--wood-dark); }
+
+/* ---------- 結果專區 ---------- */
+.history-item{
+  background:var(--kraft-bg2);
+  border:1px solid var(--kraft-border-light);
+  border-radius:14px;
+  padding:12px 16px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.history-item .hi-date{ font-size:12px; color:var(--text-soft); }
+.history-item .hi-scores{ font-size:13px; color:var(--text-mid); }
+.empty-state{
+  text-align:center;
+  color:var(--text-soft);
+  padding:26px 10px;
+}
+
+/* ---------- 各關詳細結果卡片 ---------- */
+.detail-card{
+  background:var(--kraft-bg2);
+  border:1px solid var(--kraft-border-light);
+  border-radius:16px;
+  padding:16px 18px;
+  margin-bottom:14px;
+  text-align:left;
+}
+.detail-card h3{ margin:0 0 10px; color:var(--wood-dark); font-size:16px; }
+.detail-stats-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:10px;
+}
+.detail-stat{
+  background:#fffaf0;
+  border:1px solid var(--kraft-border-light);
+  border-radius:10px;
+  padding:8px 10px;
+}
+.detail-stat .label{ font-size:11.5px; color:var(--text-soft); }
+.detail-stat .value{ font-size:16px; font-weight:bold; color:var(--wood-dark); }
+.detail-note{ font-size:13px; color:var(--text-mid); line-height:1.8; }
+.detail-list-box{ font-size:13px; color:var(--text-mid); margin-top:8px; }
+.detail-list-box ul{ margin:6px 0 0 18px; padding:0; }
+.detail-list-box li{ margin-bottom:4px; }
+.ability-mini-card{
+  background:#eaf3df; border:1px solid #8fb96a; border-radius:12px;
+  padding:10px 12px; margin:8px 0; font-size:13px; color:var(--vine-green-dark); line-height:1.6;
+}
+.tag-row{ display:flex; gap:8px; flex-wrap:wrap; margin:4px 0; }
+.tag-mini{ display:inline-block; padding:3px 10px; border-radius:10px; font-size:11.5px; font-weight:bold; }
+.tier-good-mini{ background:var(--tier-good-bg); color:var(--tier-good); }
+.tier-mid-mini{ background:var(--tier-mid-bg); color:var(--tier-mid); }
+.tier-low-mini{ background:var(--tier-low-bg); color:var(--tier-low); }
+.suggestion-mini{ font-size:13px; color:var(--text-mid); background:#fffaf0; border:1px solid var(--kraft-border-light); border-radius:12px; padding:10px 12px; margin-top:8px; line-height:1.7; }
+.mini-q-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+.mini-q{ font-size:11.5px; padding:3px 8px; border-radius:8px; background:#fffaf0; border:1px solid var(--kraft-border-light); }
+.mini-q.ok{ color:var(--tier-good); }
+.mini-q.bad{ color:var(--tier-low); }
+
+@media (max-width:600px){
+  .site-header{ padding:10px 14px; }
+  .logo-text{ font-size:15px; }
+  .crate-card{ padding:20px 16px; }
+  .recap-stats, .score-list{ grid-template-columns:1fr; }
+}
+
+/* =========================================================
+   第一關：水果守衛
+   ========================================================= */
+.l1-fruit-stage{
+  width:220px; height:220px;
+  margin:0 auto 10px auto;
+  border-radius:50%;
+  background:var(--kraft-bg2);
+  border:4px solid var(--kraft-border-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:100px;
+  cursor:pointer; user-select:none;
+  transition:background .15s ease, border-color .15s ease, transform .1s ease;
+}
+.l1-fruit-stage.empty{ font-size:18px; color:var(--text-soft); }
+.l1-fruit-stage.flash-correct{ background:var(--tier-good-bg); border-color:var(--vine-green-light); transform:scale(1.05); }
+.l1-fruit-stage.flash-wrong{ background:var(--tier-low-bg); border-color:var(--accent-red); transform:scale(.95); }
+.l1-fruit-stage.flash-miss{ background:var(--tier-mid-bg); border-color:var(--accent-gold); }
+
+/* =========================================================
+   第二關：水果搜尋
+   ========================================================= */
+.l2-fruit-grid{
+  display:grid; gap:6px;
+  justify-content:center;
+  margin:0 auto 16px auto;
+  max-width:100%;
+}
+.l2-fruit-cell{
+  display:flex; align-items:center; justify-content:center;
+  background:#fffaf0;
+  border:2px solid var(--kraft-border-light);
+  border-radius:12px;
+  aspect-ratio:1/1;
+  width:100%; min-width:32px;
+  font-size:clamp(1.1rem, 4.6vw, 1.9rem);
+  cursor:pointer; user-select:none;
+  transition:transform .15s ease, background .2s ease, opacity .3s ease;
+}
+.l2-fruit-cell:hover{ transform:scale(1.08); background:var(--kraft-bg2); }
+.l2-fruit-cell.correct{ animation:l2PopSuccess .4s ease forwards; pointer-events:none; }
+@keyframes l2PopSuccess{
+  0%{ transform:scale(1); background:var(--tier-good-bg); }
+  50%{ transform:scale(1.35); background:#b6ffb9; }
+  100%{ transform:scale(.2); opacity:0; background:#b6ffb9; }
+}
+.l2-fruit-cell.wrong{ animation:l2ShakeWrong .35s ease; background:var(--tier-low-bg) !important; border-color:var(--accent-red) !important; }
+@keyframes l2ShakeWrong{
+  0%{ transform:translateX(0); } 25%{ transform:translateX(-5px); } 50%{ transform:translateX(5px); } 75%{ transform:translateX(-5px); } 100%{ transform:translateX(0); }
+}
+.l2-fruit-cell.found{ visibility:hidden; }
+.l2-level-overlay{
+  position:absolute; inset:0;
+  background:rgba(253,243,221,0.97);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  z-index:10; border-radius:16px;
+}
+.l2-level-overlay h2{ font-size:1.6rem; color:var(--vine-green-dark); animation:l2BounceIn .5s ease; }
+@keyframes l2BounceIn{ 0%{transform:scale(.4);opacity:0;} 60%{transform:scale(1.15);opacity:1;} 100%{transform:scale(1);} }
+
+/* =========================================================
+   第三關：水果規則變換
+   ========================================================= */
+.l3-overlay{
+  position:absolute; inset:0;
+  background:rgba(253,243,221,0.96);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:20px; border-radius:0 0 12px 12px;
+}
+
+/* =========================================================
+   第四關：水果記憶鏈
+   ========================================================= */
+.l4-vine-track{
+  width:100%; height:16px;
+  background:#e2cfa0;
+  border-radius:10px;
+  border:2px solid var(--kraft-border-light);
+  overflow:hidden;
+  margin-bottom:14px;
+  position:relative;
+}
+.l4-vine-fill{
+  height:100%; width:100%;
+  background:linear-gradient(90deg, var(--vine-green-light), var(--vine-green));
+  border-radius:10px 0 0 10px;
+  transition:width 1s linear;
+  position:relative;
+}
+.l4-vine-fill::after{
+  content:'🌿'; position:absolute; right:-12px; top:50%;
+  transform:translateY(-50%); font-size:18px;
+  filter:drop-shadow(0 1px 1px rgba(0,0,0,.3));
+}
+.l4-stage-area{
+  min-height:180px;
+  border:3px solid var(--kraft-border-light);
+  border-radius:14px;
+  background:repeating-linear-gradient(180deg, #fff8e8 0px, #fff8e8 34px, #fdefd0 34px, #fdefd0 37px);
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  margin-bottom:18px; padding:8px;
+}
+.l4-memorize-area{
+  display:flex; flex-wrap:nowrap; align-items:center; justify-content:center;
+  gap:8px; width:100%; padding:6px;
+}
+.l4-memorize-area span{ animation:l4PopIn .35s ease; flex-shrink:0; line-height:1; filter:drop-shadow(0 3px 2px rgba(0,0,0,.25)); }
+@keyframes l4PopIn{ from{transform:scale(.3);opacity:0;} to{transform:scale(1);opacity:1;} }
+.l4-answer-area{ width:100%; display:flex; flex-direction:column; align-items:center; gap:16px; padding:14px 8px; }
+.l4-slots{ display:flex; flex-wrap:nowrap; gap:6px; justify-content:center; max-width:100%; }
+.l4-slot{
+  width:44px; height:44px; flex-shrink:0;
+  border:2px solid var(--kraft-border-light); border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; background:#fffaf0; transition:transform .15s;
+}
+.l4-slot.filled{ border-color:var(--wood-mid); background:#fff1d6; transform:scale(1.05); }
+.l4-fruit-buttons{ display:flex; gap:16px; }
+.l4-fruit-btn{
+  font-size:38px; background:#fffaf0;
+  border:2px solid var(--kraft-border-light); border-radius:14px;
+  width:68px; height:68px; cursor:pointer;
+  transition:transform .1s, border-color .2s;
+}
+.l4-fruit-btn:hover:not(:disabled){ border-color:var(--wood-mid); transform:translateY(-2px); }
+.l4-fruit-btn:active:not(:disabled){ transform:scale(.92); }
+.l4-fruit-btn:disabled{ opacity:.4; cursor:not-allowed; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-area" onclick="App.goHome()">
+    <svg class="logo-svg" viewBox="0 0 100 100" width="42" height="42" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#c9974f" stroke-width="3" stroke-dasharray="6 5"/>
+      <circle cx="50" cy="50" r="36" fill="#3f7a2a" stroke="#2f5c1f" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="23" fill="#fdf3dd"/>
+      <path d="M50 39 C58 39 64.5 46 62.5 55 C60.5 64.5 56 70 50 70 C44 70 39.5 64.5 37.5 55 C35.5 46 42 39 50 39 Z" fill="#c0392b" stroke="#8f2418" stroke-width="1"/>
+      <path d="M41.5 39 L50 30 L58.5 39 Z" fill="#3f7a2a"/>
+      <circle cx="44.5" cy="49" r="1.5" fill="#fdf3dd"/>
+      <circle cx="55.5" cy="49" r="1.5" fill="#fdf3dd"/>
+      <circle cx="50" cy="57" r="1.5" fill="#fdf3dd"/>
+      <circle cx="44.5" cy="60.5" r="1.3" fill="#fdf3dd"/>
+      <circle cx="55.5" cy="60.5" r="1.3" fill="#fdf3dd"/>
+    </svg>
+    <span class="logo-text">專注力分析與改善系統<small>Focus Fruit Lab</small></span>
+  </div>
+  <nav class="site-nav">
+    <a id="nav-about" onclick="App.showPage('about')">網站設立動機</a>
+    <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
+    <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ 首頁 ============ -->
+  <section id="page-home" class="page active">
+    <div class="home-fruit-bg" aria-hidden="true">
+      <span style="top:6%;left:6%;font-size:46px;transform:rotate(-12deg);">🍓</span>
+      <span style="top:14%;right:9%;font-size:38px;transform:rotate(10deg);">🍌</span>
+      <span style="top:38%;left:2%;font-size:34px;transform:rotate(8deg);">🍇</span>
+      <span style="top:60%;right:4%;font-size:44px;transform:rotate(-6deg);">🍊</span>
+      <span style="top:78%;left:10%;font-size:36px;transform:rotate(14deg);">🍉</span>
+      <span style="top:8%;left:42%;font-size:26px;transform:rotate(-4deg);">🍒</span>
+      <span style="top:88%;right:16%;font-size:30px;transform:rotate(-10deg);">🥝</span>
+      <span style="top:48%;right:22%;font-size:24px;transform:rotate(16deg);">🍍</span>
+      <span style="top:24%;right:28%;font-size:22px;transform:rotate(-18deg);">🍎</span>
+    </div>
+
+    <div class="crate-card">
+      <h1>🍓 智慧型專注力分析與改善系統</h1>
+      <div class="home-sub">遊戲化專注力評估平台</div>
+      <div class="fruit-row-decor">🍓🍌🍇🍊🍉</div>
+      <div class="home-lead-box">
+        <p>歡迎進入「智慧型專注力分析與改善系統」！本遊戲透過四個水果主題關卡，測驗你的注意力穩定度、抗干擾能力、反應控制能力與記憶負荷能力。你只需依照每關指示完成辨識、搜尋、規則切換與記憶重現等任務，系統將分析你的表現並以雷達圖呈現專注力特徵，提供個人化的專注改善建議。</p>
+      </div>
+    </div>
+
+    <div class="home-cta">
+      <button class="btn-primary btn-cta" onclick="App.goToQuizEntry()">🍓 開始測驗</button>
+    </div>
+  </section>
+
+  <!-- ============ 網站設立動機 ============ -->
+  <section id="page-about" class="page">
+    <div class="crate-card">
+      <h2>💡 網站設立動機</h2>
+      <p>在現代資訊快速發展的社會中，人們長時間處於多工處理與高資訊量的環境，使注意力容易受到外界刺激影響，進而造成學習效率下降、工作表現降低等問題。然而，專注力變化往往逐漸累積，大眾難以及時察覺自身注意力狀態，也缺乏簡易且客觀的方法了解自身專注能力與改善方向。</p>
+      <p>因此，本專案致力於開發一套智慧型專注力分析與改善系統，提供使用者一個遊戲化自主評估平台，分析使用者於不同認知任務中的表現，協助使用者了解自身專注力特徵，並提供改善建議。</p>
+      <p>本系統以水果為主題設計四項遊戲化測驗，分別評估不同面向的專注能力。「水果守衛」透過目標辨識任務，分析使用者的注意力穩定度；「水果搜尋」加入干擾元素，評估使用者的抗干擾能力；「水果規則變換」透過任務規則改變，分析使用者的反應控制能力；「水果記憶鏈」則藉由資訊記憶與順序重現，評估使用者的記憶負荷能力。</p>
+      <p>系統將四項測驗結果整合分析，並以雷達圖呈現使用者於不同能力面向的表現，使使用者能更直觀了解自身專注力特徵與優勢。此外，系統也會提供環境調整、時間管理與專注訓練等改善建議與幫助，協助使用者提升專注能力。</p>
+      <p>本專案強調，本系統並非用於醫療診斷，而是作為個人專注力管理工具，協助使用者建立自我覺察能力，並提供自我提升之參考依據。</p>
+    </div>
+  </section>
+
+  <!-- ============ 測驗說明入口 ============ -->
+  <section id="page-quiz-entry" class="page">
+    <div class="crate-card">
+      <h2>🎮 測驗說明</h2>
+      <p>本測驗共四個關卡，將依序進行、中途不會停止，每一關結束後會先顯示你在該關的表現，接著自動進入下一關：</p>
+      <div class="home-lead-box" style="text-align:left;">
+        <p>① <b>水果守衛</b>：目標辨識任務，評估注意力穩定度<br>
+        ② <b>水果搜尋</b>：加入干擾元素，評估抗干擾能力<br>
+        ③ <b>水果規則變換</b>：規則悄悄改變，評估反應控制能力<br>
+        ④ <b>水果記憶鏈</b>：記住並重現水果順序，評估記憶負荷能力</p>
+      </div>
+      <p>完成四關後，系統會將你的表現整理成雷達圖，並提供改善建議。開始之前，請先告訴我們你的暱稱與年齡：</p>
+      <div class="player-form">
+        <label>暱稱<input type="text" id="playerNameInput" maxlength="20" placeholder="例如：小水果"></label>
+        <label>年齡<input type="number" id="playerAgeInput" min="1" max="120" placeholder="例如：18"></label>
+      </div>
+      <div id="playerFormError" class="player-form-error"></div>
+      <div style="text-align:center;font-size:11.5px;color:var(--text-soft);margin-bottom:6px;">你的暱稱、年齡與測驗結果將被記錄，作為本系統的測驗資料。</div>
+      <p>準備好了嗎？遊戲中隨時可按 <b>Enter</b> 鍵快速確認 / 進入下一關卡。</p>
+      <div class="btn-row"><button class="btn-primary" onclick="App.startQuizFlow()">開始遊戲</button></div>
+    </div>
+  </section>
+
+  <!-- ============ 測驗（四關） ============ -->
+  <section id="page-quiz" class="page">
+    <div class="quiz-progress">
+      <div class="dot" id="dot-1">1</div>
+      <div class="dot" id="dot-2">2</div>
+      <div class="dot" id="dot-3">3</div>
+      <div class="dot" id="dot-4">4</div>
+    </div>
+
+    <!-- 各關卡容器將於後續段落插入 -->
+    <div id="level1-container" class="level-container">
+      <div class="crate-card" id="l1-instructions">
+        <h2 style="text-align:center;">🍓 第一關：水果守衛</h2>
+        <div class="home-sub">注意力訓練・選擇性反應</div>
+        <div class="home-lead-box">
+          <p><span style="font-size:34px;">🍓</span> 看到「草莓」→ <b>立即點擊</b><span class="tag tag-click">要點擊</span></p>
+          <p><span style="font-size:34px;">🍌🍇🍊🍎🍉🍑</span> 其他水果 → <b>不要點擊</b><span class="tag tag-noclick">不要點</span></p>
+        </div>
+        <p>水果會一個一個隨機出現在圓圈中，請保持專注：</p>
+        <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，結束後會顯示你的表現</p>
+        <div class="btn-row"><button class="btn-primary" id="l1-start-btn" onclick="L1.start()">開始本關</button></div>
+      </div>
+
+      <div class="crate-card" id="l1-game-screen" style="display:none;">
+        <div style="display:flex;justify-content:space-between;font-weight:bold;color:var(--text-mid);margin-bottom:10px;">
+          <span>回合 <span id="l1-trial-counter">0</span> / <span id="l1-trial-total">30</span></span>
+          <span>得分 <span id="l1-score-counter">0</span></span>
+        </div>
+        <div style="width:100%;height:10px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:10px;overflow:hidden;margin-bottom:20px;">
+          <div id="l1-progress-fill" style="height:100%;background:linear-gradient(90deg,var(--vine-green-light),var(--vine-green));width:0%;transition:width .2s ease;"></div>
+        </div>
+        <div class="l1-fruit-stage" id="l1-fruit-stage">準備...</div>
+        <div id="l1-hint-text" style="color:var(--text-soft);font-size:13px;min-height:18px;text-align:center;margin-top:10px;">專注看著圈圈</div>
+      </div>
+    </div>
+    <div id="level2-container" class="level-container">
+      <div class="crate-card" id="l2-instructions">
+        <h2 style="text-align:center;">🔍 第二關：水果搜尋</h2>
+        <div class="home-sub">選擇性注意力訓練・抗干擾能力</div>
+        <div class="fruit-row-decor" style="font-size:26px;">🍎 🍌 🍊 🍇 <strong>🍓</strong> 🍉 🍒</div>
+        <div class="home-lead-box">
+          <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，難度會逐漸提升，請盡量又快又準地找出所有草莓！注意畫面中可能出現外觀相似的櫻桃 🍒，請仔細分辨。</p>
+        </div>
+        <div class="btn-row"><button class="btn-primary" id="l2-start-btn" onclick="L2.start()">開始本關</button></div>
+      </div>
+
+      <div class="crate-card" id="l2-game-screen" style="display:none; position:relative;">
+        <h3 id="l2-level-title" style="text-align:center;color:var(--wood-dark);margin-top:0;">Level 1</h3>
+        <div id="l2-info-bar" style="display:flex;flex-wrap:wrap;justify-content:space-around;gap:8px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:14px;padding:10px 8px;margin-bottom:14px;font-weight:bold;color:var(--wood-dark);">
+          <div>時間<span id="l2-timer-display" style="display:block;font-size:1.2rem;">0.0s</span></div>
+          <div>已找到<span id="l2-found-display" style="display:block;font-size:1.2rem;">0 / 0</span></div>
+          <div>錯誤點擊<span id="l2-wrong-display" style="display:block;font-size:1.2rem;">0</span></div>
+        </div>
+        <div id="l2-fruit-grid" class="l2-fruit-grid"></div>
+        <div class="btn-row"><button class="btn-secondary" id="l2-finish-btn">完成（結束本小關）</button></div>
+        <div id="l2-level-complete-overlay" class="l2-level-overlay" style="display:none;">
+          <h2>🎉 小關完成！</h2>
+          <p id="l2-level-summary"></p>
+        </div>
+      </div>
+    </div>
+    <div id="level3-container" class="level-container">
+      <div class="crate-card" id="l3-instructions">
+        <h2 style="text-align:center;">🔄 第三關：水果規則變換</h2>
+        <div class="home-sub">認知彈性測試・反應控制能力</div>
+        <div class="home-lead-box">
+          <p>畫面會不斷出現不同顏色（紅／黃）與形狀（圓／長）的水果。請依照畫面指示的規則，點擊「符合規則」的水果；不符合規則的水果請不要點擊。規則會在遊戲過程中悄悄改變，請保持專注！</p>
+        </div>
+        <div class="btn-row"><button class="btn-primary" id="l3-start-btn" onclick="L3.start()">開始本關</button></div>
+      </div>
+
+      <div class="crate-card" id="l3-game-screen" style="display:none;">
+        <div id="l3-info-bar" style="display:flex;justify-content:space-between;align-items:center;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:12px 12px 0 0;padding:10px 16px;font-size:14px;font-weight:bold;color:var(--wood-dark);">
+          <div>階段 <span id="l3-stage-num">-</span> / 3　規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
+          <div>剩餘時間：<span id="l3-time-left">--</span>s</div>
+        </div>
+        <div style="height:6px;width:100%;background:#e9ecef;"><div id="l3-timer-bar-inner" style="height:100%;width:100%;background:var(--vine-green);transition:width .1s linear;"></div></div>
+        <div style="position:relative;">
+          <canvas id="l3-canvas" width="800" height="420" style="display:block;width:100%;height:auto;background:#fffaf0;border:1px solid var(--kraft-border-light);border-top:none;border-radius:0 0 12px 12px;cursor:pointer;"></canvas>
+          <div id="l3-overlay" class="l3-overlay">
+            <h2 id="l3-overlay-title" style="color:var(--wood-dark);">認知彈性測試</h2>
+            <p id="l3-overlay-text" style="color:var(--text-mid);"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="level4-container" class="level-container">
+      <div class="crate-card" id="l4-instructions">
+        <h2 style="text-align:center;">🍎🍌🍇 第四關：水果記憶鏈</h2>
+        <div class="home-sub">工作記憶負荷測試</div>
+        <div class="home-lead-box">
+          <p>畫面會先出現一排水果，請記住它們的<b>種類與順序</b>。水果消失後，依序點擊按鈕重建正確序列。每題限時 10 秒作答，共 7 題，水果數量與記憶時間會逐題增加。</p>
+        </div>
+        <div class="btn-row"><button class="btn-primary" id="l4-start-btn" onclick="L4.start()">開始本關</button></div>
+      </div>
+
+      <div class="crate-card" id="l4-playing-area" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="font-weight:bold;color:var(--wood-dark);">第 <span id="l4-level-num">1</span> / 7 關</div>
+          <div id="l4-timer-num" style="font-weight:bold;color:var(--wood-dark);background:var(--kraft-bg2);padding:5px 14px;border-radius:20px;border:2px solid var(--kraft-border-light);transition:color .3s,background .3s,border-color .3s;">⏱ <span id="l4-time-left">10</span>s</div>
+        </div>
+        <div class="l4-vine-track"><div class="l4-vine-fill" id="l4-vine-fill"></div></div>
+        <div id="l4-phase-label" style="text-align:center;font-size:15px;color:var(--text-mid);font-weight:bold;margin-bottom:10px;min-height:22px;"></div>
+        <div class="l4-stage-area" id="l4-stage-area">
+          <div id="l4-memorize-area" class="l4-memorize-area"></div>
+          <div id="l4-answer-area" class="l4-answer-area" style="display:none;">
+            <div id="l4-slots" class="l4-slots"></div>
+            <div class="l4-fruit-buttons">
+              <button class="l4-fruit-btn" data-fruit="apple">🍎</button>
+              <button class="l4-fruit-btn" data-fruit="banana">🍌</button>
+              <button class="l4-fruit-btn" data-fruit="grape">🍇</button>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn-outline" id="l4-undo-btn" style="padding:8px 16px;font-size:14px;margin:0;">↩ 回退</button>
+              <button class="btn-outline" id="l4-clear-btn" style="padding:8px 16px;font-size:14px;margin:0;">🗑 清空</button>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;visibility:hidden;" id="l4-footer">
+          <button class="btn-primary" id="l4-next-btn" disabled>下一題 ▶</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 綜合結果／雷達圖 ============ -->
+  <section id="page-results" class="page">
+    <div class="crate-card results-card">
+      <div id="backToHistoryRow" style="display:none; justify-content:flex-start; margin-bottom:10px;">
+        <button class="btn-outline" style="margin:0;" onclick="App.showPage('results-zone')">◀ 返回結果專區</button>
+      </div>
+      <h2 style="text-align:center;">🏆 你的專注力雷達圖</h2>
+      <p style="text-align:center; margin-top:-6px;">四個關卡的表現已整合分析如下（滿分 100）</p>
+      <canvas id="radarCanvas" width="440" height="440" style="display:none;"></canvas>
+      <img id="radarImg" alt="專注力雷達圖" style="max-width:100%; width:440px; margin:0 auto; display:block; border-radius:12px; border:1px solid var(--kraft-border-light);">
+      <div class="radar-hint">💡 長按（手機）或右鍵（電腦）圖片即可保存到裝置，圖片已採高解析度輸出</div>
+      <div class="score-list" id="scoreListEl"></div>
+      <div id="overallAdviceBox" class="home-lead-box" style="text-align:left;"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="App.downloadRadar()">📥 長按 / 下載保存</button>
+        <button class="btn-primary" onclick="App.restartWholeQuiz()">🔄 再玩一次</button>
+        <button class="btn-outline" onclick="App.shareResult()">🔗 分享給朋友</button>
+      </div>
+      <h2 style="margin-top:26px;">📋 各關卡詳細結果</h2>
+      <div id="levelDetailsBox"></div>
+    </div>
+  </section>
+
+  <!-- ============ 結果專區 ============ -->
+  <section id="page-results-zone" class="page">
+    <div class="crate-card">
+      <h2>📊 結果專區</h2>
+      <p>這裡會保存你在此裝置、此瀏覽器上完成過的測驗紀錄。點選任一筆紀錄即可查看該次的雷達圖與詳細結果。</p>
+      <div id="historyList"></div>
+      <div class="btn-row"><button class="btn-primary" onclick="App.goToQuizEntry()">開始新的測驗</button></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ 關卡完成 recap 覆蓋層 ============ -->
+<div class="recap-overlay" id="recapOverlay">
+  <div class="recap-box">
+    <h2 id="recapTitle">關卡完成</h2>
+    <div class="recap-sub" id="recapSub"></div>
+    <div class="recap-stats" id="recapStats"></div>
+    <div class="recap-score" id="recapScore"></div>
+    <button class="btn-primary" id="recapContinueBtn">繼續下一關</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   App：共用控制器 — 頁面切換、關卡串接、雷達圖、結果保存
+   ========================================================================= */
+const App = (function(){
+
+  const DIM_META = {
+    1: { name:'水果守衛',       dim:'注意力穩定度', short:'穩定度' },
+    2: { name:'水果搜尋',       dim:'抗干擾能力',   short:'抗干擾' },
+    3: { name:'水果規則變換',   dim:'反應控制能力', short:'反應控制' },
+    4: { name:'水果記憶鏈',     dim:'記憶負荷能力', short:'記憶負荷' }
+  };
+
+  let scores = {1:null, 2:null, 3:null, 4:null};
+  let levelDetails = {1:null, 2:null, 3:null, 4:null};
+  let playerInfo = { name:'', age:'' };
+  let pendingContinue = null;
+  let viewingHistoryIndex = null; // 目前結果專區正在檢視的紀錄索引（null = 檢視本次剛完成的結果）
+
+  const levelContainers = {
+    1: document.getElementById('level1-container'),
+    2: document.getElementById('level2-container'),
+    3: document.getElementById('level3-container'),
+    4: document.getElementById('level4-container')
+  };
+
+  /* ---------------- 頁面切換 ---------------- */
+  function showPage(name){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + name);
+    if (target) target.classList.add('active');
+
+    document.querySelectorAll('.site-nav a').forEach(a => a.classList.remove('active'));
+    if (name === 'about') document.getElementById('nav-about').classList.add('active');
+    if (name === 'results-zone'){
+      document.getElementById('nav-results').classList.add('active');
+      renderHistory();
+    }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function goHome(){ showPage('home'); }
+  function goToQuizEntry(){ showPage('quiz-entry'); }
+
+  /* ---------------- 測驗流程串接 ---------------- */
+  function setActiveLevelContainer(levelNum){
+    Object.keys(levelContainers).forEach(k => levelContainers[k].classList.remove('active'));
+    levelContainers[levelNum].classList.add('active');
+    for (let i=1;i<=4;i++){
+      const dot = document.getElementById('dot-' + i);
+      dot.classList.remove('current','done');
+      if (i < levelNum) dot.classList.add('done');
+      if (i === levelNum) dot.classList.add('current');
+    }
+  }
+
+  function startQuizFlow(){
+    const nameInput = document.getElementById('playerNameInput');
+    const ageInput = document.getElementById('playerAgeInput');
+    const errEl = document.getElementById('playerFormError');
+    const name = nameInput.value.trim();
+    const age = ageInput.value.trim();
+
+    if (!name || !age){
+      errEl.textContent = '請先填寫暱稱與年齡，才能開始測驗喔！';
+      return;
+    }
+    if (Number(age) <= 0 || Number(age) > 120){
+      errEl.textContent = '請輸入有效的年齡。';
+      return;
+    }
+    errEl.textContent = '';
+    playerInfo = { name, age };
+
+    scores = {1:null, 2:null, 3:null, 4:null};
+    levelDetails = {1:null, 2:null, 3:null, 4:null};
+    showPage('quiz');
+    setActiveLevelContainer(1);
+  }
+
+  // 每一關結束時呼叫：顯示 recap 覆蓋層、記錄分數與完整詳細數據
+  function levelComplete(levelNum, statsArr, score, detail, nextAction){
+    scores[levelNum] = Math.round(score);
+    levelDetails[levelNum] = detail || null;
+    const meta = DIM_META[levelNum];
+
+    document.getElementById('recapTitle').textContent = `✅ 第 ${levelNum} 關完成：${meta.name}`;
+    document.getElementById('recapSub').textContent = `本關評估面向：${meta.dim}`;
+
+    const statsHtml = statsArr.map(s => `
+      <div class="recap-stat"><div class="label">${s.label}</div><div class="value">${s.value}</div></div>
+    `).join('');
+    document.getElementById('recapStats').innerHTML = statsHtml;
+    document.getElementById('recapScore').textContent = `${meta.dim} 分數：${Math.round(score)} / 100`;
+
+    const btn = document.getElementById('recapContinueBtn');
+    btn.textContent = (levelNum < 4) ? '繼續下一關 ▶（按 Enter）' : '查看綜合結果 🏆（按 Enter）';
+    pendingContinue = nextAction;
+
+    document.getElementById('recapOverlay').classList.add('show');
+  }
+
+  function continueFromRecap(){
+    document.getElementById('recapOverlay').classList.remove('show');
+    if (typeof pendingContinue === 'function'){
+      const fn = pendingContinue;
+      pendingContinue = null;
+      fn();
+    }
+  }
+  document.getElementById('recapContinueBtn').addEventListener('click', continueFromRecap);
+
+  function goToLevel(levelNum){
+    setActiveLevelContainer(levelNum);
+  }
+
+  /* ---------------- 綜合結果 ---------------- */
+  function finishQuiz(){
+    viewingHistoryIndex = null;
+    showPage('results');
+    document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
+    document.getElementById('backToHistoryRow').style.display = 'none';
+    renderScoreList('scoreListEl', scores);
+    drawRadarInto('radarCanvas', 'radarImg', scores);
+    renderAdvice('overallAdviceBox', scores);
+    renderLevelDetailsInto('levelDetailsBox', levelDetails);
+    saveHistory();
+  }
+
+  function renderScoreList(elId, sc){
+    const el = document.getElementById(elId);
+    el.innerHTML = [1,2,3,4].map(i => `
+      <div class="score-item">
+        <div class="label">${DIM_META[i].dim}（${DIM_META[i].name}）</div>
+        <div class="value">${sc[i] ?? 0} 分</div>
+      </div>
+    `).join('');
+  }
+
+  function renderAdvice(elId, sc){
+    const entries = [1,2,3,4].map(i => ({i, score: sc[i] ?? 0}));
+    entries.sort((a,b) => a.score - b.score);
+    const weakest = entries[0];
+    const strongest = entries[entries.length-1];
+
+    const tips = {
+      1: '建議減少同時開啟的通知與分頁，練習「番茄鐘」等定時專注法，逐步拉長單一任務的持續時間。',
+      2: '建議整理實體與數位工作環境，移除不必要的干擾物，並可搭配白噪音或降噪耳機降低外界刺激。',
+      3: '建議在切換任務前，先寫下待辦清單並排定優先順序，減少臨時切換造成的反應延遲。',
+      4: '建議將複雜資訊拆解成小區塊（Chunking），並搭配重複覆誦或筆記輔助工作記憶。'
+    };
+
+    const html = `
+      <p><b>整體來看</b>，在「${DIM_META[strongest.i].dim}」的表現最突出（${strongest.score} 分），在「${DIM_META[weakest.i].dim}」則相對較弱（${weakest.score} 分）。</p>
+      <p><b>改善建議：</b>${tips[weakest.i]}</p>
+      <p>此外，規律的作息、充足睡眠與適度的環境調整（如減少多工、安排專注時段）都有助於整體專注力的提升。本系統僅作為個人專注力管理與自我覺察的參考工具，並非醫療診斷。</p>
+    `;
+    document.getElementById(elId).innerHTML = html;
+  }
+
+  /* ---------------- 各關詳細結果（盡量保留原始檔案的呈現內容） ---------------- */
+  function statBox(label, value){
+    return `<div class="detail-stat"><div class="label">${label}</div><div class="value">${value}</div></div>`;
+  }
+  function tagClass(tier){
+    if (tier === 'good') return 'tier-good-mini';
+    if (tier === 'mid') return 'tier-mid-mini';
+    return 'tier-low-mini';
+  }
+
+  function renderLevelDetail(levelNum, d){
+    if (!d) return `<div class="detail-card"><h3>第 ${levelNum} 關</h3><p>尚未完成此關卡。</p></div>`;
+
+    if (levelNum === 1){
+      return `<div class="detail-card">
+        <h3>🍓 水果守衛 - 詳細結果</h3>
+        <div class="detail-stats-grid">
+          ${statBox('漏按率 (Miss Rate)', d.missRate.toFixed(1)+'%')}
+          ${statBox('誤點率 (False Alarm)', d.faRate.toFixed(1)+'%')}
+          ${statBox('平均反應時間', d.avgRT ? Math.round(d.avgRT)+' ms' : '無資料')}
+          ${statBox('反應時間標準差', d.stdRT ? Math.round(d.stdRT)+' ms' : '無資料')}
+        </div>
+        <div class="detail-note">草莓總數：<b>${d.totalTargets}</b>　成功點擊：<b>${d.hits}</b>　漏按：<b>${d.misses}</b><br>
+        其他水果總數：<b>${d.totalNonTargets}</b>　誤點：<b>${d.falseAlarms}</b>　正確忽略：<b>${d.correctRejections}</b></div>
+      </div>`;
+    }
+
+    if (levelNum === 2){
+      const levelTimesHtml = (d.levelTimes||[]).map(lt => `<li>${lt.name}：${lt.time.toFixed(1)} 秒</li>`).join('');
+      const analysisHtml = (d.analysis||[]).map(a => `<li>${a}</li>`).join('');
+      return `<div class="detail-card">
+        <h3>🔍 水果搜尋 - 詳細結果</h3>
+        <div class="detail-stats-grid">
+          ${statBox('總搜尋時間', d.totalSearchTime.toFixed(1)+' 秒')}
+          ${statBox('正確率', d.accuracy.toFixed(1)+'%')}
+          ${statBox('錯誤率', d.errorRate.toFixed(1)+'%')}
+          ${statBox('干擾誤判率(🍒→🍓)', d.cherryConfusionRate.toFixed(1)+'%')}
+          ${statBox('漏掉草莓數量', d.totalMissed+' 個')}
+          ${statBox('平均搜尋速度', d.avgSpeed.toFixed(2)+' 個/秒')}
+        </div>
+        <div class="detail-list-box"><b>各小關搜尋時間：</b><ul>${levelTimesHtml}</ul></div>
+        <div class="detail-list-box"><b>能力分析：</b><ul>${analysisHtml}</ul></div>
+      </div>`;
+    }
+
+    if (levelNum === 3){
+      return `<div class="detail-card">
+        <h3>🔄 水果規則變換 - 詳細結果</h3>
+        <div class="detail-stats-grid">
+          ${statBox('總嘗試次數', d.totalTrials)}
+          ${statBox('準確率 (Accuracy)', d.accuracy+'%')}
+          ${statBox('持續性錯誤次數', d.perseverativeErrors)}
+          ${statBox('平均切換代價 (Switch Cost)', d.totalSwitchCost+' ms')}
+        </div>
+        <div class="detail-note">階段1 平均反應時間：<b>${d.stageAvgRT[0] ?? 'N/A'}${d.stageAvgRT[0]!=null?' ms':''}</b>　
+        階段2：<b>${d.stageAvgRT[1] ?? 'N/A'}${d.stageAvgRT[1]!=null?' ms':''}</b>　
+        階段3：<b>${d.stageAvgRT[2] ?? 'N/A'}${d.stageAvgRT[2]!=null?' ms':''}</b></div>
+      </div>`;
+    }
+
+    // levelNum === 4
+    const reviewHtml = (d.results||[]).map((r,idx) => `<span class="mini-q ${r.fullyCorrect?'ok':'bad'}">第${idx+1}題 ${r.fullyCorrect?'✅':'❌'}(${r.correct}/${r.n})</span>`).join(' ');
+    return `<div class="detail-card">
+      <h3>🍎🍌🍇 水果記憶鏈 - 詳細結果</h3>
+      <div class="detail-stats-grid">
+        ${statBox('總分', d.totalScore+' / '+d.totalMax)}
+        ${statBox('最大記憶長度', d.maxMemory)}
+        ${statBox('正確率', d.accuracy.toFixed(1)+'%')}
+        ${statBox('平均反應時間', d.avgReaction.toFixed(2)+' 秒')}
+      </div>
+      <div class="ability-mini-card"><b>記憶廣度評估：${d.abilityTier}</b><br>${d.abilityDesc}</div>
+      <div class="tag-row">
+        <span class="tag-mini ${tagClass(d.accuracyTag.cls)}">${d.accuracyTag.label}</span>
+        <span class="tag-mini ${tagClass(d.reactionTag.cls)}">${d.reactionTag.label}</span>
+      </div>
+      <div class="suggestion-mini">📋 ${d.suggestionText}</div>
+      <div class="detail-list-box"><b>逐題結果：</b><div class="mini-q-row">${reviewHtml}</div></div>
+    </div>`;
+  }
+
+  function renderLevelDetailsInto(containerId, details){
+    const el = document.getElementById(containerId);
+    el.innerHTML = [1,2,3,4].map(i => renderLevelDetail(i, details[i])).join('');
+  }
+
+  /* ---------------- 雷達圖繪製（高解析度，長按/下載更清晰） ---------------- */
+  function drawRadarInto(canvasId, imgId, sc){
+    const SCALE = 3; // 以 3 倍像素密度繪製，匯出圖片更清晰銳利
+    const canvas = document.getElementById(canvasId);
+    const baseSize = 440;
+    canvas.width = baseSize * SCALE;
+    canvas.height = baseSize * SCALE;
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.scale(SCALE, SCALE);
+
+    const W = baseSize, H = baseSize;
+    const cx = W/2, cy = H/2 + 6;
+    const R = Math.min(W,H)/2 - 70;
+    const labels = [1,2,3,4].map(i => DIM_META[i].short);
+    const values = [1,2,3,4].map(i => sc[i] ?? 0);
+    const N = 4;
+
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#fdf3dd';
+    ctx.fillRect(0,0,W,H);
+
+    const rings = 4;
+    for (let r=1;r<=rings;r++){
+      const rad = R * (r/rings);
+      ctx.beginPath();
+      for (let k=0;k<=N;k++){
+        const angle = -Math.PI/2 + k*(2*Math.PI/N);
+        const x = cx + rad*Math.cos(angle);
+        const y = cy + rad*Math.sin(angle);
+        if (k===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle = 'rgba(122,74,36,0.25)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    ctx.font = 'bold 15px "Microsoft JhengHei","PingFang TC",sans-serif';
+    ctx.fillStyle = '#5c3a1e';
+    for (let k=0;k<N;k++){
+      const angle = -Math.PI/2 + k*(2*Math.PI/N);
+      const x = cx + R*Math.cos(angle);
+      const y = cy + R*Math.sin(angle);
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(x,y);
+      ctx.strokeStyle = 'rgba(122,74,36,0.35)';
+      ctx.stroke();
+
+      const lx = cx + (R+34)*Math.cos(angle);
+      const ly = cy + (R+34)*Math.sin(angle);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(labels[k], lx, ly);
+      ctx.font = '11px "Microsoft JhengHei","PingFang TC",sans-serif';
+      ctx.fillStyle = '#a9713f';
+      ctx.fillText(values[k] + ' 分', lx, ly + 16);
+      ctx.font = 'bold 15px "Microsoft JhengHei","PingFang TC",sans-serif';
+      ctx.fillStyle = '#5c3a1e';
+    }
+
+    ctx.beginPath();
+    for (let k=0;k<N;k++){
+      const angle = -Math.PI/2 + k*(2*Math.PI/N);
+      const rad = R * (Math.max(0,Math.min(100,values[k]))/100);
+      const x = cx + rad*Math.cos(angle);
+      const y = cy + rad*Math.sin(angle);
+      if (k===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(63,122,42,0.35)';
+    ctx.fill();
+    ctx.strokeStyle = '#3f7a2a';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    for (let k=0;k<N;k++){
+      const angle = -Math.PI/2 + k*(2*Math.PI/N);
+      const rad = R * (Math.max(0,Math.min(100,values[k]))/100);
+      const x = cx + rad*Math.cos(angle);
+      const y = cy + rad*Math.sin(angle);
+      ctx.beginPath();
+      ctx.arc(x,y,4,0,Math.PI*2);
+      ctx.fillStyle = '#2f5c1f';
+      ctx.fill();
+    }
+
+    ctx.restore();
+    document.getElementById(imgId).src = canvas.toDataURL('image/png');
+  }
+
+  function downloadRadar(){
+    const img = document.getElementById('radarImg');
+    const a = document.createElement('a');
+    a.href = img.src;
+    a.download = 'focus-radar-' + Date.now() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function shareResult(){
+    const text = `我剛完成了「智慧型專注力分析與改善系統」測驗！\n注意力穩定度：${scores[1]} 分\n抗干擾能力：${scores[2]} 分\n反應控制能力：${scores[3]} 分\n記憶負荷能力：${scores[4]} 分\n一起來測測你的專注力吧！`;
+    if (navigator.share){
+      navigator.share({ title:'智慧型專注力分析與改善系統', text }).catch(()=>{});
+    } else if (navigator.clipboard){
+      navigator.clipboard.writeText(text).then(()=>{
+        alert('結果文字已複製，貼給朋友分享吧！');
+      }).catch(()=>{ alert(text); });
+    } else {
+      alert(text);
+    }
+  }
+
+  function restartWholeQuiz(){
+    goToQuizEntry();
+  }
+
+  /* ---------------- 結果專區（localStorage，僅保存在使用者自己的裝置／瀏覽器） ---------------- */
+  const HISTORY_KEY = 'focusLabHistory';
+
+  // ★ 設定完 Google Apps Script 後，把「網頁應用程式」網址貼在這裡（雙引號中間），
+  //    例如："https://script.google.com/macros/s/AKfycb.../exec"
+  //    留空字串 "" 代表不啟用雲端同步，資料只會存在使用者自己的裝置上。
+  const SHEET_WEBHOOK_URL = "";
+
+  function sendToSheet(record){
+    if (!SHEET_WEBHOOK_URL) return; // 尚未設定後台網址，略過雲端同步
+    try{
+      // 注意：刻意不設定 headers（讓瀏覽器預設用 text/plain），
+      // 可避免觸發 CORS 預檢請求，讓 Apps Script 網頁應用程式能順利接收。
+      fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify(record)
+      }).catch(()=>{ /* 網路異常時靜默略過，不影響使用者體驗 */ });
+    }catch(e){ /* 靜默略過 */ }
+  }
+
+  function saveHistory(){
+    const record = {
+      timestamp: Date.now(),
+      player: {...playerInfo},
+      scores: {...scores},
+      levelDetails: JSON.parse(JSON.stringify(levelDetails))
+    };
+    try{
+      const list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      list.push(record);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(-30)));
+    }catch(e){ /* localStorage 不可用時靜默略過 */ }
+
+    sendToSheet(record); // 同步一份到 Google 試算表（若已設定後台網址）
+  }
+
+  function renderHistory(){
+    const el = document.getElementById('historyList');
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){}
+
+    if (!list.length){
+      el.innerHTML = '<div class="empty-state">目前還沒有測驗紀錄，快去完成一次測驗吧！🍓</div>';
+      return;
+    }
+
+    el.innerHTML = list.slice().reverse().map((r, revIdx) => {
+      const idx = list.length - 1 - revIdx; // 還原成原始陣列索引
+      const d = new Date(r.timestamp);
+      const dateStr = d.toLocaleString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      const who = r.player ? `${r.player.name}（${r.player.age} 歲）` : '匿名玩家';
+      return `<div class="history-item" onclick="App.viewHistoryDetail(${idx})" style="cursor:pointer;">
+        <div>
+          <div class="hi-date">${dateStr}　<b>${who}</b></div>
+          <div class="hi-scores">穩定度 ${r.scores[1]} ・ 抗干擾 ${r.scores[2]} ・ 反應控制 ${r.scores[3]} ・ 記憶負荷 ${r.scores[4]}</div>
+        </div>
+        <div class="btn-outline" style="margin:0;padding:8px 16px;font-size:13px;">查看詳細結果 ▶</div>
+      </div>`;
+    }).join('');
+  }
+
+  function viewHistoryDetail(idx){
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){}
+    const record = list[idx];
+    if (!record) return;
+
+    viewingHistoryIndex = idx;
+    showPage('results');
+    const who = record.player ? `${record.player.name}（${record.player.age} 歲）` : '匿名玩家';
+    document.querySelector('#page-results h2').textContent = `📄 歷史紀錄：${who}`;
+    document.getElementById('backToHistoryRow').style.display = 'flex';
+
+    renderScoreList('scoreListEl', record.scores);
+    drawRadarInto('radarCanvas', 'radarImg', record.scores);
+    renderAdvice('overallAdviceBox', record.scores);
+    renderLevelDetailsInto('levelDetailsBox', record.levelDetails || {});
+  }
+
+  /* ---------------- 全域鍵盤：Enter 快速確認 / 下一關 ---------------- */
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter') return;
+
+    const recap = document.getElementById('recapOverlay');
+    if (recap.classList.contains('show')){
+      e.preventDefault();
+      document.getElementById('recapContinueBtn').click();
+      return;
+    }
+
+    if (document.getElementById('page-quiz-entry').classList.contains('active')){
+      e.preventDefault();
+      startQuizFlow();
+      return;
+    }
+
+    if (!document.getElementById('page-quiz').classList.contains('active')) return;
+
+    for (let i=1;i<=4;i++){
+      if (levelContainers[i].classList.contains('active')){
+        const startBtn = document.getElementById('l' + i + '-start-btn');
+        if (startBtn && startBtn.offsetParent !== null){
+          e.preventDefault();
+          startBtn.click();
+          return;
+        }
+        // 注意：L1~L4 以 const 宣告，不會掛在 window 物件上，
+        // 所以直接以識別字參照（在同一份文件的多個 <script> 標籤間共用全域範疇）
+        let module = null;
+        if (i===1 && typeof L1!=='undefined') module = L1;
+        else if (i===2 && typeof L2!=='undefined') module = L2;
+        else if (i===3 && typeof L3!=='undefined') module = L3;
+        else if (i===4 && typeof L4!=='undefined') module = L4;
+        if (module && typeof module.onEnter === 'function'){
+          e.preventDefault();
+          module.onEnter();
+        }
+        return;
+      }
+    }
+  });
+
+  return {
+    showPage, goHome, goToQuizEntry, startQuizFlow,
+    levelComplete, continueFromRecap, goToLevel, finishQuiz,
+    downloadRadar, shareResult, restartWholeQuiz, viewHistoryDetail
+  };
+})();
+</script>
+
+<script>
+/* =========================================================================
+   第一關：水果守衛 — 選擇性反應 / 注意力穩定度
+   ========================================================================= */
+const L1 = (function(){
+  const TOTAL_TRIALS = 30;
+  const TARGET_PROB = 0.4;
+  const STIMULUS_DURATION = 1100;
+  const ISI_MIN = 400;
+  const ISI_MAX = 750;
+  const FEEDBACK_DURATION = 250;
+
+  const TARGET_FRUIT = "🍓";
+  const NON_TARGET_FRUITS = ["🍌", "🍇", "🍊", "🍎", "🍉", "🍑", "🥝", "🍍"];
+
+  let currentTrial = 0;
+  let trialActive = false;
+  let trialAnswered = false;
+  let isCurrentTarget = false;
+  let stimulusStartTime = 0;
+  let stimulusTimer = null;
+
+  let hits = 0, misses = 0, falseAlarms = 0, correctRejections = 0;
+  let reactionTimes = [];
+
+  let instructionsEl, gameScreenEl, fruitStageEl, trialCounterEl, trialTotalEl, scoreCounterEl, progressFillEl, hintTextEl;
+
+  function cacheDom(){
+    instructionsEl = document.getElementById("l1-instructions");
+    gameScreenEl = document.getElementById("l1-game-screen");
+    fruitStageEl = document.getElementById("l1-fruit-stage");
+    trialCounterEl = document.getElementById("l1-trial-counter");
+    trialTotalEl = document.getElementById("l1-trial-total");
+    scoreCounterEl = document.getElementById("l1-score-counter");
+    progressFillEl = document.getElementById("l1-progress-fill");
+    hintTextEl = document.getElementById("l1-hint-text");
+    document.getElementById("l1-total-trials-hint").textContent = TOTAL_TRIALS;
+    trialTotalEl.textContent = TOTAL_TRIALS;
+    fruitStageEl.addEventListener("click", handleClick);
+  }
+
+  function start(){
+    if (!instructionsEl) cacheDom();
+
+    currentTrial = 0; hits = 0; misses = 0; falseAlarms = 0; correctRejections = 0;
+    reactionTimes = [];
+    scoreCounterEl.textContent = "0";
+
+    instructionsEl.style.display = "none";
+    gameScreenEl.style.display = "block";
+
+    fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
+    fruitStageEl.classList.add("l1-fruit-stage", "empty");
+    fruitStageEl.textContent = "準備...";
+    hintTextEl.textContent = "遊戲即將開始";
+
+    setTimeout(nextTrial, 800);
+  }
+
+  function nextTrial(){
+    if (currentTrial >= TOTAL_TRIALS){ endLevel(); return; }
+    currentTrial++;
+    trialCounterEl.textContent = currentTrial;
+    progressFillEl.style.width = ((currentTrial - 1) / TOTAL_TRIALS * 100) + "%";
+
+    isCurrentTarget = Math.random() < TARGET_PROB;
+    const fruit = isCurrentTarget ? TARGET_FRUIT : NON_TARGET_FRUITS[Math.floor(Math.random() * NON_TARGET_FRUITS.length)];
+
+    fruitStageEl.classList.remove("empty", "flash-correct", "flash-wrong", "flash-miss");
+    fruitStageEl.textContent = fruit;
+    hintTextEl.textContent = "";
+
+    trialAnswered = false;
+    trialActive = true;
+    stimulusStartTime = performance.now();
+
+    stimulusTimer = setTimeout(() => {
+      if (trialActive && !trialAnswered){
+        trialActive = false;
+        if (isCurrentTarget){
+          misses++;
+          flashStage("flash-miss");
+          hintTextEl.textContent = "漏按了！這是草莓";
+        } else {
+          correctRejections++;
+        }
+        goToNextAfterDelay();
+      }
+    }, STIMULUS_DURATION);
+  }
+
+  function handleClick(){
+    if (!trialActive || trialAnswered) return;
+    trialAnswered = true;
+    trialActive = false;
+    clearTimeout(stimulusTimer);
+
+    const rt = performance.now() - stimulusStartTime;
+
+    if (isCurrentTarget){
+      hits++;
+      reactionTimes.push(rt);
+      scoreCounterEl.textContent = hits;
+      flashStage("flash-correct");
+      hintTextEl.textContent = "答對了！反應時間 " + Math.round(rt) + " ms";
+    } else {
+      falseAlarms++;
+      flashStage("flash-wrong");
+      hintTextEl.textContent = "誤點了！這不是草莓";
+    }
+    goToNextAfterDelay();
+  }
+
+  function flashStage(cls){ fruitStageEl.classList.add(cls); }
+
+  function goToNextAfterDelay(){
+    setTimeout(() => {
+      fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
+      fruitStageEl.classList.add("empty");
+      fruitStageEl.textContent = "";
+      const isi = ISI_MIN + Math.random() * (ISI_MAX - ISI_MIN);
+      setTimeout(nextTrial, isi);
+    }, FEEDBACK_DURATION);
+  }
+
+  function endLevel(){
+    progressFillEl.style.width = "100%";
+
+    const totalTargets = hits + misses;
+    const totalNonTargets = falseAlarms + correctRejections;
+    const missRate = totalTargets > 0 ? (misses / totalTargets * 100) : 0;
+    const faRate = totalNonTargets > 0 ? (falseAlarms / totalNonTargets * 100) : 0;
+
+    let avgRT = 0, stdRT = 0;
+    if (reactionTimes.length > 0){
+      avgRT = reactionTimes.reduce((a,b)=>a+b,0) / reactionTimes.length;
+      const variance = reactionTimes.reduce((s,x)=>s+Math.pow(x-avgRT,2),0) / reactionTimes.length;
+      stdRT = Math.sqrt(variance);
+    }
+
+    // 分數計算：以漏按率／誤點率／反應時間變異度為扣分依據
+    const penalty = missRate*0.5 + faRate*0.5 + Math.min(stdRT/15, 20);
+    const score = Math.max(0, Math.min(100, 100 - penalty));
+
+    // 重置畫面回說明頁，供下次「再玩一次」使用
+    gameScreenEl.style.display = "none";
+    instructionsEl.style.display = "block";
+
+    App.levelComplete(1, [
+      { label:'漏按率', value: missRate.toFixed(1)+'%' },
+      { label:'誤點率', value: faRate.toFixed(1)+'%' },
+      { label:'平均反應時間', value: reactionTimes.length ? Math.round(avgRT)+' ms' : '無資料' },
+      { label:'反應時間標準差', value: reactionTimes.length ? Math.round(stdRT)+' ms' : '無資料' }
+    ], score, {
+      missRate, faRate, avgRT, stdRT,
+      totalTargets, hits, misses, totalNonTargets, falseAlarms, correctRejections
+    }, () => App.goToLevel(2));
+  }
+
+  // 遊戲進行中按 Enter：等同點擊圓圈（回應目前的水果）
+  function onEnter(){ handleClick(); }
+
+  return { start, onEnter };
+})();
+</script>
+
+<script>
+/* =========================================================================
+   第二關：水果搜尋 — 選擇性注意力 / 抗干擾能力
+   ========================================================================= */
+const L2 = (function(){
+  const LEVELS = [
+    { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5, strawberryCount:5 },
+    { name:"Level 2", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉"], cols:7, rows:7, strawberryCount:6 },
+    { name:"Level 3", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉","🍒"], cols:8, rows:8, strawberryCount:7 }
+  ];
+  const STRAWBERRY = "🍓";
+  const CHERRY = "🍒";
+
+  let currentLevelIndex = 0;
+  let foundCount = 0, totalStrawberriesThisLevel = 0, wrongClicksThisLevel = 0, cherryMisclicksThisLevel = 0;
+  let timerInterval = null, startTime = 0, elapsedSeconds = 0;
+
+  const record = { totalSearchTime:0, totalWrongClicks:0, totalCherryMisclicks:0, totalCorrectClicks:0, totalMissedStrawberries:0, levelTimes:[] };
+
+  let instructionsEl, gameScreenEl, levelTitle, fruitGrid, timerDisplay, foundDisplay, wrongDisplay, levelCompleteOverlay, levelSummary, finishBtn;
+
+  function cacheDom(){
+    instructionsEl = document.getElementById("l2-instructions");
+    gameScreenEl = document.getElementById("l2-game-screen");
+    levelTitle = document.getElementById("l2-level-title");
+    fruitGrid = document.getElementById("l2-fruit-grid");
+    timerDisplay = document.getElementById("l2-timer-display");
+    foundDisplay = document.getElementById("l2-found-display");
+    wrongDisplay = document.getElementById("l2-wrong-display");
+    levelCompleteOverlay = document.getElementById("l2-level-complete-overlay");
+    levelSummary = document.getElementById("l2-level-summary");
+    finishBtn = document.getElementById("l2-finish-btn");
+    finishBtn.addEventListener("click", () => {
+      if (timerInterval === null) return;
+      const missed = totalStrawberriesThisLevel - foundCount;
+      finishLevel(missed);
+    });
+  }
+
+  function shuffleArray(arr){
+    const a = arr.slice();
+    for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+
+  function generateFruitLayout(cfg){
+    const totalCells = cfg.cols*cfg.rows;
+    const strawberryCount = Math.min(cfg.strawberryCount, totalCells);
+    const otherFruits = cfg.fruitTypes.filter(f => f !== STRAWBERRY);
+    const layout = [];
+    for (let i=0;i<strawberryCount;i++) layout.push(STRAWBERRY);
+    for (let i=strawberryCount;i<totalCells;i++) layout.push(otherFruits[Math.floor(Math.random()*otherFruits.length)]);
+    return { layout: shuffleArray(layout), strawberryCount };
+  }
+
+  function formatSeconds(sec){ return sec.toFixed(1) + "s"; }
+
+  function startTimer(){
+    startTime = Date.now(); elapsedSeconds = 0;
+    timerDisplay.textContent = formatSeconds(0);
+    timerInterval = setInterval(() => {
+      elapsedSeconds = (Date.now()-startTime)/1000;
+      timerDisplay.textContent = formatSeconds(elapsedSeconds);
+    }, 100);
+  }
+  function stopTimer(){
+    clearInterval(timerInterval); timerInterval = null;
+    elapsedSeconds = (Date.now()-startTime)/1000;
+    timerDisplay.textContent = formatSeconds(elapsedSeconds);
+  }
+
+  function renderLevel(levelIndex){
+    const cfg = LEVELS[levelIndex];
+    foundCount = 0; wrongClicksThisLevel = 0; cherryMisclicksThisLevel = 0;
+    levelTitle.textContent = cfg.name;
+    wrongDisplay.textContent = "0";
+    fruitGrid.style.gridTemplateColumns = `repeat(${cfg.cols}, 1fr)`;
+    fruitGrid.innerHTML = "";
+
+    const { layout, strawberryCount } = generateFruitLayout(cfg);
+    totalStrawberriesThisLevel = strawberryCount;
+    foundDisplay.textContent = `0 / ${strawberryCount}`;
+
+    layout.forEach(fruit => {
+      const cell = document.createElement("div");
+      cell.className = "l2-fruit-cell";
+      cell.textContent = fruit;
+      cell.dataset.fruit = fruit;
+      cell.addEventListener("click", () => handleFruitClick(cell, fruit));
+      fruitGrid.appendChild(cell);
+    });
+
+    levelCompleteOverlay.style.display = "none";
+    startTimer();
+  }
+
+  function handleFruitClick(cell, fruit){
+    if (cell.classList.contains("found") || cell.classList.contains("correct")) return;
+
+    if (fruit === STRAWBERRY){
+      cell.classList.add("correct");
+      setTimeout(() => cell.classList.add("found"), 380);
+      foundCount++;
+      foundDisplay.textContent = `${foundCount} / ${totalStrawberriesThisLevel}`;
+      if (foundCount >= totalStrawberriesThisLevel) finishLevel(0);
+    } else {
+      wrongClicksThisLevel++;
+      wrongDisplay.textContent = wrongClicksThisLevel;
+      if (fruit === CHERRY) cherryMisclicksThisLevel++;
+      cell.classList.remove("wrong");
+      void cell.offsetWidth;
+      cell.classList.add("wrong");
+      setTimeout(() => cell.classList.remove("wrong"), 350);
+    }
+  }
+
+  function finishLevel(missedCount){
+    stopTimer();
+    record.totalSearchTime += elapsedSeconds;
+    record.totalWrongClicks += wrongClicksThisLevel;
+    record.totalCherryMisclicks += cherryMisclicksThisLevel;
+    record.totalCorrectClicks += foundCount;
+    record.totalMissedStrawberries += missedCount;
+    record.levelTimes.push({ name: LEVELS[currentLevelIndex].name, time: elapsedSeconds });
+
+    levelSummary.textContent = `搜尋時間：${formatSeconds(elapsedSeconds)}　錯誤點擊：${wrongClicksThisLevel} 次　漏掉草莓：${missedCount} 個`;
+    levelCompleteOverlay.style.display = "flex";
+
+    setTimeout(() => {
+      currentLevelIndex++;
+      if (currentLevelIndex < LEVELS.length){
+        renderLevel(currentLevelIndex);
+      } else {
+        endLevel();
+      }
+    }, 1400);
+  }
+
+  function start(){
+    if (!instructionsEl) cacheDom();
+    instructionsEl.style.display = "none";
+    gameScreenEl.style.display = "block";
+    currentLevelIndex = 0;
+    record.totalSearchTime = 0; record.totalWrongClicks = 0; record.totalCherryMisclicks = 0;
+    record.totalCorrectClicks = 0; record.totalMissedStrawberries = 0; record.levelTimes = [];
+    renderLevel(currentLevelIndex);
+  }
+
+  function endLevel(){
+    const totalClicks = record.totalCorrectClicks + record.totalWrongClicks;
+    const accuracy = totalClicks > 0 ? (record.totalCorrectClicks/totalClicks*100) : 0;
+    const errorRate = totalClicks > 0 ? (record.totalWrongClicks/totalClicks*100) : 0;
+    const cherryConfusionRate = record.totalWrongClicks > 0 ? (record.totalCherryMisclicks/record.totalWrongClicks*100) : 0;
+    const avgSpeed = record.totalSearchTime > 0 ? record.totalCorrectClicks/record.totalSearchTime : 0;
+
+    // 分數計算：以錯誤率／干擾誤判率／漏掉目標為扣分依據
+    const penalty = errorRate*0.6 + cherryConfusionRate*0.3 + record.totalMissedStrawberries*8;
+    const score = Math.max(0, Math.min(100, 100 - penalty));
+
+    // 能力分析文字（沿用原始檔案的判斷邏輯）
+    const analysis = [];
+    analysis.push(record.totalSearchTime > 60
+      ? '搜尋時間較長：可能代表目標搜尋效率較低，建議加強視覺搜尋速度練習。'
+      : '搜尋時間表現良好，目標搜尋效率佳。');
+    analysis.push(errorRate > 15
+      ? '錯誤率偏高：可能代表抗干擾能力較弱，容易被非目標物件吸引而誤觸。'
+      : '錯誤率偏低，抗干擾能力表現良好。');
+    if (cherryConfusionRate > 30) analysis.push('干擾誤判率偏高：容易將外觀相似的櫻桃（🍒）誤認為草莓（🍓），顯示對相似特徵的區辨能力仍可加強。');
+    else if (record.totalCherryMisclicks > 0) analysis.push('偶有將櫻桃誤認為草莓的情形，但整體區辨能力仍屬穩定。');
+    else analysis.push('沒有將櫻桃誤認為草莓，對相似特徵的區辨能力表現優異。');
+    analysis.push(record.totalMissedStrawberries > 0
+      ? '漏掉目標較多：可能代表視覺掃描範圍不足，建議練習系統性掃描策略。'
+      : '沒有漏掉任何目標，視覺掃描範圍表現優異。');
+
+    gameScreenEl.style.display = "none";
+    instructionsEl.style.display = "block";
+
+    App.levelComplete(2, [
+      { label:'總搜尋時間', value: record.totalSearchTime.toFixed(1)+' 秒' },
+      { label:'正確率', value: accuracy.toFixed(1)+'%' },
+      { label:'錯誤率', value: errorRate.toFixed(1)+'%' },
+      { label:'平均搜尋速度', value: avgSpeed.toFixed(2)+' 個/秒' }
+    ], score, {
+      totalSearchTime: record.totalSearchTime, accuracy, errorRate, cherryConfusionRate,
+      totalMissed: record.totalMissedStrawberries, avgSpeed,
+      levelTimes: record.levelTimes.slice(), analysis
+    }, () => App.goToLevel(3));
+  }
+
+  // 遊戲進行中按 Enter：等同按下「完成（結束本小關）」
+  function onEnter(){ if (finishBtn && timerInterval !== null) finishBtn.click(); }
+
+  return { start, onEnter };
+})();
+</script>
+
+<script>
+/* =========================================================================
+   第三關：水果規則變換 — 認知彈性 / 反應控制能力
+   ========================================================================= */
+const L3 = (function(){
+  const CONFIG = {
+    stageDurationMs: 15000,
+    trialTimeoutMs: 1500,
+    isiMs: 400,
+    instructionMs: 2200,
+    fruitRadius: 34,
+    canvasWidth: 800,
+    canvasHeight: 420
+  };
+
+  const STAGES = [
+    { id:1, label:"紅色水果 (RED)", instruction:"請點擊所有「紅色」的水果", rule:(f)=>f.color==="red" },
+    { id:2, label:"圓形水果 (ROUND)", instruction:"規則已改變！請點擊所有「圓形」的水果", rule:(f)=>f.shape==="round" },
+    { id:3, label:"黃色且圓形 (YELLOW + ROUND)", instruction:"規則再次改變！請點擊「黃色且圓形」的水果", rule:(f)=>f.color==="yellow"&&f.shape==="round" }
+  ];
+  const COLORS = ["red","yellow"];
+  const SHAPES = ["round","long"];
+  const COLOR_HEX = { red:"#c0392b", yellow:"#e8a930" };
+
+  const state = {
+    stageIndex:0, stageStartTime:0, gameStartTime:0, running:false, paused:true,
+    currentTrial:null, trials:[], isiTimeoutId:null, rafId:null
+  };
+
+  let instructionsEl, gameScreenEl, canvas, ctx, overlay, overlayTitle, overlayText, stageNumEl, ruleTextEl, timeLeftEl, timerBarInner;
+
+  function cacheDom(){
+    instructionsEl = document.getElementById("l3-instructions");
+    gameScreenEl = document.getElementById("l3-game-screen");
+    canvas = document.getElementById("l3-canvas");
+    ctx = canvas.getContext("2d");
+    overlay = document.getElementById("l3-overlay");
+    overlayTitle = document.getElementById("l3-overlay-title");
+    overlayText = document.getElementById("l3-overlay-text");
+    stageNumEl = document.getElementById("l3-stage-num");
+    ruleTextEl = document.getElementById("l3-rule-text");
+    timeLeftEl = document.getElementById("l3-time-left");
+    timerBarInner = document.getElementById("l3-timer-bar-inner");
+    canvas.addEventListener("click", handleCanvasClick);
+  }
+
+  function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function randomFruit(){ return { color: randChoice(COLORS), shape: randChoice(SHAPES) }; }
+  function randomPosition(){
+    const r = CONFIG.fruitRadius;
+    return { x: r + Math.random()*(CONFIG.canvasWidth-2*r), y: r + Math.random()*(CONFIG.canvasHeight-2*r) };
+  }
+
+  function clearCanvas(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
+
+  function drawFruit(fruit){
+    const { x, y, color, shape } = fruit;
+    const r = CONFIG.fruitRadius;
+    ctx.fillStyle = COLOR_HEX[color];
+    ctx.strokeStyle = "rgba(90,60,20,0.3)";
+    ctx.lineWidth = 2;
+
+    if (shape === "round"){
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    } else {
+      const w = r*2.1, h = r*1.1, rx = x-w/2, ry = y-h/2, rad = h/2;
+      ctx.beginPath();
+      ctx.moveTo(rx+rad, ry);
+      ctx.lineTo(rx+w-rad, ry);
+      ctx.arc(rx+w-rad, ry+rad, rad, -Math.PI/2, Math.PI/2);
+      ctx.lineTo(rx+rad, ry+h);
+      ctx.arc(rx+rad, ry+rad, rad, Math.PI/2, -Math.PI/2);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+    ctx.fillStyle = "#3f7a2a";
+    ctx.beginPath(); ctx.ellipse(x, y-r*0.9, 5, 8, 0, 0, Math.PI*2); ctx.fill();
+  }
+
+  function pointInFruit(px,py,fruit){
+    const r = CONFIG.fruitRadius;
+    if (fruit.shape === "round"){
+      const dx=px-fruit.x, dy=py-fruit.y;
+      return dx*dx+dy*dy <= r*r;
+    }
+    const w=r*2.1, h=r*1.1;
+    return px>=fruit.x-w/2 && px<=fruit.x+w/2 && py>=fruit.y-h/2 && py<=fruit.y+h/2;
+  }
+
+  function start(){
+    if (!instructionsEl) cacheDom();
+    instructionsEl.style.display = "none";
+    gameScreenEl.style.display = "block";
+
+    state.stageIndex = 0;
+    state.trials = [];
+    state.running = true;
+    state.gameStartTime = performance.now();
+    overlay.style.display = "none";
+    startStage(0);
+    loop();
+  }
+
+  function startStage(index){
+    state.stageIndex = index;
+    state.stageStartTime = performance.now();
+    state.paused = true;
+    const stage = STAGES[index];
+    stageNumEl.textContent = stage.id;
+    ruleTextEl.textContent = stage.label;
+    showInstruction(stage.instruction, () => { state.paused = false; scheduleNextTrial(0); });
+  }
+
+  function showInstruction(text, callback){
+    overlayTitle.textContent = "階段 " + STAGES[state.stageIndex].id + " / 3";
+    overlayText.innerHTML = text;
+    overlay.style.display = "flex";
+    setTimeout(() => { overlay.style.display = "none"; callback(); }, CONFIG.instructionMs);
+  }
+
+  function scheduleNextTrial(delay){
+    clearTimeout(state.isiTimeoutId);
+    state.isiTimeoutId = setTimeout(() => {
+      if (!state.running || state.paused) return;
+      spawnTrial();
+    }, delay);
+  }
+
+  function spawnTrial(){
+    if (isStageOver()){ advanceStageOrEnd(); return; }
+    const fruit = { ...randomFruit(), ...randomPosition() };
+    const startTime = performance.now();
+    const timeoutId = setTimeout(() => resolveTrial("timeout", performance.now()), CONFIG.trialTimeoutMs);
+    state.currentTrial = { fruit, startTime, timeoutId, stageIndex: state.stageIndex };
+  }
+
+  function resolveTrial(responseType, timestamp){
+    if (!state.currentTrial) return;
+    clearTimeout(state.currentTrial.timeoutId);
+    const { fruit, startTime, stageIndex } = state.currentTrial;
+    const currentRule = STAGES[stageIndex].rule;
+    const matchesCurrent = currentRule(fruit);
+    let outcome, RT = null, perseverative = false;
+
+    if (responseType === "click"){
+      RT = Math.round(timestamp - startTime);
+      if (matchesCurrent){ outcome = "hit"; }
+      else {
+        outcome = "commission_error";
+        if (stageIndex > 0){
+          const prevRule = STAGES[stageIndex-1].rule;
+          if (prevRule(fruit)) perseverative = true;
+        }
+      }
+    } else {
+      outcome = matchesCurrent ? "omission_error" : "correct_rejection";
+    }
+
+    state.trials.push({ trialIndex: state.trials.length, stageIndex, outcome, perseverative, RT });
+    state.currentTrial = null;
+
+    if (isStageOver()) advanceStageOrEnd();
+    else scheduleNextTrial(CONFIG.isiMs);
+  }
+
+  function isStageOver(){ return performance.now() - state.stageStartTime >= CONFIG.stageDurationMs; }
+
+  function advanceStageOrEnd(){
+    clearTimeout(state.isiTimeoutId);
+    const nextIndex = state.stageIndex + 1;
+    if (nextIndex < STAGES.length) startStage(nextIndex);
+    else endLevel();
+  }
+
+  function handleCanvasClick(evt){
+    if (!state.running || state.paused || !state.currentTrial) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+    const px = (evt.clientX-rect.left)*scaleX, py = (evt.clientY-rect.top)*scaleY;
+    if (pointInFruit(px,py,state.currentTrial.fruit)) resolveTrial("click", performance.now());
+  }
+
+  function loop(){
+    clearCanvas();
+    if (state.currentTrial) drawFruit(state.currentTrial.fruit);
+    if (state.running && !state.paused){
+      const elapsed = performance.now() - state.stageStartTime;
+      const remain = Math.max(0, CONFIG.stageDurationMs - elapsed);
+      timeLeftEl.textContent = Math.ceil(remain/1000);
+      timerBarInner.style.width = (remain/CONFIG.stageDurationMs*100) + "%";
+    }
+    if (state.running) state.rafId = requestAnimationFrame(loop);
+  }
+
+  function computeSummary(){
+    const trials = state.trials;
+    const total = trials.length;
+    const correctCount = trials.filter(t => t.outcome==="hit"||t.outcome==="correct_rejection").length;
+    const accuracy = total ? (correctCount/total*100) : 0;
+    const perseverativeErrors = trials.filter(t => t.perseverative).length;
+
+    const stageAvgRT = STAGES.map((s,i) => {
+      const hits = trials.filter(t => t.stageIndex===i && t.outcome==="hit" && t.RT!=null);
+      if (!hits.length) return null;
+      return +(hits.reduce((a,b)=>a+b.RT,0)/hits.length).toFixed(1);
+    });
+
+    const switchCosts = [];
+    for (let i=1;i<STAGES.length;i++){
+      if (stageAvgRT[i]!=null && stageAvgRT[i-1]!=null){
+        switchCosts.push(+(stageAvgRT[i]-stageAvgRT[i-1]).toFixed(1));
+      }
+    }
+    const totalSwitchCost = switchCosts.length ? +(switchCosts.reduce((a,b)=>a+b,0)/switchCosts.length).toFixed(1) : 0;
+
+    return { totalTrials: total, accuracy: +accuracy.toFixed(1), perseverativeErrors, totalSwitchCost, stageAvgRT };
+  }
+
+  function endLevel(){
+    state.running = false; state.paused = true;
+    cancelAnimationFrame(state.rafId);
+    clearTimeout(state.isiTimeoutId);
+    if (state.currentTrial) clearTimeout(state.currentTrial.timeoutId);
+
+    const summary = computeSummary();
+
+    // 分數計算：以準確率為基礎，扣除持續性錯誤與切換代價(switch cost)
+    const penalty = (100-summary.accuracy) + summary.perseverativeErrors*4 + Math.max(0,summary.totalSwitchCost)/10;
+    const score = Math.max(0, Math.min(100, 100 - penalty * 0.6));
+
+    gameScreenEl.style.display = "none";
+    instructionsEl.style.display = "block";
+
+    App.levelComplete(3, [
+      { label:'總嘗試次數', value: summary.totalTrials },
+      { label:'準確率', value: summary.accuracy + '%' },
+      { label:'持續性錯誤次數', value: summary.perseverativeErrors },
+      { label:'平均切換代價', value: summary.totalSwitchCost + ' ms' }
+    ], score, {
+      totalTrials: summary.totalTrials, accuracy: summary.accuracy,
+      perseverativeErrors: summary.perseverativeErrors, totalSwitchCost: summary.totalSwitchCost,
+      stageAvgRT: summary.stageAvgRT
+    }, () => App.goToLevel(4));
+  }
+
+  return { start };
+})();
+</script>
+
+<script>
+/* =========================================================================
+   第四關：水果記憶鏈 — 工作記憶負荷能力
+   ========================================================================= */
+const L4 = (function(){
+  const FRUITS = ['apple','banana','grape'];
+  const FRUIT_EMOJI = { apple:'🍎', banana:'🍌', grape:'🍇' };
+  const LEVEL_COUNTS = [3,4,5,6,7,8,9];
+  const BASE_MEMORIZE_SECONDS = 3;
+  const ANSWER_SECONDS = 10;
+
+  let levelIndex = 0, correctSequence = [], playerAnswer = [];
+  let timeLeft = ANSWER_SECONDS, memLeft = 0, timerInterval = null;
+  let answerStartTime = 0, answerPhaseActive = false, results = [];
+
+  let instructionsEl, playingArea, levelNumEl, timeLeftEl, timerNum, vineFill, phaseLabel,
+      memorizeArea, answerArea, slotsEl, nextBtn, footerEl, fruitButtons;
+
+  function cacheDom(){
+    instructionsEl = document.getElementById('l4-instructions');
+    playingArea = document.getElementById('l4-playing-area');
+    levelNumEl = document.getElementById('l4-level-num');
+    timeLeftEl = document.getElementById('l4-time-left');
+    timerNum = document.getElementById('l4-timer-num');
+    vineFill = document.getElementById('l4-vine-fill');
+    phaseLabel = document.getElementById('l4-phase-label');
+    memorizeArea = document.getElementById('l4-memorize-area');
+    answerArea = document.getElementById('l4-answer-area');
+    slotsEl = document.getElementById('l4-slots');
+    nextBtn = document.getElementById('l4-next-btn');
+    footerEl = document.getElementById('l4-footer');
+    fruitButtons = document.querySelectorAll('.l4-fruit-btn');
+
+    fruitButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!answerPhaseActive) return;
+        const emptyIndex = playerAnswer.indexOf(null);
+        if (emptyIndex === -1) return;
+        playerAnswer[emptyIndex] = btn.dataset.fruit;
+        renderSlots(); checkComplete();
+      });
+    });
+    document.getElementById('l4-undo-btn').addEventListener('click', () => {
+      if (!answerPhaseActive) return;
+      let lastFilled = -1;
+      for (let i=0;i<playerAnswer.length;i++) if (playerAnswer[i]!==null) lastFilled = i;
+      if (lastFilled !== -1){ playerAnswer[lastFilled] = null; renderSlots(); checkComplete(); }
+    });
+    document.getElementById('l4-clear-btn').addEventListener('click', () => {
+      if (!answerPhaseActive) return;
+      playerAnswer = playerAnswer.map(()=>null); renderSlots(); checkComplete();
+    });
+    nextBtn.addEventListener('click', () => {
+      if (nextBtn.disabled || !answerPhaseActive) return;
+      submitAnswer();
+    });
+  }
+
+  function isValidSequence(seq){
+    const n = seq.length;
+    let run = 1;
+    for (let i=1;i<n;i++){
+      if (seq[i]===seq[i-1]){ run++; if (run>2) return false; } else run = 1;
+    }
+    if (n>=4 && new Set(seq).size < 3) return false;
+    const counts = { apple:0, banana:0, grape:0 };
+    seq.forEach(f => counts[f]++);
+    const maxCount = Math.max(counts.apple, counts.banana, counts.grape);
+    if (maxCount > Math.ceil(n/2)) return false;
+    for (let p=1;p<=3;p++){
+      if (n-p<2) continue;
+      let periodic = true;
+      for (let i=p;i<n;i++){ if (seq[i]!==seq[i-p]){ periodic=false; break; } }
+      if (periodic) return false;
+    }
+    return true;
+  }
+
+  function generateSequence(n){
+    let seq, attempts = 0;
+    do {
+      seq = [];
+      for (let i=0;i<n;i++) seq.push(FRUITS[Math.floor(Math.random()*FRUITS.length)]);
+      attempts++;
+    } while (!isValidSequence(seq) && attempts < 3000);
+    return seq;
+  }
+
+  function getFruitFontSize(n){
+    if (n<=5) return 50; if (n===6) return 42; if (n===7) return 38; if (n===8) return 34; return 30;
+  }
+
+  function renderMemorizeFruits(seq){
+    memorizeArea.innerHTML = '';
+    const fontSize = getFruitFontSize(seq.length);
+    seq.forEach(fruit => {
+      const span = document.createElement('span');
+      span.style.fontSize = fontSize + 'px';
+      span.textContent = FRUIT_EMOJI[fruit];
+      memorizeArea.appendChild(span);
+    });
+  }
+
+  function updateVine(current, total){
+    const pct = total>0 ? Math.max(0,(current/total)*100) : 0;
+    vineFill.style.width = pct + '%';
+  }
+  function resetVineFull(){
+    vineFill.style.transition = 'none';
+    vineFill.style.width = '100%';
+    void vineFill.offsetWidth;
+    vineFill.style.transition = 'width 1s linear';
+  }
+
+  function startLevel(){
+    const n = LEVEL_COUNTS[levelIndex];
+    levelNumEl.textContent = levelIndex + 1;
+    correctSequence = generateSequence(n);
+    playerAnswer = new Array(n).fill(null);
+    answerPhaseActive = false;
+    answerArea.style.display = 'none';
+    memorizeArea.style.display = 'flex';
+    renderMemorizeFruits(correctSequence);
+
+    const memSeconds = BASE_MEMORIZE_SECONDS + levelIndex;
+    phaseLabel.textContent = `請記住水果的種類與順序...（${memSeconds} 秒）`;
+    timerNum.classList.remove('urgent');
+    footerEl.style.visibility = 'hidden';
+    nextBtn.disabled = true;
+
+    memLeft = memSeconds;
+    timeLeftEl.textContent = memLeft;
+    resetVineFull();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      memLeft--;
+      timeLeftEl.textContent = memLeft;
+      updateVine(memLeft, memSeconds);
+      if (memLeft <= 0){ clearInterval(timerInterval); startAnswerPhase(); }
+    }, 1000);
+  }
+
+  function startAnswerPhase(){
+    memorizeArea.style.display = 'none';
+    answerArea.style.display = 'flex';
+    phaseLabel.textContent = '依序點擊水果，重建正確序列！';
+    timerNum.classList.remove('urgent');
+
+    renderSlots();
+    answerPhaseActive = true;
+    footerEl.style.visibility = 'visible';
+    nextBtn.disabled = true;
+    timeLeft = ANSWER_SECONDS;
+    timeLeftEl.textContent = timeLeft;
+    resetVineFull();
+    answerStartTime = Date.now();
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timeLeftEl.textContent = timeLeft;
+      updateVine(timeLeft, ANSWER_SECONDS);
+      if (timeLeft <= 3) timerNum.classList.add('urgent');
+      if (timeLeft <= 0){ clearInterval(timerInterval); submitAnswer(); }
+    }, 1000);
+  }
+
+  function renderSlots(){
+    slotsEl.innerHTML = '';
+    playerAnswer.forEach(fruit => {
+      const div = document.createElement('div');
+      div.className = 'l4-slot' + (fruit ? ' filled' : '');
+      div.textContent = fruit ? FRUIT_EMOJI[fruit] : '';
+      slotsEl.appendChild(div);
+    });
+  }
+
+  function checkComplete(){
+    nextBtn.disabled = !playerAnswer.every(f => f !== null);
+  }
+
+  function submitAnswer(){
+    if (!answerPhaseActive) return;
+    answerPhaseActive = false;
+    clearInterval(timerInterval);
+
+    const n = correctSequence.length;
+    let correctCount = 0;
+    for (let i=0;i<n;i++){ if (playerAnswer[i]!==null && playerAnswer[i]===correctSequence[i]) correctCount++; }
+    const reactionTime = (Date.now()-answerStartTime)/1000;
+
+    results.push({ n, correct: correctCount, reactionTime, fullyCorrect: correctCount===n });
+
+    levelIndex++;
+    if (levelIndex < LEVEL_COUNTS.length) startLevel();
+    else endLevel();
+  }
+
+  // 依「最大記憶長度」判斷工作記憶落在前段／中段／後段
+  function getAbilityAssessment(maxMemory){
+    if (maxMemory >= 7) return { tier:'前段', desc:'7 位數或以上：表現優異，代表短期記憶的「工作空間」大，具備同時處理大量資訊的天賦。' };
+    if (maxMemory >= 5) return { tier:'中段', desc:'5-6 位數：專注力相當於全球平均水平。' };
+    return { tier:'後段', desc:'3-4 位數：專注力偏低，可能在測驗當下注意力較不集中。' };
+  }
+  function getAccuracyTier(accuracy){
+    if (accuracy >= 90) return { label:'工作記憶表現佳', cls:'good' };
+    if (accuracy >= 75) return { label:'一般', cls:'mid' };
+    return { label:'建議加強', cls:'low' };
+  }
+  function getReactionTier(avgReaction){
+    if (avgReaction < 4) return { label:'資訊處理效率高', cls:'good' };
+    if (avgReaction <= 7) return { label:'一般', cls:'mid' };
+    return { label:'處理速度較慢', cls:'low' };
+  }
+  function buildSuggestion(accuracy, avgReaction, accTier, reactTier){
+    const openingMap = { good:'表現優異', mid:'表現接近一般使用者', low:'仍有進步空間' };
+    const reactionPhraseMap = {
+      good:'平均反應時間短，資訊處理效率高，能迅速完成回憶與排序。',
+      mid:'完成速度中等，資訊處理效率尚可。',
+      low:'完成時間略長，表示在資訊量增加時可能需要較多時間進行整理與回憶。'
+    };
+    const adviceMap = {
+      good:'建議可以挑戰更長的水果序列，持續維持良好的工作記憶表現。',
+      mid:'建議可透過短時記憶訓練或降低多工情境，逐步提升資訊處理效率。',
+      low:'建議先從較短的序列開始反覆練習，減少同時處理的資訊量，逐步累積工作記憶容量。'
+    };
+    const worseTier = (accTier.cls==='low'||reactTier.cls==='low') ? 'low' : (accTier.cls==='mid'||reactTier.cls==='mid') ? 'mid' : 'good';
+    return `本次測驗中，你的工作記憶${openingMap[accTier.cls]}，正確率為 ${accuracy.toFixed(0)}%，`
+      + `${reactionPhraseMap[reactTier.cls]}${adviceMap[worseTier]}`;
+  }
+
+  function start(){
+    if (!instructionsEl) cacheDom();
+    instructionsEl.style.display = 'none';
+    playingArea.style.display = 'block';
+    levelIndex = 0; results = [];
+    startLevel();
+  }
+
+  function endLevel(){
+    const totalScore = results.reduce((s,r)=>s+r.correct,0);
+    const totalMax = results.reduce((s,r)=>s+r.n,0);
+    const fullyCorrectNs = results.filter(r=>r.fullyCorrect).map(r=>r.n);
+    const maxMemory = fullyCorrectNs.length ? Math.max(...fullyCorrectNs) : 0;
+    const accuracy = totalMax>0 ? (totalScore/totalMax*100) : 0;
+    const avgReaction = results.reduce((s,r)=>s+r.reactionTime,0) / results.length;
+
+    // 分數計算：正確率為主要依據，並依最大記憶長度給予加成，反應時間過長則扣分
+    const score = Math.max(0, Math.min(100, accuracy*0.7 + (maxMemory/9)*30 - Math.max(0,avgReaction-4)*2));
+
+    const assessment = getAbilityAssessment(maxMemory);
+    const accTier = getAccuracyTier(accuracy);
+    const reactTier = getReactionTier(avgReaction);
+    const suggestionText = buildSuggestion(accuracy, avgReaction, accTier, reactTier);
+
+    playingArea.style.display = 'none';
+    instructionsEl.style.display = 'block';
+
+    App.levelComplete(4, [
+      { label:'總分', value: totalScore+' / '+totalMax },
+      { label:'最大記憶長度', value: maxMemory },
+      { label:'正確率', value: accuracy.toFixed(1)+'%' },
+      { label:'平均反應時間', value: avgReaction.toFixed(2)+' 秒' }
+    ], score, {
+      totalScore, totalMax, maxMemory, accuracy, avgReaction,
+      abilityTier: assessment.tier, abilityDesc: assessment.desc,
+      accuracyTag: accTier, reactionTag: reactTier, suggestionText,
+      results: results.map(r => ({ n:r.n, correct:r.correct, fullyCorrect:r.fullyCorrect }))
+    }, () => App.finishQuiz());
+  }
+
+  // 遊戲進行中按 Enter：等同按下「下一題」（需先完成本題序列）
+  function onEnter(){ if (!nextBtn.disabled && answerPhaseActive) nextBtn.click(); }
+
+  return { start, onEnter };
+})();
+</script>
+
+</body>
+</html>
