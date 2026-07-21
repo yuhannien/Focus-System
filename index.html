@@ -830,7 +830,7 @@ main{
       <div class="score-list" id="scoreListEl"></div>
       <div id="overallAdviceBox" class="home-lead-box" style="text-align:left;"></div>
       <div class="btn-row">
-        <button class="btn-secondary" onclick="App.downloadRadar()">📥 長按 / 下載保存</button>
+        <button class="btn-secondary" onclick="App.downloadRadar()">📥 長按保存結果</button>
         <button class="btn-primary" onclick="App.restartWholeQuiz()">🔄 再玩一次</button>
         <button class="btn-outline" onclick="App.shareResult()">🔗 分享給朋友</button>
       </div>
@@ -876,6 +876,7 @@ const App = (function(){
   };
 
   let scores = {1:null, 2:null, 3:null, 4:null};
+  let displayedScores = {1:null, 2:null, 3:null, 4:null}; // 目前結果頁正在顯示的分數（本次結果或歷史紀錄）
   let levelDetails = {1:null, 2:null, 3:null, 4:null};
   let playerInfo = { name:'', age:'' };
   let pendingContinue = null;
@@ -958,7 +959,7 @@ const App = (function(){
     document.getElementById('recapScore').textContent = `${meta.dim} 分數：${Math.round(score)} / 100`;
 
     const btn = document.getElementById('recapContinueBtn');
-    btn.textContent = (levelNum < 4) ? '繼續下一關 ▶（按 Enter）' : '查看綜合結果 🏆（按 Enter）';
+    btn.textContent = (levelNum < 4) ? '繼續下一關 ▶' : '查看綜合結果 🏆';
     pendingContinue = nextAction;
 
     document.getElementById('recapOverlay').classList.add('show');
@@ -981,6 +982,7 @@ const App = (function(){
   /* ---------------- 綜合結果 ---------------- */
   function finishQuiz(){
     viewingHistoryIndex = null;
+    displayedScores = scores;
     showPage('results');
     document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
     document.getElementById('backToHistoryRow').style.display = 'none';
@@ -1007,16 +1009,24 @@ const App = (function(){
     const weakest = entries[0];
     const strongest = entries[entries.length-1];
 
-    const tips = {
-      1: '建議減少同時開啟的通知與分頁，練習「番茄鐘」等定時專注法，逐步拉長單一任務的持續時間。',
-      2: '建議整理實體與數位工作環境，移除不必要的干擾物，並可搭配白噪音或降噪耳機降低外界刺激。',
-      3: '建議在切換任務前，先寫下待辦清單並排定優先順序，減少臨時切換造成的反應延遲。',
-      4: '建議將複雜資訊拆解成小區塊（Chunking），並搭配重複覆誦或筆記輔助工作記憶。'
+    // 改善建議：針對較弱面向
+    const improveTips = {
+      1: '可以減少同時開啟的通知與分頁，練習「番茄鐘」等定時專注法，逐步拉長單一任務的持續時間。',
+      2: '可以整理實體與數位工作環境，移除不必要的干擾物，並可搭配白噪音或降噪耳機降低外界刺激。',
+      3: '可以在切換任務前，先寫下待辦清單並排定優先順序，減少臨時切換造成的反應延遲。',
+      4: '可以將複雜資訊拆解成小區塊（Chunking），並搭配重複覆誦或筆記輔助工作記憶。'
+    };
+    // 維持優勢的建議：針對較強面向
+    const maintainTips = {
+      1: '可以持續維持良好的作息與睡眠品質，並嘗試在較複雜或干擾較多的情境下延續這項優勢。',
+      2: '可以在更多元的環境（如較吵雜或多工的場合）中練習，進一步鞏固這項抗干擾優勢。',
+      3: '可以嘗試同時處理多項任務或規則更複雜的挑戰，持續鍛鍊反應與切換能力。',
+      4: '可以挑戰更長、更複雜的記憶內容，例如多步驟的待辦事項或較長的資訊清單，發揮這項優勢。'
     };
 
     const html = `
-      <p><b>整體來看</b>，在「${DIM_META[strongest.i].dim}」的表現最突出（${strongest.score} 分），在「${DIM_META[weakest.i].dim}」則相對較弱（${weakest.score} 分）。</p>
-      <p><b>改善建議：</b>${tips[weakest.i]}</p>
+      <p><b>優勢面向：</b>在「${DIM_META[strongest.i].dim}」的表現最突出（${strongest.score} 分）。${maintainTips[strongest.i]}</p>
+      <p><b>待加強面向：</b>在「${DIM_META[weakest.i].dim}」相對較弱（${weakest.score} 分）。${improveTips[weakest.i]}</p>
       <p>此外，規律的作息、充足睡眠與適度的環境調整（如減少多工、安排專注時段）都有助於整體專注力的提升。本系統僅作為個人專注力管理與自我覺察的參考工具，並非醫療診斷。</p>
     `;
     document.getElementById(elId).innerHTML = html;
@@ -1209,15 +1219,22 @@ const App = (function(){
   }
 
   function shareResult(){
-    const text = `我剛完成了「智慧型專注力分析與改善系統」測驗！\n注意力穩定度：${scores[1]} 分\n抗干擾能力：${scores[2]} 分\n反應控制能力：${scores[3]} 分\n記憶負荷能力：${scores[4]} 分\n一起來測測你的專注力吧！`;
+    const sc = displayedScores;
+    const entries = [1,2,3,4].map(i => ({i, score: sc[i] ?? 0}));
+    entries.sort((a,b) => b.score - a.score);
+    const best = entries[0];
+
+    const url = window.location.href;
+    const text = `嗨～我剛完成了「智慧型專注力分析與改善系統」測驗，在「${DIM_META[best.i].dim}」表現最突出，拿到 ${best.score} 分！換你來試試看啦！`;
+
     if (navigator.share){
-      navigator.share({ title:'智慧型專注力分析與改善系統', text }).catch(()=>{});
+      navigator.share({ title:'智慧型專注力分析與改善系統', text, url }).catch(()=>{});
     } else if (navigator.clipboard){
-      navigator.clipboard.writeText(text).then(()=>{
-        alert('結果文字已複製，貼給朋友分享吧！');
-      }).catch(()=>{ alert(text); });
+      navigator.clipboard.writeText(text + '\n' + url).then(()=>{
+        alert('分享文字與連結已複製，貼給朋友分享吧！');
+      }).catch(()=>{ alert(text + '\n' + url); });
     } else {
-      alert(text);
+      alert(text + '\n' + url);
     }
   }
 
@@ -1231,7 +1248,7 @@ const App = (function(){
   // ★ 設定完 Google Apps Script 後，把「網頁應用程式」網址貼在這裡（雙引號中間），
   //    例如："https://script.google.com/macros/s/AKfycb.../exec"
   //    留空字串 "" 代表不啟用雲端同步，資料只會存在使用者自己的裝置上。
-  const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx07C9pJSP_d4V4TjZNvZAiPQFzaYevHWRvdUCuFSedklWMfXq1YsU005JaFQOYr3uq/exec";
+  const SHEET_WEBHOOK_URL = "";
 
   function sendToSheet(record){
     if (!SHEET_WEBHOOK_URL) return; // 尚未設定後台網址，略過雲端同步
@@ -1293,8 +1310,9 @@ const App = (function(){
     if (!record) return;
 
     viewingHistoryIndex = idx;
+    displayedScores = record.scores;
     showPage('results');
-    const who = record.player ? `${record.player.name}（${record.player.age} 歲）` : '匿名玩家';
+    const who = record.player ? record.player.name : '匿名玩家';
     document.querySelector('#page-results h2').textContent = `📄 歷史紀錄：${who}`;
     document.getElementById('backToHistoryRow').style.display = 'flex';
 
