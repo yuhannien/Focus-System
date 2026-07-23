@@ -519,19 +519,49 @@ main{
 }
 .roster-table tr:nth-child(even) td{ background:#fffaf0; }
 
-/* ---------- 房間主頁：分頁與雙框 ---------- */
-.room-hub-tabs{
-  display:flex; gap:8px; justify-content:center; margin:18px 0 22px;
+/* ---------- 「房間」下拉選單 ---------- */
+.nav-dropdown{
+  position:relative;
+  display:flex;
+  align-items:center;
 }
-.room-hub-tab{
-  font-family:inherit; font-size:14px; font-weight:bold;
-  padding:10px 24px; border-radius:20px;
-  border:2px solid var(--kraft-border-light);
-  background:transparent; color:var(--wood-dark);
-  cursor:pointer; transition:box-shadow .15s ease, background .15s ease, color .15s ease, transform .15s ease;
+.nav-dropdown-toggle{ cursor:pointer; }
+.nav-dropdown-menu{
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  margin-top:4px;
+  flex-direction:column;
+  min-width:170px;
+  background:var(--wood-deepest);
+  border:1px solid var(--kraft-border-light);
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 10px 26px rgba(0,0,0,0.45);
+  z-index:150;
 }
-.room-hub-tab:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.18); transform:translateY(-1px); }
-.room-hub-tab.active{ background:var(--vine-green); color:#fff; border-color:var(--vine-green); }
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu{
+  display:flex;
+}
+.nav-dropdown-menu a{
+  color:#fdf3dd;
+  font-size:14px;
+  font-weight:bold;
+  padding:12px 18px;
+  border:none;
+  border-radius:0;
+  text-align:left;
+  transition:background .15s ease;
+}
+.nav-dropdown-menu a:hover{
+  background:rgba(253,243,221,0.15);
+  box-shadow:none;
+  transform:none;
+}
+
+/* ---------- 房間：可點擊的選擇框（建立房間／加入房間） ---------- */
 .room-hub-boxes{
   display:flex; gap:18px; flex-wrap:wrap; justify-content:center; align-items:stretch;
 }
@@ -543,6 +573,7 @@ main{
   padding:20px 22px;
 }
 .room-hub-box h3{ margin:0 0 6px; color:var(--wood-dark); text-align:center; }
+.room-hub-box p{ font-size:13px; margin:0; text-align:center; }
 .room-hub-box label{
   display:block; font-size:13px; color:var(--text-soft); font-weight:bold; margin:14px 0 6px;
 }
@@ -552,6 +583,17 @@ main{
   border-radius:12px; background:#fffaf0; color:var(--text-dark);
 }
 .room-hub-box input:focus{ outline:none; border-color:var(--wood-mid); }
+.room-hub-box-clickable{
+  cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  transition:box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+}
+.room-hub-box-clickable:hover{
+  box-shadow:0 10px 24px rgba(0,0,0,0.25);
+  transform:translateY(-3px);
+  border-color:var(--wood-mid);
+}
+.room-hub-box-clickable .fruit-icon-big{ font-size:40px; }
 @media (max-width:600px){
   .room-hub-boxes{ flex-direction:column; }
 }
@@ -716,7 +758,13 @@ main{
     <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
     <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
     <a id="nav-login" onclick="App.openLoginModal()">登入</a>
-    <a id="nav-room" class="nav-authed" style="display:none;" onclick="App.showPage('room-hub')">房間</a>
+    <div class="nav-dropdown nav-authed" style="display:none;">
+      <a class="nav-dropdown-toggle" id="nav-room">房間 ▾</a>
+      <div class="nav-dropdown-menu">
+        <a onclick="App.showPage('room-manage')">建立/加入房間</a>
+        <a onclick="App.showPage('room-view')">查看房間</a>
+      </div>
+    </div>
     <span id="nav-user-badge" class="nav-authed" style="display:none; align-items:center; gap:6px; color:#fdf3dd; font-size:13px; padding:0 8px;"></span>
     <a id="nav-logout" class="nav-authed" style="display:none;" onclick="App.logout()">登出</a>
   </nav>
@@ -947,50 +995,71 @@ main{
   </section>
 
 
-  <!-- ============ 房間 ============ -->
-  <section id="page-room-hub" class="page">
+  <!-- ============ 建立/加入房間 ============ -->
+  <section id="page-room-manage" class="page">
     <div class="crate-card">
-      <h2>🏠 房間</h2>
+      <h2>🏠 建立/加入房間</h2>
       <p>建立房間可以取得一組代碼，分享給你想追蹤的使用者；加入房間則是輸入別人給你的代碼，讓你之後完成的測驗結果被記錄到該房間中。</p>
 
-      <div id="roomHubLoginNotice" class="home-lead-box" style="display:none;">
+      <div id="roomManageLoginNotice" class="home-lead-box" style="display:none;">
         <p>請先點選右上角的「登入」，使用 Google 帳號登入後才能使用房間功能喔！</p>
       </div>
 
-      <div id="roomHubContent" style="display:none;">
-        <div class="room-hub-tabs">
-          <button type="button" class="room-hub-tab active" id="tab-room-manage" onclick="App.showRoomHubTab('manage')">建立/加入房間</button>
-          <button type="button" class="room-hub-tab" id="tab-room-view" onclick="App.showRoomHubTab('view')">查看房間</button>
-        </div>
+      <div id="roomManageContent" style="display:none;">
 
-        <!-- 分頁一：建立／加入房間（正中間兩個框框） -->
-        <div id="roomHubTabManage" class="room-hub-tab-panel">
-          <div class="room-hub-boxes">
-            <div class="room-hub-box">
-              <h3>🏠 建立房間</h3>
-              <p style="font-size:13px;margin:0;">取得一組房間代碼，分享給你想追蹤的使用者。</p>
-              <label>房間名稱（選填）<input type="text" id="newRoomNameInput" maxlength="30" placeholder="例如：三年二班 / 業務部"></label>
-              <div id="createRoomError" class="player-form-error"></div>
-              <div class="btn-row"><button class="btn-primary" onclick="App.createRoom()">建立房間</button></div>
-              <div id="newRoomResultBox" style="display:none;"></div>
-            </div>
-
-            <div class="room-hub-box">
-              <h3>🔑 加入房間</h3>
-              <p style="font-size:13px;margin:0;">輸入管理者給你的房間代碼。</p>
-              <label>房間代碼<input type="text" id="joinRoomCodeInput" maxlength="10" placeholder="例如：AB12CD" style="text-transform:uppercase;"></label>
-              <div id="joinRoomError" class="player-form-error"></div>
-              <div class="btn-row"><button class="btn-primary" onclick="App.joinRoom()">加入房間</button></div>
-              <div id="joinRoomResultBox" style="display:none;"></div>
-            </div>
+        <!-- 步驟一：兩個大按鈕，選擇要建立還是加入 -->
+        <div id="roomManageChoice" class="room-hub-boxes">
+          <div class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('create')">
+            <span class="fruit-icon-big">🏠</span>
+            <h3>建立房間</h3>
+            <p>取得一組房間代碼，分享給你想追蹤的使用者。</p>
+            <button class="btn-primary" type="button" style="pointer-events:none;">建立房間 ▶</button>
+          </div>
+          <div class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('join')">
+            <span class="fruit-icon-big">🔑</span>
+            <h3>加入房間</h3>
+            <p>輸入管理者給你的房間代碼。</p>
+            <button class="btn-primary" type="button" style="pointer-events:none;">加入房間 ▶</button>
           </div>
         </div>
 
-        <!-- 分頁二：查看房間 -->
-        <div id="roomHubTabView" class="room-hub-tab-panel" style="display:none;">
-          <div id="myRoomsBox"></div>
+        <!-- 步驟二之一：建立房間表單 -->
+        <div id="roomManageFormCreate" style="display:none;">
+          <button class="btn-outline" style="margin:0 0 16px;" onclick="App.showRoomManageChoice()">◀ 返回</button>
+          <div class="room-hub-box" style="max-width:420px;margin:0 auto;">
+            <h3>🏠 建立房間</h3>
+            <label>房間名稱（選填）<input type="text" id="newRoomNameInput" maxlength="30" placeholder="例如：三年二班 / 業務部"></label>
+            <div id="createRoomError" class="player-form-error"></div>
+            <div class="btn-row"><button class="btn-primary" onclick="App.createRoom()">建立房間</button></div>
+            <div id="newRoomResultBox" style="display:none;"></div>
+          </div>
         </div>
+
+        <!-- 步驟二之二：加入房間表單 -->
+        <div id="roomManageFormJoin" style="display:none;">
+          <button class="btn-outline" style="margin:0 0 16px;" onclick="App.showRoomManageChoice()">◀ 返回</button>
+          <div class="room-hub-box" style="max-width:420px;margin:0 auto;">
+            <h3>🔑 加入房間</h3>
+            <label>房間代碼<input type="text" id="joinRoomCodeInput" maxlength="10" placeholder="例如：AB12CD" style="text-transform:uppercase;"></label>
+            <div id="joinRoomError" class="player-form-error"></div>
+            <div class="btn-row"><button class="btn-primary" onclick="App.joinRoom()">加入房間</button></div>
+            <div id="joinRoomResultBox" style="display:none;"></div>
+          </div>
+        </div>
+
       </div>
+    </div>
+  </section>
+
+  <!-- ============ 查看房間 ============ -->
+  <section id="page-room-view" class="page">
+    <div class="crate-card">
+      <h2>📁 查看房間</h2>
+      <p>這裡列出你建立過的所有房間，點擊任一房間即可查看該房間的分析資料。</p>
+      <div id="roomViewLoginNotice" class="home-lead-box" style="display:none;">
+        <p>請先點選右上角的「登入」，使用 Google 帳號登入後才能查看房間喔！</p>
+      </div>
+      <div id="myRoomsBox"></div>
     </div>
   </section>
 
@@ -1089,7 +1158,11 @@ const App = (function(){
       document.getElementById('nav-results').classList.add('active');
       renderHistory();
     }
-    if (name === 'room-hub'){
+    if (name === 'room-manage'){
+      document.getElementById('nav-room').classList.add('active');
+      showRoomManageChoice(); // 每次進入都從「選擇建立/加入」畫面開始
+    }
+    if (name === 'room-view'){
       document.getElementById('nav-room').classList.add('active');
       if (currentUser) loadMyRooms();
     }
@@ -1099,19 +1172,21 @@ const App = (function(){
   function goHome(){ showPage('home'); }
   function goToQuizEntry(){ showPage('quiz-entry'); }
 
-  /* ---------------- 房間主頁：分頁切換 ---------------- */
-  function showRoomHubTab(tab){
-    const isManage = tab === 'manage';
-    document.getElementById('tab-room-manage').classList.toggle('active', isManage);
-    document.getElementById('tab-room-view').classList.toggle('active', !isManage);
-    document.getElementById('roomHubTabManage').style.display = isManage ? 'block' : 'none';
-    document.getElementById('roomHubTabView').style.display = isManage ? 'none' : 'block';
-    if (!isManage) loadMyRooms();
+  /* ---------------- 建立/加入房間：兩步驟畫面切換 ---------------- */
+  function showRoomManageChoice(){
+    document.getElementById('roomManageChoice').style.display = 'flex';
+    document.getElementById('roomManageFormCreate').style.display = 'none';
+    document.getElementById('roomManageFormJoin').style.display = 'none';
+  }
+
+  function showRoomManageForm(type){
+    document.getElementById('roomManageChoice').style.display = 'none';
+    document.getElementById('roomManageFormCreate').style.display = (type === 'create') ? 'block' : 'none';
+    document.getElementById('roomManageFormJoin').style.display = (type === 'join') ? 'block' : 'none';
   }
 
   function backToRoomList(){
-    showPage('room-hub');
-    showRoomHubTab('view');
+    showPage('room-view');
   }
 
   /* ---------------- 測驗流程串接 ---------------- */
@@ -1572,7 +1647,7 @@ const App = (function(){
     try{ localStorage.setItem(USER_KEY, JSON.stringify(currentUser)); }catch(e){}
     document.getElementById('loginOverlay').classList.remove('show');
     updateAuthUI();
-    showPage('room-hub'); // 登入後直接看到「建立房間／加入房間」畫面
+    showPage('room-manage'); // 登入後直接看到「建立房間／加入房間」畫面
   }
 
   function logout(){
@@ -1601,8 +1676,10 @@ const App = (function(){
       badge.innerHTML = '';
     }
 
-    document.getElementById('roomHubLoginNotice').style.display = loggedIn ? 'none' : 'block';
-    document.getElementById('roomHubContent').style.display = loggedIn ? 'block' : 'none';
+    document.getElementById('roomManageLoginNotice').style.display = loggedIn ? 'none' : 'block';
+    document.getElementById('roomManageContent').style.display = loggedIn ? 'block' : 'none';
+    document.getElementById('roomViewLoginNotice').style.display = loggedIn ? 'none' : 'block';
+    document.getElementById('myRoomsBox').style.display = loggedIn ? 'block' : 'none';
 
     if (loggedIn) loadMyRooms();
   }
@@ -1675,7 +1752,7 @@ const App = (function(){
       .then(res => res.json())
       .then(data => {
         if (data.status !== 'ok' || !data.rooms || !data.rooms.length){
-          box.innerHTML = '<p style="font-size:14px;color:var(--text-soft);text-align:center;">您尚未建立房間!</p>';
+          box.innerHTML = '<p style="font-size:14px;color:var(--text-soft);text-align:center;">尚未建立房間</p>';
           return;
         }
         box.innerHTML = '<h3 style="color:var(--wood-dark);">📁 我建立的房間</h3>' + data.rooms.map(r => `
@@ -1852,7 +1929,7 @@ const App = (function(){
     levelComplete, continueFromRecap, goToLevel, finishQuiz,
     downloadRadar, shareResult, restartWholeQuiz, viewHistoryDetail,
     openLoginModal, logout, createRoom, joinRoom, leaveRoom, viewRoomDashboard,
-    showRoomHubTab, backToRoomList, deleteRoom
+    showRoomManageChoice, showRoomManageForm, backToRoomList, deleteRoom
   };
 })();
 </script>
