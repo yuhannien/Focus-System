@@ -242,7 +242,7 @@ main{
   color:var(--text-soft);
   font-weight:bold;
 }
-.player-form input{
+.player-form input, .player-form select{
   font-family:inherit;
   font-size:15px;
   padding:10px 14px;
@@ -252,7 +252,7 @@ main{
   color:var(--text-dark);
   width:180px;
 }
-.player-form input:focus{ outline:none; border-color:var(--wood-mid); }
+.player-form input:focus, .player-form select:focus{ outline:none; border-color:var(--wood-mid); }
 .player-form-error{
   color:var(--accent-red);
   font-size:13px;
@@ -519,83 +519,35 @@ main{
 }
 .roster-table tr:nth-child(even) td{ background:#fffaf0; }
 
-/* ---------- 「房間」下拉選單 ---------- */
-.nav-dropdown{
-  position:relative;
+/* ---------- 房間中心：建立／加入並排 ---------- */
+.room-hub-grid{
   display:flex;
-  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
 }
-.nav-dropdown-toggle{ cursor:pointer; }
-.nav-dropdown-menu{
-  display:none;
-  position:absolute;
-  top:100%;
-  left:0;
-  margin-top:4px;
-  flex-direction:column;
-  min-width:170px;
-  background:var(--wood-deepest);
+.room-hub-grid .crate-card{ flex:1; min-width:260px; margin-top:0; }
+
+/* ---------- 送出中按鈕狀態（防連點） ---------- */
+button:disabled{ opacity:0.6; cursor:not-allowed; }
+.room-list-item{
+  background:var(--kraft-bg2);
   border:1px solid var(--kraft-border-light);
   border-radius:14px;
-  overflow:hidden;
-  box-shadow:0 10px 26px rgba(0,0,0,0.45);
-  z-index:150;
-}
-.nav-dropdown:hover .nav-dropdown-menu,
-.nav-dropdown:focus-within .nav-dropdown-menu{
+  padding:10px 14px;
+  margin-bottom:8px;
   display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
 }
-.nav-dropdown-menu a{
-  color:#fdf3dd;
-  font-size:14px;
-  font-weight:bold;
-  padding:12px 18px;
-  border:none;
-  border-radius:0;
-  text-align:left;
-  transition:background .15s ease;
-}
-.nav-dropdown-menu a:hover{
-  background:rgba(253,243,221,0.15);
-  box-shadow:none;
-  transform:none;
-}
-
-/* ---------- 房間：可點擊的選擇框（建立房間／加入房間） ---------- */
-.room-hub-boxes{
-  display:flex; gap:18px; flex-wrap:wrap; justify-content:center; align-items:stretch;
-}
-.room-hub-box{
-  flex:1; min-width:230px;
-  background:var(--kraft-bg2);
-  border:2px solid var(--kraft-border-light);
-  border-radius:16px;
-  padding:20px 22px;
-}
-.room-hub-box h3{ margin:0 0 6px; color:var(--wood-dark); text-align:center; }
-.room-hub-box p{ font-size:13px; margin:0; text-align:center; }
-.room-hub-box label{
-  display:block; font-size:13px; color:var(--text-soft); font-weight:bold; margin:14px 0 6px;
-}
-.room-hub-box input{
-  width:100%; font-family:inherit; font-size:15px;
-  padding:10px 12px; border:2px solid var(--kraft-border-light);
-  border-radius:12px; background:#fffaf0; color:var(--text-dark);
-}
-.room-hub-box input:focus{ outline:none; border-color:var(--wood-mid); }
-.room-hub-box-clickable{
-  cursor:pointer;
-  display:flex; flex-direction:column; align-items:center; gap:10px;
-  transition:box-shadow .15s ease, transform .15s ease, border-color .15s ease;
-}
-.room-hub-box-clickable:hover{
-  box-shadow:0 10px 24px rgba(0,0,0,0.25);
-  transform:translateY(-3px);
-  border-color:var(--wood-mid);
-}
-.room-hub-box-clickable .fruit-icon-big{ font-size:40px; }
-@media (max-width:600px){
-  .room-hub-boxes{ flex-direction:column; }
+.room-list-item .btn-group{ display:flex; gap:6px; flex-wrap:wrap; }
+.room-list-item button{ margin:0; padding:8px 14px; font-size:12.5px; }
+.btn-danger{
+  background:linear-gradient(135deg, #e07a6d, var(--accent-red));
+  color:#fff; border:none; border-radius:20px;
+  box-shadow:0 4px 10px rgba(192,57,43,0.35);
 }
 
 @media (max-width:600px){
@@ -758,13 +710,7 @@ main{
     <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
     <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
     <a id="nav-login" onclick="App.openLoginModal()">登入</a>
-    <div class="nav-dropdown nav-authed" style="display:none;">
-      <a class="nav-dropdown-toggle" id="nav-room">房間 ▾</a>
-      <div class="nav-dropdown-menu">
-        <a onclick="App.showPage('room-manage')">建立/加入房間</a>
-        <a onclick="App.showPage('room-view')">查看房間</a>
-      </div>
-    </div>
+    <a id="nav-room-hub" class="nav-authed" style="display:none;" onclick="App.showPage('room-hub')">🏠 房間</a>
     <span id="nav-user-badge" class="nav-authed" style="display:none; align-items:center; gap:6px; color:#fdf3dd; font-size:13px; padding:0 8px;"></span>
     <a id="nav-logout" class="nav-authed" style="display:none;" onclick="App.logout()">登出</a>
   </nav>
@@ -824,10 +770,14 @@ main{
         ④ <b>水果記憶鏈</b>：記住並重現水果順序，評估記憶負荷能力</p>
       </div>
       <p>完成四關後，系統會將你的表現整理成雷達圖，並提供改善建議。開始之前，請先告訴我們你的暱稱與年齡：</p>
-      <div id="joinedRoomBadge" style="display:none; text-align:center; margin-bottom:10px;"></div>
       <div class="player-form">
         <label>暱稱<input type="text" id="playerNameInput" maxlength="20" placeholder="例如：小水果"></label>
         <label>年齡<input type="number" id="playerAgeInput" min="1" max="120" placeholder="例如：18"></label>
+        <label>測驗房間
+          <select id="testRoomSelect" onchange="App.onTestRoomChange()">
+            <option value="">不選擇房間（個人測試）</option>
+          </select>
+        </label>
       </div>
       <div id="playerFormError" class="player-form-error"></div>
       <div style="text-align:center;font-size:11.5px;color:var(--text-soft);margin-bottom:6px;">你的暱稱、年齡與測驗結果將被記錄，作為本系統的測驗資料。</div>
@@ -995,79 +945,72 @@ main{
   </section>
 
 
-  <!-- ============ 建立/加入房間 ============ -->
-  <section id="page-room-manage" class="page">
-    <div class="crate-card">
-      <h2>🏠 建立/加入房間</h2>
-      <p>建立房間可以取得一組代碼，分享給你想追蹤的使用者；加入房間則是輸入別人給你的代碼，讓你之後完成的測驗結果被記錄到該房間中。</p>
-
-      <div id="roomManageLoginNotice" class="home-lead-box" style="display:none;">
-        <p>請先點選右上角的「登入」，使用 Google 帳號登入後才能使用房間功能喔！</p>
+  <!-- ============ 房間中心 ============ -->
+  <section id="page-room-hub" class="page">
+    <div class="room-hub-grid">
+      <div class="crate-card" id="roomCreateCard">
+        <h2>🏫 建立房間</h2>
+        <p>建立一個房間以取得一組房間代碼，並傳給你想追蹤的使用者。</p>
+        <div id="roomCreateLoginNotice" class="home-lead-box" style="display:none;">
+          <p>請先登入 Google 帳號才能建立房間喔！</p>
+        </div>
+        <div id="roomCreateForm">
+          <div class="player-form">
+            <label>房間名稱（選填）<input type="text" id="newRoomNameInput" maxlength="30" placeholder="例如：三年二班 / 業務部"></label>
+          </div>
+          <div id="createRoomError" class="player-form-error"></div>
+          <div class="btn-row"><button class="btn-primary" id="createRoomBtn" onclick="App.createRoom()">建立房間</button></div>
+        </div>
+        <div id="newRoomResultBox" style="display:none;"></div>
       </div>
 
-      <div id="roomManageContent" style="display:none;">
-
-        <!-- 步驟一：兩個大按鈕，選擇要建立還是加入 -->
-        <div id="roomManageChoice" class="room-hub-boxes">
-          <div class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('create')">
-            <span class="fruit-icon-big">🏠</span>
-            <h3>建立房間</h3>
-            <p>取得一組房間代碼，分享給你想追蹤的使用者。</p>
-            <button class="btn-primary" type="button" style="pointer-events:none;">建立房間 ▶</button>
-          </div>
-          <div class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('join')">
-            <span class="fruit-icon-big">🔑</span>
-            <h3>加入房間</h3>
-            <p>輸入管理者給你的房間代碼。</p>
-            <button class="btn-primary" type="button" style="pointer-events:none;">加入房間 ▶</button>
-          </div>
+      <div class="crate-card" id="roomJoinCard">
+        <h2>🔑 加入房間</h2>
+        <p>輸入管理者給你的房間代碼，加入後可以在測驗頁選擇要綁定這個房間。</p>
+        <div id="roomJoinLoginNotice" class="home-lead-box" style="display:none;">
+          <p>請先登入 Google 帳號才能加入房間喔！</p>
         </div>
-
-        <!-- 步驟二之一：建立房間表單 -->
-        <div id="roomManageFormCreate" style="display:none;">
-          <button class="btn-outline" style="margin:0 0 16px;" onclick="App.showRoomManageChoice()">◀ 返回</button>
-          <div class="room-hub-box" style="max-width:420px;margin:0 auto;">
-            <h3>🏠 建立房間</h3>
-            <label>房間名稱（選填）<input type="text" id="newRoomNameInput" maxlength="30" placeholder="例如：三年二班 / 業務部"></label>
-            <div id="createRoomError" class="player-form-error"></div>
-            <div class="btn-row"><button class="btn-primary" onclick="App.createRoom()">建立房間</button></div>
-            <div id="newRoomResultBox" style="display:none;"></div>
-          </div>
-        </div>
-
-        <!-- 步驟二之二：加入房間表單 -->
-        <div id="roomManageFormJoin" style="display:none;">
-          <button class="btn-outline" style="margin:0 0 16px;" onclick="App.showRoomManageChoice()">◀ 返回</button>
-          <div class="room-hub-box" style="max-width:420px;margin:0 auto;">
-            <h3>🔑 加入房間</h3>
+        <div id="roomJoinForm">
+          <div class="player-form">
             <label>房間代碼<input type="text" id="joinRoomCodeInput" maxlength="10" placeholder="例如：AB12CD" style="text-transform:uppercase;"></label>
-            <div id="joinRoomError" class="player-form-error"></div>
-            <div class="btn-row"><button class="btn-primary" onclick="App.joinRoom()">加入房間</button></div>
-            <div id="joinRoomResultBox" style="display:none;"></div>
           </div>
+          <div id="joinRoomError" class="player-form-error"></div>
+          <div class="btn-row"><button class="btn-primary" id="joinRoomBtn" onclick="App.joinRoom()">加入房間</button></div>
         </div>
-
+        <div id="joinRoomResultBox" style="display:none;"></div>
       </div>
     </div>
-  </section>
 
-  <!-- ============ 查看房間 ============ -->
-  <section id="page-room-view" class="page">
     <div class="crate-card">
-      <h2>📁 查看房間</h2>
-      <p>這裡列出你建立過的所有房間，點擊任一房間即可查看該房間的分析資料。</p>
-      <div id="roomViewLoginNotice" class="home-lead-box" style="display:none;">
-        <p>請先點選右上角的「登入」，使用 Google 帳號登入後才能查看房間喔！</p>
-      </div>
+      <h2>📁 我建立的房間</h2>
       <div id="myRoomsBox"></div>
     </div>
+
+    <div class="crate-card">
+      <h2>📋 我加入的房間</h2>
+      <div id="joinedRoomsBox"></div>
+    </div>
   </section>
 
-  <!-- ============ 房間數據儀表板 ============ -->
+  <!-- ============ 我加入的房間：個人紀錄 ============ -->
+  <section id="page-room-member-detail" class="page">
+    <div class="crate-card">
+      <div style="display:flex; justify-content:flex-start; margin-bottom:10px;">
+        <button class="btn-outline" style="margin:0;" onclick="App.showPage('room-hub')">◀ 返回我的房間</button>
+      </div>
+      <h2 id="memberRoomTitle" style="text-align:center;">📋 房間紀錄</h2>
+      <p id="memberRoomSub" style="text-align:center; margin-top:-6px;"></p>
+      <div class="btn-row"><button class="btn-primary" onclick="App.retestInRoom()">🔄 再測一次</button></div>
+      <h3 style="margin-top:16px;">你在此房間的歷史測驗紀錄</h3>
+      <div id="memberRoomHistory"></div>
+    </div>
+  </section>
+
+  <!-- ============ 房間數據儀表板（建立者查看整體） ============ -->
   <section id="page-room-dashboard" class="page">
     <div class="crate-card results-card">
       <div style="display:flex; justify-content:flex-start; margin-bottom:10px;">
-        <button class="btn-outline" style="margin:0;" onclick="App.backToRoomList()">◀ 返回我的房間</button>
+        <button class="btn-outline" style="margin:0;" onclick="App.showPage('room-hub')">◀ 返回我的房間</button>
       </div>
       <h2 id="roomDashboardTitle" style="text-align:center;">📈 房間數據</h2>
       <p id="roomDashboardSub" style="text-align:center; margin-top:-6px;"></p>
@@ -1132,8 +1075,9 @@ const App = (function(){
   //    留空字串 "" 代表尚未啟用 Google 登入功能。
   const GOOGLE_CLIENT_ID = "245822345405-tn3a1tpnqm2e4elhqf5r2lj7jbcjh0t3.apps.googleusercontent.com";
 
-  let currentUser = null;   // { name, email, picture }（Google 登入後的使用者資訊）
-  let joinedRoom = null;    // { code, roomName, teacherName }（目前已加入的房間）
+  let currentUser = null;   // { name, email, picture }（Google 登入後的使用者資訊；不持久化，重新整理即清除）
+  let joinedRoom = null;    // { code, roomName, teacherName }（測驗頁下拉選單目前選到的房間）
+  let joinedRoomsList = []; // 這次瀏覽期間，使用者加入過的所有房間
 
   const levelContainers = {
     1: document.getElementById('level1-container'),
@@ -1152,42 +1096,22 @@ const App = (function(){
     if (name === 'about') document.getElementById('nav-about').classList.add('active');
     if (name === 'quiz-entry'){
       document.getElementById('nav-quiz').classList.add('active');
-      updateJoinedRoomBadge();
+      populateTestRoomSelect();
     }
     if (name === 'results-zone'){
       document.getElementById('nav-results').classList.add('active');
       renderHistory();
     }
-    if (name === 'room-manage'){
-      document.getElementById('nav-room').classList.add('active');
-      showRoomManageChoice(); // 每次進入都從「選擇建立/加入」畫面開始
-    }
-    if (name === 'room-view'){
-      document.getElementById('nav-room').classList.add('active');
-      if (currentUser) loadMyRooms();
+    if (name === 'room-hub'){
+      document.getElementById('nav-room-hub').classList.add('active');
+      loadMyRooms();
+      renderJoinedRoomsList();
     }
     window.scrollTo({top:0, behavior:'smooth'});
   }
 
   function goHome(){ showPage('home'); }
   function goToQuizEntry(){ showPage('quiz-entry'); }
-
-  /* ---------------- 建立/加入房間：兩步驟畫面切換 ---------------- */
-  function showRoomManageChoice(){
-    document.getElementById('roomManageChoice').style.display = 'flex';
-    document.getElementById('roomManageFormCreate').style.display = 'none';
-    document.getElementById('roomManageFormJoin').style.display = 'none';
-  }
-
-  function showRoomManageForm(type){
-    document.getElementById('roomManageChoice').style.display = 'none';
-    document.getElementById('roomManageFormCreate').style.display = (type === 'create') ? 'block' : 'none';
-    document.getElementById('roomManageFormJoin').style.display = (type === 'join') ? 'block' : 'none';
-  }
-
-  function backToRoomList(){
-    showPage('room-view');
-  }
 
   /* ---------------- 測驗流程串接 ---------------- */
   function setActiveLevelContainer(levelNum){
@@ -1606,10 +1530,7 @@ const App = (function(){
     renderLevelDetailsInto('levelDetailsBox', record.levelDetails || {});
   }
 
-  /* ---------------- Google 登入 ---------------- */
-  const USER_KEY = 'focusLabUser';
-  const JOINED_ROOM_KEY = 'focusLabJoinedRoom';
-
+  /* ---------------- Google 登入（不記住登入狀態，每次進站需重新登入） ---------------- */
   function parseJwt(token){
     try{
       const base64Url = token.split('.')[1];
@@ -1644,22 +1565,18 @@ const App = (function(){
     const payload = parseJwt(response.credential);
     if (!payload) return;
     currentUser = { name: payload.name, email: payload.email, picture: payload.picture };
-    try{ localStorage.setItem(USER_KEY, JSON.stringify(currentUser)); }catch(e){}
+    // 注意：刻意不寫入 localStorage，重新整理或重新進站都需要再次登入。
     document.getElementById('loginOverlay').classList.remove('show');
     updateAuthUI();
-    showPage('room-manage'); // 登入後直接看到「建立房間／加入房間」畫面
+    showPage('room-hub'); // 登入後直接進入房間中心，看到「建立房間」與「加入房間」兩個框框
   }
 
   function logout(){
     currentUser = null;
     joinedRoom = null;
-    try{
-      localStorage.removeItem(USER_KEY);
-      localStorage.removeItem(JOINED_ROOM_KEY);
-    }catch(e){}
+    joinedRoomsList = [];
     if (typeof google !== 'undefined' && google.accounts) google.accounts.id.disableAutoSelect();
     updateAuthUI();
-    updateJoinedRoomBadge();
     showPage('home');
   }
 
@@ -1676,15 +1593,13 @@ const App = (function(){
       badge.innerHTML = '';
     }
 
-    document.getElementById('roomManageLoginNotice').style.display = loggedIn ? 'none' : 'block';
-    document.getElementById('roomManageContent').style.display = loggedIn ? 'block' : 'none';
-    document.getElementById('roomViewLoginNotice').style.display = loggedIn ? 'none' : 'block';
-    document.getElementById('myRoomsBox').style.display = loggedIn ? 'block' : 'none';
-
-    if (loggedIn) loadMyRooms();
+    document.getElementById('roomCreateLoginNotice').style.display = loggedIn ? 'none' : 'block';
+    document.getElementById('roomCreateForm').style.display = loggedIn ? 'block' : 'none';
+    document.getElementById('roomJoinLoginNotice').style.display = loggedIn ? 'none' : 'block';
+    document.getElementById('roomJoinForm').style.display = loggedIn ? 'block' : 'none';
   }
 
-  /* ---------------- 房間：建立／加入／查詢 ---------------- */
+  /* ---------------- 房間：建立／加入／刪除／查詢 ---------------- */
   function generateCode(len){
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 避開易混淆字元 0/O、1/I
     let out = '';
@@ -1692,27 +1607,12 @@ const App = (function(){
     return out;
   }
 
-  function updateJoinedRoomBadge(){
-    const el = document.getElementById('joinedRoomBadge');
-    if (!el) return;
-    if (joinedRoom){
-      el.style.display = 'block';
-      el.innerHTML = `<span class="tag tag-click">🏠 已加入房間：${joinedRoom.code}${joinedRoom.roomName ? '（'+joinedRoom.roomName+'）' : ''}</span>
-        <a onclick="App.leaveRoom()" style="margin-left:8px;font-size:12px;color:var(--text-soft);cursor:pointer;text-decoration:underline;">離開房間</a>`;
-    } else {
-      el.style.display = 'none';
-      el.innerHTML = '';
-    }
-  }
-
-  function leaveRoom(){
-    joinedRoom = null;
-    try{ localStorage.removeItem(JOINED_ROOM_KEY); }catch(e){}
-    updateJoinedRoomBadge();
-  }
-
+  // ★ 建立房間：用 isCreatingRoom 旗標 + 停用按鈕，避免快速連點造成重複送出
+  let isCreatingRoom = false;
   function createRoom(){
     const errEl = document.getElementById('createRoomError');
+    const btn = document.getElementById('createRoomBtn');
+    if (isCreatingRoom) return; // 正在送出中，忽略這次點擊
     if (!currentUser){ errEl.textContent = '請先登入 Google 帳號才能建立房間。'; return; }
     if (!SHEET_WEBHOOK_URL){ errEl.textContent = '尚未設定雲端後台網址（SHEET_WEBHOOK_URL），無法建立房間。'; return; }
     errEl.textContent = '';
@@ -1720,57 +1620,56 @@ const App = (function(){
     const roomName = document.getElementById('newRoomNameInput').value.trim();
     const roomCode = generateCode(6);
 
+    isCreatingRoom = true;
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = '建立中…';
+
     fetch(SHEET_WEBHOOK_URL, {
       method: 'POST',
       body: JSON.stringify({ action:'createRoom', roomName, creatorName: currentUser.name, creatorEmail: currentUser.email, roomCode })
     }).then(() => {
       const box = document.getElementById('newRoomResultBox');
       box.style.display = 'block';
-      box.innerHTML = `<div class="room-code-display">
+      box.innerHTML = '';
+
+      const wrap = document.createElement('div');
+      wrap.className = 'room-code-display';
+      wrap.innerHTML = `
         <div style="font-size:14px;color:var(--text-mid);">房間建立成功！將以下代碼分享給你要追蹤的使用者：</div>
         <div class="code">${roomCode}</div>
         <div class="btn-row">
-          <button class="btn-outline" style="margin:0;" onclick="navigator.clipboard && navigator.clipboard.writeText('${roomCode}')">📋 複製代碼</button>
-          <button class="btn-primary" style="margin:0;" onclick="App.viewRoomDashboard('${roomCode}')">📈 查看本房間數據</button>
-        </div>
-      </div>`;
+          <button class="btn-outline" type="button">📋 複製代碼</button>
+          <button class="btn-primary" type="button">📈 查看本房間數據</button>
+        </div>`;
+      wrap.querySelector('.btn-outline').addEventListener('click', () => {
+        if (navigator.clipboard) navigator.clipboard.writeText(roomCode);
+      });
+      wrap.querySelector('.btn-primary').addEventListener('click', () => viewRoomDashboard(roomCode));
+      box.appendChild(wrap);
+
       document.getElementById('newRoomNameInput').value = '';
       loadMyRooms();
     }).catch(() => {
       errEl.textContent = '建立房間時發生網路錯誤，請稍後再試一次。';
+    }).finally(() => {
+      isCreatingRoom = false;
+      btn.disabled = false;
+      btn.textContent = originalLabel;
     });
   }
 
-  function loadMyRooms(){
-    const box = document.getElementById('myRoomsBox');
-    if (!box) return;
-    if (!currentUser || !SHEET_WEBHOOK_URL){ box.innerHTML = ''; return; }
-
-    box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入中…</p>';
-
-    fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.status !== 'ok' || !data.rooms || !data.rooms.length){
-          box.innerHTML = '<p style="font-size:14px;color:var(--text-soft);text-align:center;">尚未建立房間</p>';
-          return;
-        }
-        box.innerHTML = '<h3 style="color:var(--wood-dark);">📁 我建立的房間</h3>' + data.rooms.map(r => `
-          <div class="room-item">
-            <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.roomCode}</span></div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;" onclick="App.viewRoomDashboard('${r.roomCode}')">查看數據 ▶</button>
-              <button class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;color:var(--accent-red);border-color:var(--accent-red);" onclick="App.deleteRoom('${r.roomCode}')">🗑 刪除</button>
-            </div>
-          </div>
-        `).join('');
-      }).catch(() => { box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入房間列表時發生網路錯誤。</p>'; });
-  }
-
-  // 刪除房間（需要後台 Google Apps Script 支援 action:'deleteRoom'，詳見程式碼註解）
-  function deleteRoom(roomCode){
+  // ★ 刪除房間：用 isDeletingRoom 旗標 + 停用按鈕，避免連點；用 dataset 綁定，避免代碼含特殊字元導致 onclick 失效
+  let isDeletingRoom = false;
+  function deleteRoom(roomCode, btn){
+    if (isDeletingRoom) return;
     if (!currentUser || !SHEET_WEBHOOK_URL) return;
-    if (!confirm(`確定要刪除房間 ${roomCode} 嗎？此動作無法復原，房間內所有成員的紀錄也會一併移除。`)) return;
+    if (!window.confirm(`確定要刪除房間「${roomCode}」嗎？此動作無法復原。`)) return;
+
+    isDeletingRoom = true;
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = '刪除中…';
 
     fetch(SHEET_WEBHOOK_URL, {
       method: 'POST',
@@ -1779,21 +1678,83 @@ const App = (function(){
       if (data.status === 'ok'){
         loadMyRooms();
       } else {
-        alert('刪除房間失敗：' + (data.message || '請確認後台 Apps Script 是否已加入 deleteRoom 的處理邏輯。'));
+        alert('刪除失敗：找不到這個房間，或這不是你建立的房間。');
+        btn.disabled = false;
+        btn.textContent = originalLabel;
       }
     }).catch(() => {
       alert('刪除房間時發生網路錯誤，請稍後再試一次。');
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }).finally(() => { isDeletingRoom = false; });
+  }
+
+  function loadMyRooms(){
+    const box = document.getElementById('myRoomsBox');
+    if (!box) return;
+    if (!currentUser){ box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);">請先登入才能查看你建立的房間。</p>'; return; }
+    if (!SHEET_WEBHOOK_URL){ box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);">尚未設定雲端後台網址，無法查詢房間。</p>'; return; }
+
+    fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status !== 'ok' || !data.rooms || !data.rooms.length){
+          box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);">您尚未建立房間!</p>';
+          return;
+        }
+        box.innerHTML = '';
+        data.rooms.forEach(r => {
+          const item = document.createElement('div');
+          item.className = 'room-list-item';
+          item.innerHTML = `
+            <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.roomCode}</span></div>
+            <div class="btn-group">
+              <button class="btn-outline btn-view-room" type="button">查看數據 ▶</button>
+              <button class="btn-danger btn-delete-room" type="button">🗑 刪除</button>
+            </div>`;
+          // 用 addEventListener + closure 綁定，不依賴字串拼接的 onclick，避免代碼/名稱含特殊字元時失效
+          item.querySelector('.btn-view-room').addEventListener('click', () => viewRoomDashboard(r.roomCode));
+          item.querySelector('.btn-delete-room').addEventListener('click', (ev) => deleteRoom(r.roomCode, ev.currentTarget));
+          box.appendChild(item);
+        });
+      }).catch(() => { box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);">查詢房間時發生網路錯誤。</p>'; });
+  }
+
+  function renderJoinedRoomsList(){
+    const box = document.getElementById('joinedRoomsBox');
+    if (!box) return;
+    if (!joinedRoomsList.length){
+      box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);">您尚未加入任何房間!</p>';
+      return;
+    }
+    box.innerHTML = '';
+    joinedRoomsList.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'room-list-item';
+      item.innerHTML = `
+        <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.code}</span>　管理者：${r.teacherName || '—'}</div>
+        <div class="btn-group"><button class="btn-outline btn-view-member" type="button">查看紀錄 ▶</button></div>`;
+      item.querySelector('.btn-view-member').addEventListener('click', () => viewRoomMemberDetail(r.code));
+      box.appendChild(item);
     });
   }
 
+  let isJoiningRoom = false;
   function joinRoom(){
     const errEl = document.getElementById('joinRoomError');
+    const btn = document.getElementById('joinRoomBtn');
+    if (isJoiningRoom) return;
     if (!currentUser){ errEl.textContent = '請先登入 Google 帳號才能加入房間。'; return; }
     if (!SHEET_WEBHOOK_URL){ errEl.textContent = '尚未設定雲端後台網址（SHEET_WEBHOOK_URL），無法加入房間。'; return; }
 
     const code = document.getElementById('joinRoomCodeInput').value.trim().toUpperCase();
     if (!code){ errEl.textContent = '請輸入房間代碼。'; return; }
     errEl.textContent = '';
+
+    isJoiningRoom = true;
+    btn.disabled = true;
+    const originalLabel = btn.textContent;
+    btn.textContent = '查詢中…';
 
     fetch(`${SHEET_WEBHOOK_URL}?action=checkRoom&roomCode=${encodeURIComponent(code)}`)
       .then(res => res.json())
@@ -1802,20 +1763,30 @@ const App = (function(){
           errEl.textContent = '找不到這個房間代碼，請確認後再試一次。';
           return;
         }
-        joinedRoom = { code, roomName: data.roomName, teacherName: data.teacherName };
-        try{ localStorage.setItem(JOINED_ROOM_KEY, JSON.stringify(joinedRoom)); }catch(e){}
-        updateJoinedRoomBadge();
+        const room = { code, roomName: data.roomName, teacherName: data.teacherName };
+        if (!joinedRoomsList.some(r => r.code === code)) joinedRoomsList.push(room);
+        joinedRoom = room; // 設為目前預設要使用的房間（測驗頁下拉選單可再切換）
+        renderJoinedRoomsList();
 
         const box = document.getElementById('joinRoomResultBox');
         box.style.display = 'block';
-        box.innerHTML = `<div class="room-code-display">
+        box.innerHTML = '';
+        const wrap = document.createElement('div');
+        wrap.className = 'room-code-display';
+        wrap.innerHTML = `
           <div style="font-size:14px;color:var(--text-mid);">已成功加入房間！</div>
           <div style="font-size:18px;font-weight:bold;color:var(--vine-green-dark);margin:6px 0;">${data.roomName || '(未命名房間)'}</div>
           <div style="font-size:12.5px;color:var(--text-soft);">管理者：${data.teacherName || '—'}</div>
-          <div class="btn-row"><button class="btn-primary" onclick="App.goToQuizEntry()">前往測驗 ▶</button></div>
-        </div>`;
+          <div class="btn-row"><button class="btn-primary" type="button">前往測驗 ▶</button></div>`;
+        wrap.querySelector('.btn-primary').addEventListener('click', () => goToQuizEntry());
+        box.appendChild(wrap);
+        document.getElementById('joinRoomCodeInput').value = '';
       }).catch(() => {
         errEl.textContent = '查詢房間時發生網路錯誤，請稍後再試一次。';
+      }).finally(() => {
+        isJoiningRoom = false;
+        btn.disabled = false;
+        btn.textContent = originalLabel;
       });
   }
 
@@ -1860,6 +1831,67 @@ const App = (function(){
       }).catch(() => { alert('查詢房間數據時發生網路錯誤，請稍後再試一次。'); });
   }
 
+  /* ---------------- 我加入的房間：個人紀錄／再測一次 ---------------- */
+  let currentMemberRoomCode = null;
+
+  function viewRoomMemberDetail(roomCode){
+    const room = joinedRoomsList.find(r => r.code === roomCode);
+    if (!room) return;
+    currentMemberRoomCode = roomCode;
+
+    showPage('room-member-detail');
+    document.getElementById('memberRoomTitle').textContent = `📋 ${room.roomName || '(未命名房間)'}`;
+    document.getElementById('memberRoomSub').textContent = `房間代碼：${roomCode}　管理者：${room.teacherName || '—'}`;
+
+    let list = [];
+    try{ list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){}
+    const mine = list.filter(r => r.roomCode === roomCode);
+
+    const el = document.getElementById('memberRoomHistory');
+    if (!mine.length){
+      el.innerHTML = '<div class="empty-state">你在這個房間裡還沒有測驗紀錄。</div>';
+      return;
+    }
+    el.innerHTML = mine.slice().reverse().map((r) => {
+      const idx = list.indexOf(r);
+      const d = new Date(r.timestamp);
+      const dateStr = d.toLocaleString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div class="history-item" data-idx="${idx}" style="cursor:pointer;">
+        <div>
+          <div class="hi-date">${dateStr}</div>
+          <div class="hi-scores">穩定度 ${r.scores[1]} ・ 抗干擾 ${r.scores[2]} ・ 反應控制 ${r.scores[3]} ・ 記憶負荷 ${r.scores[4]}</div>
+        </div>
+        <div class="btn-outline" style="margin:0;padding:8px 16px;font-size:13px;">查看詳細結果 ▶</div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.history-item').forEach(item => {
+      item.addEventListener('click', () => viewHistoryDetail(Number(item.dataset.idx)));
+    });
+  }
+
+  function retestInRoom(){
+    if (currentMemberRoomCode){
+      const room = joinedRoomsList.find(r => r.code === currentMemberRoomCode);
+      if (room) joinedRoom = room; // 綁定接下來的測驗到這個房間
+    }
+    goToQuizEntry();
+  }
+
+  /* ---------------- 測驗頁：選擇要綁定的房間（或個人測試） ---------------- */
+  function populateTestRoomSelect(){
+    const sel = document.getElementById('testRoomSelect');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">不選擇房間（個人測試）</option>' +
+      joinedRoomsList.map(r => `<option value="${r.code}">${r.code}${r.roomName ? ' - '+r.roomName : ''}</option>`).join('');
+    sel.value = joinedRoom ? joinedRoom.code : '';
+  }
+
+  function onTestRoomChange(){
+    const sel = document.getElementById('testRoomSelect');
+    const code = sel.value;
+    joinedRoom = code ? (joinedRoomsList.find(r => r.code === code) || null) : null;
+  }
+
   /* ---------------- 全域鍵盤：Enter 快速確認 / 下一關 ---------------- */
   document.addEventListener('keydown', function(e){
     if (e.key !== 'Enter') return;
@@ -1874,6 +1906,20 @@ const App = (function(){
     if (document.getElementById('page-quiz-entry').classList.contains('active')){
       e.preventDefault();
       startQuizFlow();
+      return;
+    }
+
+    if (document.getElementById('page-room-hub').classList.contains('active')){
+      if (e.target.closest('#roomCreateCard')){
+        e.preventDefault();
+        createRoom();
+        return;
+      }
+      if (e.target.closest('#roomJoinCard')){
+        e.preventDefault();
+        joinRoom();
+        return;
+      }
       return;
     }
 
@@ -1903,33 +1949,15 @@ const App = (function(){
     }
   });
 
-  /* ---------------- 初始化：每次重新進站都必須重新登入 ----------------
-     （刻意不從 localStorage 還原 currentUser，即使使用者上次沒有按登出，
-      重新整理或關掉分頁再打開網站時，也會回到「未登入」狀態）
-     若使用者之前有加入過房間，仍會還原「已加入房間」的標記（僅供顯示參考）。 */
-  try{
-    const savedRoom = localStorage.getItem(JOINED_ROOM_KEY);
-    if (savedRoom) joinedRoom = JSON.parse(savedRoom);
-  }catch(e){}
+  /* ---------------- 初始化：不還原登入狀態，每次進站都是未登入 ---------------- */
   updateAuthUI();
-  updateJoinedRoomBadge();
-
-  /* ---------------- 建立／加入房間輸入框：可按 Enter 直接送出 ---------------- */
-  const newRoomNameEl = document.getElementById('newRoomNameInput');
-  if (newRoomNameEl) newRoomNameEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ e.preventDefault(); createRoom(); }
-  });
-  const joinRoomCodeEl = document.getElementById('joinRoomCodeInput');
-  if (joinRoomCodeEl) joinRoomCodeEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ e.preventDefault(); joinRoom(); }
-  });
 
   return {
     showPage, goHome, goToQuizEntry, startQuizFlow,
     levelComplete, continueFromRecap, goToLevel, finishQuiz,
     downloadRadar, shareResult, restartWholeQuiz, viewHistoryDetail,
-    openLoginModal, logout, createRoom, joinRoom, leaveRoom, viewRoomDashboard,
-    showRoomManageChoice, showRoomManageForm, backToRoomList, deleteRoom
+    openLoginModal, logout, createRoom, deleteRoom, joinRoom, viewRoomDashboard,
+    viewRoomMemberDetail, retestInRoom, onTestRoomChange
   };
 })();
 </script>
