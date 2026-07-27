@@ -1379,7 +1379,7 @@
         <section id="page-quiz-entry" class="page">
             <div class="crate-card">
                 <h2>🎮 測驗說明</h2>
-                <p>本測驗共四個關卡，將依序進行、中途不會停止，每一關結束後會先顯示你在該關的表現，接著自動進入下一關：</p>
+                <p>本測驗共四個關卡，將依序進行，中途不會停止。每一關結束後會先顯示你在該關的表現，接著自動進入下一關：</p>
                 <div class="home-lead-box" style="text-align:left;">
                     <p>
                         ① <b>水果守衛</b>：目標辨識任務，評估注意力穩定度<br>
@@ -1392,7 +1392,7 @@
                 <div id="joinedRoomBadge" style="display:none; text-align:center; margin-bottom:10px;"></div>
                 <div class="player-form">
                     <label>
-                        要在哪個房間進行測試？
+                        選擇房間進行測試？
                         <select id="quizRoomSelect" onchange="App.onQuizRoomSelectChange()">
                             <option value="">不選擇房間</option>
                         </select>
@@ -1559,7 +1559,7 @@
         <section id="page-results-zone" class="page">
             <div class="crate-card">
                 <h2>結果專區</h2>
-                <p>這裡會保存你在此裝置、此瀏覽器上完成過的測驗紀錄。點選任一筆紀錄即可查看該次的雷達圖與詳細結果。</p>
+                <p>這裡會保存你在此瀏覽器上完成過的測驗紀錄。點選任一筆紀錄即可查看該次的雷達圖與詳細結果。</p>
                 <div id="historyList"></div>
                 <div class="btn-row"><button class="btn-primary" onclick="App.goToQuizEntry()">開始新的測驗</button></div>
             </div>
@@ -1569,7 +1569,7 @@
         <!-- ============ 建立/加入房間 ============ -->
         <section id="page-room-manage" class="page">
             <div class="crate-card">
-                <h2>🏠 建立/加入房間</h2>
+                <h2>🏠 建立|加入房間</h2>
                 <p>建立房間可以取得一組代碼，分享給你想追蹤的使用者；加入房間則是輸入別人給你的代碼，讓你之後完成的測驗結果被記錄到該房間中。</p>
 
                 <div id="roomManageLoginNotice" class="home-lead-box" style="display:none;">
@@ -1599,7 +1599,7 @@
                         <button class="btn-outline" style="margin:0 0 16px;" onclick="App.showRoomManageChoice()">◀ 返回</button>
                         <div class="room-hub-box" style="max-width:420px;margin:0 auto;">
                             <h3>🏠 建立房間</h3>
-                            <label>房間名稱<input type="text" id="newRoomNameInput" maxlength="30" placeholder="例如：102 / 業務部"></label>
+                            <label>房間名稱<input type="text" id="newRoomNameInput" maxlength="30" placeholder="例如：一年二班 / 行銷部"></label>
                             <div id="createRoomError" class="player-form-error"></div>
                             <div class="btn-row"><button type="button" id="createRoomBtn" class="btn-primary" onclick="App.createRoom()">建立房間</button></div>
                             <div id="newRoomResultBox" style="display:none;"></div>
