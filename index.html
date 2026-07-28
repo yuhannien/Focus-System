@@ -6,6 +6,7 @@
     <title>智慧型專注力分析與改善系統</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
     <style>
              /* =========================================================
         全站共用主題：水果攤／木箱風格
@@ -440,30 +441,88 @@
                      display: block;
                  }
 
-             .quiz-progress {
-                 display: flex;
-                 justify-content: center;
-                 gap: 10px;
-                 margin-bottom: 16px;
-             }
+             /* ---------- 木箱水果進度條 (fruit progress bar) ---------- */
+            .quiz-progress {
+                position: relative;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                max-width: 480px;
+                margin: 0 auto 30px;
+                padding: 0 6px;
+            }
 
-                 .quiz-progress .dot {
-                     width: 14px;
-                     height: 14px;
-                     border-radius: 50%;
-                     background: rgba(253,243,221,0.3);
-                     border: 2px solid var(--kraft-border-light);
-                     transition: background .2s ease, transform .2s ease;
-                 }
+                .quiz-progress::before {
+                    content: "";
+                    position: absolute;
+                    left: 22px;
+                    right: 22px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    height: 10px;
+                    background: var(--wood-deepest);
+                    border-radius: 8px;
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+                    z-index: 0;
+                }
 
-                     .quiz-progress .dot.done {
-                         background: var(--vine-green-light);
-                     }
+            .quiz-progress-fill {
+                position: absolute;
+                left: 22px;
+                top: 50%;
+                transform: translateY(-50%);
+                height: 10px;
+                width: 0%;
+                max-width: calc(100% - 44px);
+                background: linear-gradient(90deg, var(--vine-green), var(--vine-green-light));
+                border-radius: 8px;
+                box-shadow: 0 0 8px rgba(111,174,63,0.7);
+                transition: width .5s ease;
+                z-index: 1;
+            }
 
-                     .quiz-progress .dot.current {
-                         background: #fff;
-                         transform: scale(1.25);
-                     }
+                .quiz-progress .dot {
+                    position: relative;
+                    z-index: 2;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 22px;
+                    background: radial-gradient(circle at 35% 30%, #e8c98a, var(--wood-mid) 70%);
+                    border: 3px solid var(--kraft-border-light);
+                    box-shadow: 0 3px 8px rgba(0,0,0,0.45);
+                    transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+                    filter: grayscale(70%) brightness(0.8);
+                }
+
+                    .quiz-progress .dot.done {
+                        background: radial-gradient(circle at 35% 30%, #cdeab0, var(--vine-green) 70%);
+                        border-color: var(--vine-green-light);
+                        filter: none;
+                    }
+
+                    .quiz-progress .dot.current {
+                        filter: none;
+                        border-color: #fff8e6;
+                        transform: scale(1.2);
+                        box-shadow: 0 0 0 5px rgba(201,151,79,0.35), 0 4px 12px rgba(0,0,0,0.5);
+                    }
+
+                    .quiz-progress .dot .fruit-label {
+                        position: absolute;
+                        top: 100%;
+                        margin-top: 6px;
+                        font-size: 11px;
+                        font-weight: bold;
+                        color: #fdf3dd;
+                        white-space: nowrap;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+                    }
 
              /* ---------- 關卡完成 recap 覆蓋層 ---------- */
              .recap-overlay {
@@ -1435,10 +1494,11 @@
         <!-- ============ 測驗（四關） ============ -->
         <section id="page-quiz" class="page">
             <div class="quiz-progress">
-                <div class="dot" id="dot-1">1</div>
-                <div class="dot" id="dot-2">2</div>
-                <div class="dot" id="dot-3">3</div>
-                <div class="dot" id="dot-4">4</div>
+                <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+                <div class="dot" id="dot-1">🍓<span class="fruit-label">第一關</span></div>
+                <div class="dot" id="dot-2">🍊<span class="fruit-label">第二關</span></div>
+                <div class="dot" id="dot-3">🍇<span class="fruit-label">第三關</span></div>
+                <div class="dot" id="dot-4">🍌<span class="fruit-label">第四關</span></div>
             </div>
 
             <!-- 各關卡容器將於後續段落插入 -->
@@ -3956,6 +4016,105 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     </script>
+<!-- ===== 新增:左下角音樂開關 + 進度條自動連動 ===== -->
+    <button id="musicToggleBtn" class="music-toggle-btn" onclick="toggleBgMusic()" title="背景音樂開關">
+        <span id="musicToggleIcon">🔇</span>
+    </button>
 
+    <style>
+        .music-toggle-btn {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 3px solid var(--kraft-border-light);
+            background: radial-gradient(circle at 35% 30%, var(--wood-light), var(--wood-dark) 75%);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 300;
+            transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+            .music-toggle-btn:hover {
+                transform: translateY(-2px) scale(1.05);
+            }
+            .music-toggle-btn.on {
+                background: radial-gradient(circle at 35% 30%, var(--vine-green-light), var(--vine-green-dark) 75%);
+                border-color: var(--vine-green-light);
+                animation: musicPulse 1.6s ease-in-out infinite;
+            }
+        @keyframes musicPulse {
+            0%, 100% { box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 0 0 rgba(111,174,63,0.5); }
+            50% { box-shadow: 0 6px 16px rgba(0,0,0,0.5), 0 0 0 8px rgba(111,174,63,0); }
+        }
+    </style>
+
+    <script>
+    /* 進度條依 dot 的 done / current 狀態自動更新填色,不需修改任何原有函式 */
+    (function () {
+        const fillEl = document.getElementById('quiz-progress-fill');
+        if (!fillEl) return;
+        const dots = [1, 2, 3, 4].map(i => document.getElementById('dot-' + i));
+        function updateFill() {
+            const doneCount = dots.filter(d => d && d.classList.contains('done')).length;
+            const currentIdx = dots.findIndex(d => d && d.classList.contains('current'));
+            let levelNum = currentIdx >= 0 ? currentIdx + 1 : doneCount + 1;
+            if (levelNum > 4) levelNum = 4;
+            fillEl.style.width = ((levelNum - 1) / 3 * 100) + '%';
+        }
+        dots.forEach(d => {
+            if (!d) return;
+            new MutationObserver(updateFill).observe(d, { attributes: true, attributeFilter: ['class'] });
+        });
+        updateFill();
+    })();
+
+    /* 溫暖背景音樂:Tone.js 合成輕柔和弦循環 */
+    let bgMusicOn = false, bgMusicInited = false, bgSynth, bgLoop;
+
+    function initBgMusic() {
+        if (bgMusicInited) return;
+        bgMusicInited = true;
+        bgSynth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: 'sine' },
+            envelope: { attack: 1.5, decay: 1, sustain: 0.6, release: 3 }
+        }).toDestination();
+        bgSynth.volume.value = -20;
+        const chords = [
+            ['C4', 'E4', 'G4'], ['A3', 'C4', 'E4'],
+            ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4']
+        ];
+        let i = 0;
+        Tone.Transport.bpm.value = 68;
+        bgLoop = new Tone.Loop(time => {
+            bgSynth.triggerAttackRelease(chords[i % chords.length], '2n', time);
+            i++;
+        }, '2m').start(0);
+    }
+
+    async function toggleBgMusic() {
+        const icon = document.getElementById('musicToggleIcon');
+        const btn = document.getElementById('musicToggleBtn');
+        if (!bgMusicOn) {
+            await Tone.start();
+            initBgMusic();
+            Tone.Transport.start();
+            bgMusicOn = true;
+            icon.textContent = '🎵';
+            btn.classList.add('on');
+        } else {
+            Tone.Transport.pause();
+            bgMusicOn = false;
+            icon.textContent = '🔇';
+            btn.classList.remove('on');
+        }
+    }
+    </script>
+</body>
 </body>
 </html>
