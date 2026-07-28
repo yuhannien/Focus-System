@@ -3933,6 +3933,28 @@ function renderLineChart() {
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
     });
 }
+document.addEventListener('DOMContentLoaded', function() {
+            const roomToggle = document.getElementById('nav-room');
+            const dropdownMenu = document.querySelector('.nav-dropdown-menu');
+
+            if (roomToggle && dropdownMenu) {
+                roomToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (dropdownMenu.style.display === 'flex') {
+                        dropdownMenu.style.display = 'none';
+                    } else {
+                        dropdownMenu.style.display = 'flex';
+                    }
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.nav-dropdown')) {
+                        dropdownMenu.style.display = 'none';
+                    }
+                });
+            }
+        });
     </script>
 
 </body>
