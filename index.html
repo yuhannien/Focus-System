@@ -4074,44 +4074,65 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFill();
     })();
 
-    /* 溫暖背景音樂:Tone.js 合成輕柔和弦循環 */
-    let bgMusicOn = false, bgMusicInited = false, bgSynth, bgLoop;
+/* 溫暖背景音樂:木質音樂盒風格 — 一顆持續的暖墊長音 + 輕柔五聲音階旋律 */
+    let bgMusicOn = false, bgMusicInited = false;
+    let bgPadSynth, bgMelodySynth, bgReverb, bgFilter, bgSequence;
+
+    // 五聲音階旋律,null 是休止符,營造放鬆的呼吸感
+    const BG_MELODY_NOTES = [
+        'C4', null, 'E4', 'D4', null, 'G4', 'E4', null,
+        'A4', 'G4', null, 'E4', 'D4', null, 'C4', null
+    ];
+    const BG_PAD_NOTES = ['C3', 'G3', 'C4']; // 底層暖墊和弦,只彈一次、持續到關閉為止
 
     function initBgMusic() {
         if (bgMusicInited) return;
         bgMusicInited = true;
-        bgSynth = new Tone.PolySynth(Tone.Synth, {
+
+        bgReverb = new Tone.Reverb({ decay: 5, wet: 0.3 }).toDestination();
+        bgFilter = new Tone.Filter({ frequency: 1100, type: 'lowpass', rolloff: -12 }).connect(bgReverb);
+
+        // 底層暖墊:只啟動一次,之後持續發聲到關閉為止,音量固定,不會重複觸發造成忽大忽小
+        bgPadSynth = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'sine' },
-            envelope: { attack: 1.5, decay: 1, sustain: 0.6, release: 3 }
-        }).toDestination();
-        bgSynth.volume.value = -20;
-        const chords = [
-            ['C4', 'E4', 'G4'], ['A3', 'C4', 'E4'],
-            ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4']
-        ];
-        let i = 0;
-        Tone.Transport.bpm.value = 68;
-        bgLoop = new Tone.Loop(time => {
-            bgSynth.triggerAttackRelease(chords[i % chords.length], '2n', time);
-            i++;
-        }, '2m').start(0);
+            envelope: { attack: 4, decay: 0, sustain: 1, release: 4 },
+            volume: -26
+        }).connect(bgFilter);
+
+        // 旋律:木質音樂盒般的輕柔撥音,五聲音階,聽起來放鬆愉快不刺耳
+        bgMelodySynth = new Tone.Synth({
+            oscillator: { type: 'triangle' },
+            envelope: { attack: 0.02, decay: 0.6, sustain: 0.1, release: 1.4 },
+            volume: -18
+        }).connect(bgFilter);
+
+        Tone.Transport.bpm.value = 76;
+        bgSequence = new Tone.Sequence((time, note) => {
+            if (note) bgMelodySynth.triggerAttackRelease(note, '8n', time, 0.7);
+        }, BG_MELODY_NOTES, '8n');
+        bgSequence.loop = true;
     }
 
     async function toggleBgMusic() {
         const icon = document.getElementById('musicToggleIcon');
         const btn = document.getElementById('musicToggleBtn');
+
         if (!bgMusicOn) {
             await Tone.start();
             initBgMusic();
-            Tone.Transport.start();
             bgMusicOn = true;
             icon.textContent = '🎵';
             btn.classList.add('on');
+            bgPadSynth.triggerAttack(BG_PAD_NOTES); // 暖墊只彈一次,之後持續不斷
+            bgSequence.start(0);
+            Tone.Transport.start();
         } else {
-            Tone.Transport.pause();
             bgMusicOn = false;
             icon.textContent = '🔇';
             btn.classList.remove('on');
+            bgSequence.stop();
+            bgPadSynth.releaseAll();
+            Tone.Transport.stop();
         }
     }
     </script>
