@@ -837,46 +837,12 @@
                      color: var(--tier-low);
                  }
 
-             /* ---------- 使用者登入徽章（頭像下拉選單） ---------- */
-             .nav-avatar-toggle {
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 padding: 4px 10px;
-             }
-
-                 .nav-avatar-toggle img {
-                     width: 30px;
-                     height: 30px;
-                     border-radius: 50%;
-                     border: 2px solid var(--kraft-border-light);
-                     display: block;
-                 }
-
-             .nav-avatar-fallback {
-                 width: 30px;
-                 height: 30px;
+             /* ---------- 使用者登入徽章 ---------- */
+             #nav-user-badge img {
+                 width: 24px;
+                 height: 24px;
                  border-radius: 50%;
-                 background: var(--vine-green);
-                 color: #fdf3dd;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 font-weight: bold;
-                 font-size: 14px;
                  border: 2px solid var(--kraft-border-light);
-             }
-
-             .nav-dropdown-username {
-                 display: block;
-                 padding: 10px 18px 4px;
-                 font-size: 12px;
-                 color: var(--kraft-border-light);
-                 font-weight: bold;
-                 white-space: nowrap;
-                 overflow: hidden;
-                 text-overflow: ellipsis;
-                 max-width: 200px;
              }
 
              /* ---------- 房間代碼顯示 ---------- */
@@ -993,37 +959,6 @@
                      box-shadow: none;
                      transform: none;
                  }
-                 /* ---------- 三槓漢堡選單圖示 ---------- */
-             .nav-hamburger-toggle {
-                 padding: 8px 12px;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-             }
-
-             .nav-hamburger-icon {
-                 display: flex;
-                 flex-direction: column;
-                 justify-content: center;
-                 gap: 4px;
-                 width: 22px;
-                 height: 16px;
-                 transition: transform .25s ease;
-             }
-
-                 .nav-hamburger-icon span {
-                     display: block;
-                     width: 100%;
-                     height: 2.5px;
-                     background: #fdf3dd;
-                     border-radius: 2px;
-                 }
-
-             .nav-dropdown:hover .nav-hamburger-icon,
-             .nav-dropdown:focus-within .nav-hamburger-icon {
-                 transform: rotate(90deg);
-             }
-                 
 
              /* ---------- 房間：可點擊的選擇框（建立房間／加入房間） ---------- */
              .room-hub-boxes {
@@ -1466,20 +1401,9 @@
             <span class="logo-text">專注力分析與改善系統<small>Focus Fruit Lab</small></span>
         </div>
         <nav class="site-nav">
-            <div class="nav-dropdown">
-                <a class="nav-dropdown-toggle nav-hamburger-toggle" id="nav-menu-toggle" aria-label="選單">
-                    <span class="nav-hamburger-icon">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </span>
-                </a>
-                <div class="nav-dropdown-menu">
-                    <a id="nav-about" onclick="App.showPage('about')">網站設立動機</a>
-                    <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
-                    <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
-                </div>
-            </div>
+            <a id="nav-about" onclick="App.showPage('about')">網站設立動機</a>
+            <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
+            <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
             <a id="nav-login" onclick="App.openLoginModal()">登入</a>
             <div class="nav-dropdown nav-authed" style="display:none;">
                 <a class="nav-dropdown-toggle" id="nav-room">房間 ▾</a>
@@ -1488,13 +1412,8 @@
                     <a onclick="App.showPage('room-view')">查看房間</a>
                 </div>
             </div>
-            <div class="nav-dropdown nav-authed" style="display:none;">
-                <a class="nav-dropdown-toggle nav-avatar-toggle" id="nav-user-badge"></a>
-                <div class="nav-dropdown-menu">
-                    <span id="nav-user-name-label" class="nav-dropdown-username"></span>
-                    <a onclick="App.logout()">登出</a>
-                </div>
-            </div>
+            <span id="nav-user-badge" class="nav-authed" style="display:none; align-items:center; gap:6px; color:#fdf3dd; font-size:13px; padding:0 8px;"></span>
+            <a id="nav-logout" class="nav-authed" style="display:none;" onclick="App.logout()">登出</a>
         </nav>
     </header>
 
@@ -2514,15 +2433,11 @@
         document.querySelectorAll('.nav-authed').forEach(el => { el.style.display = loggedIn ? '' : 'none'; });
 
         const badge = document.getElementById('nav-user-badge');
-        const nameLabel = document.getElementById('nav-user-name-label');
         if (loggedIn){
-        badge.innerHTML = currentUser.picture
-            ? `<img src="${currentUser.picture}" alt="${currentUser.name || ''}">`
-            : `<span class="nav-avatar-fallback">${(currentUser.name || '?').charAt(0).toUpperCase()}</span>`;
-        if (nameLabel) nameLabel.textContent = currentUser.name || '';
+        badge.style.display = 'flex';
+        badge.innerHTML = (currentUser.picture ? `<img src="${currentUser.picture}" alt="">` : '') + `<span>${currentUser.name}</span>`;
         } else {
         badge.innerHTML = '';
-        if (nameLabel) nameLabel.textContent = '';
         }
 
         document.getElementById('roomManageLoginNotice').style.display = loggedIn ? 'none' : 'block';
@@ -4159,65 +4074,44 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFill();
     })();
 
-/* 溫暖背景音樂:木質音樂盒風格 — 一顆持續的暖墊長音 + 輕柔五聲音階旋律 */
-    let bgMusicOn = false, bgMusicInited = false;
-    let bgPadSynth, bgMelodySynth, bgReverb, bgFilter, bgSequence;
-
-    // 五聲音階旋律,null 是休止符,營造放鬆的呼吸感
-    const BG_MELODY_NOTES = [
-        'C4', null, 'E4', 'D4', null, 'G4', 'E4', null,
-        'A4', 'G4', null, 'E4', 'D4', null, 'C4', null
-    ];
-    const BG_PAD_NOTES = ['C3', 'G3', 'C4']; // 底層暖墊和弦,只彈一次、持續到關閉為止
+    /* 溫暖背景音樂:Tone.js 合成輕柔和弦循環 */
+    let bgMusicOn = false, bgMusicInited = false, bgSynth, bgLoop;
 
     function initBgMusic() {
         if (bgMusicInited) return;
         bgMusicInited = true;
-
-        bgReverb = new Tone.Reverb({ decay: 5, wet: 0.3 }).toDestination();
-        bgFilter = new Tone.Filter({ frequency: 1100, type: 'lowpass', rolloff: -12 }).connect(bgReverb);
-
-        // 底層暖墊:只啟動一次,之後持續發聲到關閉為止,音量固定,不會重複觸發造成忽大忽小
-        bgPadSynth = new Tone.PolySynth(Tone.Synth, {
+        bgSynth = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'sine' },
-            envelope: { attack: 4, decay: 0, sustain: 1, release: 4 },
-            volume: -26
-        }).connect(bgFilter);
-
-        // 旋律:木質音樂盒般的輕柔撥音,五聲音階,聽起來放鬆愉快不刺耳
-        bgMelodySynth = new Tone.Synth({
-            oscillator: { type: 'triangle' },
-            envelope: { attack: 0.02, decay: 0.6, sustain: 0.1, release: 1.4 },
-            volume: -18
-        }).connect(bgFilter);
-
-        Tone.Transport.bpm.value = 76;
-        bgSequence = new Tone.Sequence((time, note) => {
-            if (note) bgMelodySynth.triggerAttackRelease(note, '8n', time, 0.7);
-        }, BG_MELODY_NOTES, '8n');
-        bgSequence.loop = true;
+            envelope: { attack: 1.5, decay: 1, sustain: 0.6, release: 3 }
+        }).toDestination();
+        bgSynth.volume.value = -20;
+        const chords = [
+            ['C4', 'E4', 'G4'], ['A3', 'C4', 'E4'],
+            ['F3', 'A3', 'C4'], ['G3', 'B3', 'D4']
+        ];
+        let i = 0;
+        Tone.Transport.bpm.value = 68;
+        bgLoop = new Tone.Loop(time => {
+            bgSynth.triggerAttackRelease(chords[i % chords.length], '2n', time);
+            i++;
+        }, '2m').start(0);
     }
 
     async function toggleBgMusic() {
         const icon = document.getElementById('musicToggleIcon');
         const btn = document.getElementById('musicToggleBtn');
-
         if (!bgMusicOn) {
             await Tone.start();
             initBgMusic();
+            Tone.Transport.start();
             bgMusicOn = true;
             icon.textContent = '🎵';
             btn.classList.add('on');
-            bgPadSynth.triggerAttack(BG_PAD_NOTES); // 暖墊只彈一次,之後持續不斷
-            bgSequence.start(0);
-            Tone.Transport.start();
         } else {
+            Tone.Transport.pause();
             bgMusicOn = false;
             icon.textContent = '🔇';
             btn.classList.remove('on');
-            bgSequence.stop();
-            bgPadSynth.releaseAll();
-            Tone.Transport.stop();
         }
     }
     </script>
