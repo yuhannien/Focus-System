@@ -79,6 +79,8 @@
                  user-select: none;
                  padding: 4px 8px;
                  border-radius: 12px;
+                 touch-action: manipulation;
+                 -webkit-tap-highlight-color: rgba(0,0,0,0.06);
                  transition: box-shadow .15s ease, transform .15s ease;
              }
 
@@ -358,6 +360,8 @@
                  border-radius: 30px;
                  padding: 14px 34px;
                  cursor: pointer;
+                 touch-action: manipulation;
+                 -webkit-tap-highlight-color: rgba(0,0,0,0.06);
                  color: #fff;
                  background: linear-gradient(135deg, var(--vine-green-light), var(--vine-green));
                  box-shadow: 0 8px 20px rgba(63,122,42,0.4);
@@ -611,6 +615,14 @@
                  align-items: center;
                  flex-wrap: wrap;
                  gap: 8px;
+                 width: 100%;
+                 font-family: inherit;
+                 text-align: left;
+                 cursor: pointer;
+                 touch-action: manipulation;
+                 -webkit-tap-highlight-color: rgba(0,0,0,0.06);
+                 appearance: none;
+                 -webkit-appearance: none;
              }
 
                  .history-item .hi-date {
@@ -804,7 +816,17 @@
                  align-items: center;
                  flex-wrap: wrap;
                  gap: 8px;
+                 width: 100%;
+                 font-family: inherit;
+                 text-align: left;
+                 touch-action: manipulation;
+                 -webkit-tap-highlight-color: rgba(0,0,0,0.06);
+                 appearance: none;
+                 -webkit-appearance: none;
              }
+                 .room-item.room-item-clickable {
+                     cursor: pointer;
+                 }
 
              /* ---------- 房間成員數據表 ---------- */
              .roster-table {
@@ -895,6 +917,9 @@
                  border: 2px solid var(--kraft-border-light);
                  border-radius: 16px;
                  padding: 20px 22px;
+                 margin: 0;
+                 appearance: none;
+                 -webkit-appearance: none;
              }
 
                  .room-hub-box h3 {
@@ -939,6 +964,10 @@
                  flex-direction: column;
                  align-items: center;
                  gap: 10px;
+                 width: 100%;
+                 font-family: inherit;
+                 touch-action: manipulation;
+                 -webkit-tap-highlight-color: rgba(0,0,0,0.06);
                  transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
              }
 
@@ -1576,18 +1605,18 @@
 
                     <!-- 步驟一：兩個大按鈕，選擇要建立還是加入 -->
                     <div id="roomManageChoice" class="room-hub-boxes">
-                        <div class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('create')">
+                        <button type="button" class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('create')">
                             <span class="fruit-icon-big">🏠</span>
                             <h3>建立房間</h3>
                             <p>取得一組房間代碼，分享給你想追蹤的使用者。</p>
-                            <button class="btn-primary" type="button" style="pointer-events:none;">建立房間 ▶</button>
-                        </div>
-                        <div class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('join')">
+                            <span class="btn-primary" style="pointer-events:none; display:inline-block;">建立房間 ▶</span>
+                        </button>
+                        <button type="button" class="room-hub-box room-hub-box-clickable" onclick="App.showRoomManageForm('join')">
                             <span class="fruit-icon-big">🔑</span>
                             <h3>加入房間</h3>
                             <p>輸入管理者給你的房間代碼。</p>
-                            <button class="btn-primary" type="button" style="pointer-events:none;">加入房間 ▶</button>
-                        </div>
+                            <span class="btn-primary" style="pointer-events:none; display:inline-block;">加入房間 ▶</span>
+                        </button>
                     </div>
 
                     <!-- 步驟二之一：建立房間表單 -->
@@ -2238,13 +2267,13 @@
         const d = new Date(r.timestamp);
         const dateStr = d.toLocaleString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
         const who = r.player ? `${r.player.name}（${r.player.age} 歲）` : '匿名玩家';
-        return `<div class="history-item" onclick="App.viewHistoryDetail(${idx})" style="cursor:pointer;">
+        return `<button type="button" class="history-item" onclick="App.viewHistoryDetail(${idx})">
         <div>
         <div class="hi-date">${dateStr}　<b>${who}</b></div>
         <div class="hi-scores">穩定度 ${r.scores[1]} ・ 抗干擾 ${r.scores[2]} ・ 反應控制 ${r.scores[3]} ・ 記憶負荷 ${r.scores[4]}</div>
         </div>
         <div class="btn-outline" style="margin:0;padding:8px 16px;font-size:13px;">查看詳細結果 ▶</div>
-        </div>`;
+        </button>`;
         }).join('');
         }
 
@@ -2562,10 +2591,10 @@
         }
 
         box.innerHTML = list.map(r => `
-        <div class="room-item" style="cursor:pointer;" onclick="App.viewJoinedRoomDetail('${r.code}')">
+        <button type="button" class="room-item room-item-clickable" onclick="App.viewJoinedRoomDetail('${r.code}')">
         <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.code}</span>${r.teacherName ? '　管理者：'+r.teacherName : ''}</div>
         <div class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;">查看紀錄 ▶</div>
-        </div>
+        </button>
         `).join('');
         }
 
@@ -2590,13 +2619,13 @@
         listEl.innerHTML = filtered.slice().reverse().map(({ r, idx }) => {
         const d = new Date(r.timestamp);
         const dateStr = d.toLocaleString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-        return `<div class="history-item" onclick="App.viewHistoryDetail(${idx})" style="cursor:pointer;">
+        return `<button type="button" class="history-item" onclick="App.viewHistoryDetail(${idx})">
         <div>
         <div class="hi-date">${dateStr}</div>
         <div class="hi-scores">穩定度 ${r.scores[1]} ・ 抗干擾 ${r.scores[2]} ・ 反應控制 ${r.scores[3]} ・ 記憶負荷 ${r.scores[4]}</div>
         </div>
         <div class="btn-outline" style="margin:0;padding:8px 16px;font-size:13px;">查看詳細結果 ▶</div>
-        </div>`;
+        </button>`;
         }).join('');
         }
 
