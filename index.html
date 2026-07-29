@@ -1421,7 +1421,6 @@
 
                  to {
                      transform: scale(1);
-                     opacity: 1;
                  }
              }
 
@@ -1645,7 +1644,7 @@
                         <p><span style="font-size:34px;">🍌🍇🍊🍎🍉🍑</span> 其他水果 → <b>不要點擊</b><span class="tag tag-noclick">不要點</span></p>
                     </div>
                     <p>水果會一個一個隨機出現在圓圈中，請保持專注：</p>
-                    <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，結束後會顯示你的表現</p>
+                    <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，難度會隨階段提升（時間變短、水果旋轉）</p>
                     <div class="btn-row"><button class="btn-primary" id="l1-start-btn" onclick="L1.start()">開始本關</button></div>
                 </div>
 
@@ -1668,7 +1667,7 @@
                     <div class="fruit-row-decor" style="font-size:26px;">🍎 🍌 🍊 🍇 <strong>🍓</strong> 🍉 🍒</div>
                     <div class="home-lead-box">
                         <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，難度會逐漸提升，請盡量又快又準地找出所有草莓！注意畫面中可能出現外觀相似的櫻桃 🍒，請仔細分辨。</p>
-                        <p>也可以用<b>方向鍵</b>移動選取框、按 <b>Enter</b> 點擊目前選取的格子；就算找滿所有草莓，也不會自動結束，請用下鍵移到格子最下方的「完成」按鈕（或直接點擊畫面上的按鈕），再按一次 <b>Enter</b> 確認完成本小關。</p>
+                        <p>也可以用<b>方向鍵</b>移動選取框、按 <b>Enter</b> 點擊目前選取的格子；找完後，請用下鍵移到格子最下方的「完成」按鈕（或直接點擊畫面上的按鈕），再按一次 <b>Enter</b> 確認完成本小關。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l2-start-btn" onclick="L2.start()">開始本關</button></div>
                 </div>
@@ -1677,7 +1676,7 @@
                     <h3 id="l2-level-title" style="text-align:center;color:var(--wood-dark);margin-top:0;">Level 1</h3>
                     <div id="l2-info-bar" style="display:flex;flex-wrap:wrap;justify-content:space-around;gap:8px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:14px;padding:10px 8px;margin-bottom:14px;font-weight:bold;color:var(--wood-dark);">
                         <div>時間<span id="l2-timer-display" style="display:block;font-size:1.2rem;">0.0s</span></div>
-                        <div>已找到<span id="l2-found-display" style="display:block;font-size:1.2rem;">0 / 0</span></div>
+                        <div>已找到<span id="l2-found-display" style="display:block;font-size:1.2rem;">0</span></div>
                         <div>錯誤點擊<span id="l2-wrong-display" style="display:block;font-size:1.2rem;">0</span></div>
                     </div>
                     <div id="l2-fruit-grid" class="l2-fruit-grid"></div>
@@ -2006,19 +2005,16 @@
         };
 
         let scores = {1:null, 2:null, 3:null, 4:null};
-        let displayedScores = {1:null, 2:null, 3:null, 4:null}; // 目前結果頁正在顯示的分數（本次結果或歷史紀錄）
+        let displayedScores = {1:null, 2:null, 3:null, 4:null}; 
         let levelDetails = {1:null, 2:null, 3:null, 4:null};
         let playerInfo = { name:'', age:'' };
         let pendingContinue = null;
-        let viewingHistoryIndex = null; // 目前結果專區正在檢視的紀錄索引（null = 檢視本次剛完成的結果）
+        let viewingHistoryIndex = null; 
 
-        // ★ 到 Google Cloud Console 建立 OAuth Client ID（應用程式類型選「網頁應用程式」）後，
-        //    把 Client ID 貼在這裡（雙引號中間），例如："123456-abc.apps.googleusercontent.com"
-        //    留空字串 "" 代表尚未啟用 Google 登入功能。
         const GOOGLE_CLIENT_ID = "245822345405-tn3a1tpnqm2e4elhqf5r2lj7jbcjh0t3.apps.googleusercontent.com";
 
-        let currentUser = null;   // { name, email, picture }（Google 登入後的使用者資訊）
-        let joinedRoom = null;    // { code, roomName, teacherName }（目前已加入的房間）
+        let currentUser = null;   
+        let joinedRoom = null;    
 
         const levelContainers = {
         1: document.getElementById('level1-container'),
@@ -2046,7 +2042,7 @@
         }
         if (name === 'room-manage'){
         document.getElementById('nav-room').classList.add('active');
-        showRoomManageChoice(); // 每次進入都從「選擇建立/加入」畫面開始
+        showRoomManageChoice(); 
         }
         if (name === 'room-view'){
         document.getElementById('nav-room').classList.add('active');
@@ -2112,7 +2108,6 @@
         setActiveLevelContainer(1);
         }
 
-        // 每一關結束時呼叫：顯示 recap 覆蓋層、記錄分數與完整詳細數據
         function levelComplete(levelNum, statsArr, score, detail, nextAction){
         scores[levelNum] = Math.round(score);
         levelDetails[levelNum] = detail || null;
@@ -2179,14 +2174,12 @@
         const weakest = entries[0];
         const strongest = entries[entries.length-1];
 
-        // 改善建議：針對較弱面向
         const improveTips = {
         1: '可以減少同時開啟的通知與分頁，練習「番茄鐘」等定時專注法，逐步拉長單一任務的持續時間。',
         2: '可以整理實體與數位工作環境，移除不必要的干擾物，並可搭配白噪音或降噪耳機降低外界刺激。',
         3: '可以在切換任務前，先寫下待辦清單並排定優先順序，減少臨時切換造成的反應延遲。',
         4: '可以將複雜資訊拆解成小區塊（Chunking），並搭配重複覆誦或筆記輔助工作記憶。'
         };
-        // 維持優勢的建議：針對較強面向
         const maintainTips = {
         1: '可以持續維持良好的作息與睡眠品質，並嘗試在較複雜或干擾較多的情境下延續這項優勢。',
         2: '可以在更多元的環境（如較吵雜或多工的場合）中練習，進一步鞏固這項抗干擾優勢。',
@@ -2202,7 +2195,6 @@
         document.getElementById(elId).innerHTML = html;
         }
 
-        /* 針對待加強面向開立 AI 專業建議欄位 */
         function getAISuggestionText(weakestIndex) {
         const aiTips = {
         1: "💡 <b>AI 專屬改善建議（針對注意力穩定度）：</b><br>1. <b>建立單一焦點習慣</b>：建議在工作或學習時，嘗試使用「番茄鐘工作法」（工作 25 分鐘，休息 5 分鐘），降低分心機率。<br>2. <b>環境減干擾</b>：開啟手機「勿擾模式」，關閉非必要網頁頁籤。<br>3. <b>自我覺察練習</b>：當發現自己發呆或恍神時，深呼吸三次以將注意力拉回當下。",
@@ -2280,7 +2272,6 @@
         </div>`;
         }
 
-        // levelNum === 4
         const reviewHtml = (d.results||[]).map((r,idx) => `<span class="mini-q ${r.fullyCorrect?'ok':'bad'}">第${idx+1}題 ${r.fullyCorrect?'✅':'❌'}(${r.correct}/${r.n})</span>`).join(' ');
         return `<div class="detail-card">
         <h3>🍎🍌🍇 水果記憶鏈 - 詳細結果</h3>
@@ -2319,7 +2310,6 @@
         ctx.fillStyle = '#fdf3dd';
         ctx.fillRect(0,0,W,H);
 
-        // 標題
         ctx.font = 'bold 20px "Microsoft JhengHei", sans-serif';
         ctx.fillStyle = '#5c3a1e';
         ctx.textAlign = 'center';
@@ -2331,7 +2321,6 @@
         const values = [1,2,3,4].map(i => sc[i] ?? 0);
         const N = 4;
 
-        // 雷達網格
         const rings = 4;
         for (let r=1;r<=rings;r++){
         const rad = R * (r/rings);
@@ -2347,7 +2336,6 @@
         ctx.stroke();
         }
 
-        // 雷達圖軸線與標籤
         ctx.font = 'bold 13px "Microsoft JhengHei", sans-serif';
         ctx.fillStyle = '#5c3a1e';
         for (let k=0;k<N;k++){
@@ -2367,7 +2355,6 @@
         ctx.fillText(labels[k] + ' ' + values[k] + '分', lx, ly);
         }
 
-        // 多邊形填色
         ctx.beginPath();
         for (let k=0;k<N;k++){
         const angle = -Math.PI/2 + k*(2*Math.PI/N);
@@ -2391,7 +2378,17 @@
         const img = document.getElementById('radarImg');
         const a = document.createElement('a');
         a.href = img.src;
-        a.download = 'focus-radar-' + Date.now() + '.png';
+        
+        // 修改檔名格式為「螢幕擷取畫面 YYYY-MM-DD HHMMSS」
+        const d = new Date();
+        const YYYY = d.getFullYear();
+        const MM = String(d.getMonth() + 1).padStart(2, '0');
+        const DD = String(d.getDate()).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        const ss = String(d.getSeconds()).padStart(2, '0');
+
+        a.download = `螢幕擷取畫面 ${YYYY}-${MM}-${DD} ${hh}${mm}${ss}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -2421,7 +2418,7 @@
         goToQuizEntry();
         }
 
-        /* ---------------- 結果專區（localStorage，僅保存在使用者自己的裝置／瀏覽器） ---------------- */
+        /* ---------------- 結果專區（localStorage） ---------------- */
         const HISTORY_KEY = 'focusLabHistory';
 
         const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx07C9pJSP_d4V4TjZNvZAiPQFzaYevHWRvdUCuFSedklWMfXq1YsU005JaFQOYr3uq/exec";
@@ -3018,12 +3015,12 @@
 
     <script>
         /* =========================================================================
-        第一關：水果守衛 — 選擇性反應 / 注意力穩定度
+        第一關：水果守衛 — 選擇性反應 / 注意力穩定度（漸進難度設定）
         ========================================================================= */
         const L1 = (function(){
         const TOTAL_TRIALS = 30;
         const TARGET_PROB = 0.4;
-        const STIMULUS_DURATION = 1100;
+        const BASE_STIMULUS_DURATION = 1100; // 第一階段基礎反應時間
         const ISI_MIN = 400;
         const ISI_MAX = 750;
         const FEEDBACK_DURATION = 250;
@@ -3069,6 +3066,7 @@
 
         fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
         fruitStageEl.classList.add("l1-fruit-stage", "empty");
+        fruitStageEl.style.transform = "none";
         fruitStageEl.textContent = "準備...";
         hintTextEl.textContent = "遊戲即將開始";
 
@@ -3088,6 +3086,26 @@
         fruitStageEl.textContent = fruit;
         hintTextEl.textContent = "";
 
+        // 計算階段難度：反應時間與旋轉角度
+        let currentDuration = BASE_STIMULUS_DURATION;
+        let rotationDegree = 0;
+
+        if (currentTrial <= 10) {
+            // 第一階段：正向，全速 (1100ms)
+            currentDuration = BASE_STIMULUS_DURATION;
+            rotationDegree = 0;
+        } else if (currentTrial <= 20) {
+            // 第二階段：正向，時間砍到 2/3 (約 733ms)
+            currentDuration = Math.round(BASE_STIMULUS_DURATION * (2 / 3));
+            rotationDegree = 0;
+        } else {
+            // 第三階段：隨機旋轉，時間砍到 1/2 (550ms)
+            currentDuration = Math.round(BASE_STIMULUS_DURATION * (1 / 2));
+            rotationDegree = Math.floor(Math.random() * 360);
+        }
+
+        fruitStageEl.style.transform = `rotate(${rotationDegree}deg)`;
+
         trialAnswered = false;
         trialActive = true;
         stimulusStartTime = performance.now();
@@ -3104,7 +3122,7 @@
         }
         goToNextAfterDelay();
         }
-        }, STIMULUS_DURATION);
+        }, currentDuration);
         }
 
         function handleClick(){
@@ -3135,6 +3153,7 @@
         setTimeout(() => {
         fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
         fruitStageEl.classList.add("empty");
+        fruitStageEl.style.transform = "none";
         fruitStageEl.textContent = "";
         const isi = ISI_MIN + Math.random() * (ISI_MAX - ISI_MIN);
         setTimeout(nextTrial, isi);
@@ -3156,8 +3175,13 @@
         stdRT = Math.sqrt(variance);
         }
 
-        const penalty = missRate*0.5 + faRate*0.5 + Math.min(stdRT/15, 20);
-        const score = Math.max(0, Math.min(100, 100 - penalty));
+        // 分數計算：掛機判定 (hits=0 判定 0 分) + 命中率/誤點率扣分
+        let score = 0;
+        if (hits > 0) {
+            const rtPenalty = Math.min(stdRT / 15, 15) + (avgRT > 600 ? Math.min((avgRT - 600) / 20, 15) : 0);
+            const penalty = missRate * 0.7 + faRate * 0.7 + rtPenalty;
+            score = Math.max(0, Math.min(100, 100 - penalty));
+        }
 
         gameScreenEl.style.display = "none";
         instructionsEl.style.display = "block";
@@ -3183,9 +3207,9 @@
     <script>
         const L2 = (function(){
         const LEVELS = [
-        { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5, strawberryCount:5 },
-        { name:"Level 2", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉"], cols:7, rows:7, strawberryCount:6 },
-        { name:"Level 3", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉","🍒"], cols:8, rows:8, strawberryCount:7 }
+        { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5 },
+        { name:"Level 2", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉"], cols:7, rows:7 },
+        { name:"Level 3", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉","🍒"], cols:8, rows:8 }
         ];
         const STRAWBERRY = "🍓";
         const CHERRY = "🍒";
@@ -3194,6 +3218,7 @@
         let foundCount = 0, totalStrawberriesThisLevel = 0, wrongClicksThisLevel = 0, cherryMisclicksThisLevel = 0;
         let timerInterval = null, startTime = 0, elapsedSeconds = 0;
         let levelFinished = false;
+        let generatedStrawberryCounts = [];
 
         let cursorRow = 0, cursorCol = 0;
         let cursorOnFinish = false;
@@ -3227,9 +3252,27 @@
         return a;
         }
 
-        function generateFruitLayout(cfg){
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateFruitLayout(cfg, levelIndex){
         const totalCells = cfg.cols*cfg.rows;
-        const strawberryCount = Math.min(cfg.strawberryCount, totalCells);
+        
+        let targetCount = 5;
+        if (levelIndex === 0) {
+            targetCount = getRandomInt(5, 11);
+        } else if (levelIndex === 1) {
+            const prev = generatedStrawberryCounts[0] || 5;
+            targetCount = getRandomInt(prev + 1, 13);
+        } else {
+            const prev = generatedStrawberryCounts[1] || 6;
+            targetCount = getRandomInt(prev + 1, 15);
+        }
+        
+        const strawberryCount = Math.min(targetCount, totalCells);
+        generatedStrawberryCounts[levelIndex] = strawberryCount;
+
         const otherFruits = cfg.fruitTypes.filter(f => f !== STRAWBERRY);
         const layout = [];
         for (let i=0;i<strawberryCount;i++) layout.push(STRAWBERRY);
@@ -3263,9 +3306,9 @@
         fruitGrid.style.gridTemplateColumns = `repeat(${cfg.cols}, 1fr)`;
         fruitGrid.innerHTML = "";
 
-        const { layout, strawberryCount } = generateFruitLayout(cfg);
+        const { layout, strawberryCount } = generateFruitLayout(cfg, levelIndex);
         totalStrawberriesThisLevel = strawberryCount;
-        foundDisplay.textContent = `0 / ${strawberryCount}`;
+        foundDisplay.textContent = `0`;
 
         cellsMatrix = [];
         for (let r=0;r<cfg.rows;r++) cellsMatrix.push(new Array(cfg.cols).fill(null));
@@ -3351,16 +3394,13 @@
         cell.classList.add("correct");
         setTimeout(() => cell.classList.add("found"), 380);
         foundCount++;
-        foundDisplay.textContent = `${foundCount} / ${totalStrawberriesThisLevel}`;
-        if (foundCount >= totalStrawberriesThisLevel) finishLevel(0);
+        foundDisplay.textContent = `${foundCount}`;
         } else {
         wrongClicksThisLevel++;
         wrongDisplay.textContent = wrongClicksThisLevel;
         if (fruit === CHERRY) cherryMisclicksThisLevel++;
-        cell.classList.remove("wrong");
-        void cell.offsetWidth;
-        cell.classList.add("wrong");
-        setTimeout(() => cell.classList.remove("wrong"), 350);
+        cell.classList.add("correct");
+        setTimeout(() => cell.classList.add("found"), 380);
         }
         }
 
@@ -3392,6 +3432,7 @@
         instructionsEl.style.display = "none";
         gameScreenEl.style.display = "block";
         currentLevelIndex = 0;
+        generatedStrawberryCounts = [];
         record.totalSearchTime = 0; record.totalWrongClicks = 0; record.totalCherryMisclicks = 0;
         record.totalCorrectClicks = 0; record.totalMissedStrawberries = 0; record.levelTimes = [];
         renderLevel(currentLevelIndex);
