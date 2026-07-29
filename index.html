@@ -874,27 +874,37 @@
                  padding: 4px 10px;
              }
 
-                 .nav-avatar-toggle img {
-                     width: 30px;
-                     height: 30px;
-                     border-radius: 50%;
-                     border: 2px solid var(--kraft-border-light);
-                     display: block;
-                 }
+            /* 修改 1：調整大頭貼圖片的高度與寬度維持固定大小 */
+            .nav-avatar-toggle img {
+                width: 30px;
+                height: 30px; /* 確保高度不會隨父容器變高 */
+                border-radius: 50%;
+                border: 2px solid var(--kraft-border-light);
+                display: block;
+            }
 
-             .nav-avatar-fallback {
-                 width: 30px;
-                 height: 30px;
-                 border-radius: 50%;
-                 background: var(--vine-green);
-                 color: #fdf3dd;
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 font-weight: bold;
-                 font-size: 14px;
-                 border: 2px solid var(--kraft-border-light);
-             }
+            /* 修改 2：調整未上傳頭貼時的備用圖示高度與寬度 */
+            .nav-avatar-fallback {
+                width: 30px;
+                height: 30px; /* 確保高度不會隨父容器變高 */
+                border-radius: 50%;
+                background: var(--vine-green);
+                color: #fdf3dd;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 14px;
+                border: 2px solid var(--kraft-border-light);
+            }
+
+            /* 修改 3：確保導覽列的下拉選單容器不要強行撐高 */
+            .nav-dropdown {
+                position: relative;
+                display: flex;
+                align-items: center;
+                height: auto; /* 避免繼承外層高度 */
+            }
 
              .nav-dropdown-username {
                  display: block;
