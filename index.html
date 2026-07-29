@@ -4115,6 +4115,7 @@
     processAndRenderDashboard();
 }
 
+// 替換後的完整程式碼
 function renderPeriodControls() {
     const container = document.getElementById('periods-container');
     if (!container) return;
@@ -4125,8 +4126,8 @@ function renderPeriodControls() {
             <div style="margin-bottom:8px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:12px;">
                 <strong>第 ${idx+1} 次測驗：</strong>
                 名稱：<input type="text" value="${p.name}" onchange="definedPeriods[${idx}].name=this.value" style="width:90px; padding:2px 4px;">
-                開始：<input type="date" value="${p.start}" onchange="definedPeriods[${idx}].start=this.value" style="padding:2px 4px;">
-                結束：<input type="date" value="${p.end}" onchange="definedPeriods[${idx}].end=this.value" style="padding:2px 4px;">
+                開始：<input type="datetime-local" value="${p.start}" onchange="definedPeriods[${idx}].start=this.value" style="padding:2px 4px;">
+                結束：<input type="datetime-local" value="${p.end}" onchange="definedPeriods[${idx}].end=this.value" style="padding:2px 4px;">
                 <button type="button" class="btn-outline" style="padding:2px 6px; color:var(--accent-red); border-color:var(--accent-red);" onclick="definedPeriods.splice(${idx},1); renderPeriodControls();">刪除</button>
             </div>`;
     });
@@ -4141,8 +4142,20 @@ function renderPeriodControls() {
 }
 
 function addPeriodSetting() {
-    const today = new Date().toISOString().split('T')[0];
-    definedPeriods.push({ name: `第${definedPeriods.length+1}次測驗`, start: today, end: today });
+    const now = new Date();
+    // 格式化目前時間為 YYYY-MM-DDTHH:mm (datetime-local 所需格式)
+    const formatDateTime = (date) => {
+        const pad = (n) => n.toString().padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    };
+
+    const startTime = formatDateTime(now);
+    
+    // 預設結束時間為 1 小時後
+    const end = new Date(now.getTime() + 60 * 60 * 1000);
+    const endTime = formatDateTime(end);
+
+    definedPeriods.push({ name: `第${definedPeriods.length+1}次測驗`, start: startTime, end: endTime });
     renderPeriodControls();
 }
 
@@ -4156,10 +4169,14 @@ function applyPeriods() {
 function getFilteredRecords() {
     if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) return currentAnalRecords;
     const p = definedPeriods[selectedPeriodIndex];
-    const start = new Date(p.start + 'T00:00:00');
-    const end = new Date(p.end + 'T23:59:59');
+    
+    // 將輸入的時間直接解析為 Date 物件（精確到分鐘）
+    const start = new Date(p.start);
+    const end = new Date(p.end);
+    
     return currentAnalRecords.filter(r => {
-        const t = new Date(r.time);
+        // 解析資料中的時間字串，支援 'YYYY/MM/DD HH:mm:ss' 或 'YYYY-MM-DD HH:mm:ss'
+        const t = new Date(r.time.replace(/-/g, '/'));
         return t >= start && t <= end;
     });
 }
@@ -4173,6 +4190,10 @@ function processAndRenderDashboard() {
     renderLineChart();
 }
 
+// 全域變數：記錄當前開啟的等級區間 (用來判斷點擊的是否為同一個區間)
+let currentActiveLevel = null;
+
+// 1. 等級對應人數佔比與點擊顯示暱稱
 function renderLevelDistribution(records) {
     const ranges = [
         { label: 'a. 高工作記憶力 (85-100)', min: 85, max: 100, bg: '#d4edda' },
@@ -4193,11 +4214,22 @@ function renderLevelDistribution(records) {
         const div = document.createElement('div');
         div.style.cssText = `background:${r.bg}; padding:8px; border-radius:6px; text-align:center; cursor:pointer; font-size:12px; border:1px solid #ccc;`;
         div.innerHTML = `<strong>${r.label.split(' ')[0]} ${r.label.split(' ')[1]}</strong><h3 style="margin:4px 0; color:var(--wood-dark);">${players.length} 人</h3>(${pct}%)`;
+        
+        // 💡 修改這裏的點擊事件邏輯：
         div.onclick = () => {
             const nickBox = document.getElementById('nicknames-display');
-            nickBox.style.display = 'block';
-            document.getElementById('nickname-title').innerText = `${r.label} 名單 (${players.length}人)：`;
-            document.getElementById('nickname-tags').innerHTML = players.length ? players.map(p => `<span style="background:var(--kraft-bg); border:1px solid var(--kraft-border-light); padding:2px 8px; border-radius:12px; font-size:12px;">👤 ${p}</span>`).join('') : '<span style="color:#888;">無玩家紀錄</span>';
+            
+            // 判斷：如果點擊的是「同一個等級區間」且「目前選單是打開的」
+            if (currentActiveLevel === r.label && nickBox.style.display === 'block') {
+                nickBox.style.display = 'none'; // 隱藏暱稱框 (收合)
+                currentActiveLevel = null;      // 清空紀錄
+            } else {
+                // 如果點擊的是不同區間，或是原本關閉狀態 -> 顯示內容並開啟
+                nickBox.style.display = 'block';
+                currentActiveLevel = r.label;  // 記錄當前開啟的區間
+                document.getElementById('nickname-title').innerText = `${r.label} 名單 (${players.length}人)：`;
+                document.getElementById('nickname-tags').innerHTML = players.length ? players.map(p => `<span style="background:var(--kraft-bg); border:1px solid var(--kraft-border-light); padding:2px 8px; border-radius:12px; font-size:12px;">👤 ${p}</span>`).join('') : '<span style="color:#888;">無玩家紀錄</span>';
+            }
         };
         container.appendChild(div);
     });
