@@ -231,6 +231,8 @@
                  padding: 20px 22px;
                  margin: 18px 0 24px;
                  text-align: left;
+                 word-break: break-word;
+                 overflow-wrap: break-word;
              }
 
                  .home-lead-box p {
@@ -1134,6 +1136,14 @@
                      font-size: 40px;
                  }
 
+             /* 改善 AI 建議框文字換行設定 */
+             #aiSuggestionBox {
+                 word-break: break-word;
+                 overflow-wrap: break-word;
+                 white-space: pre-wrap;
+                 line-height: 1.6;
+             }
+
              @media (max-width:600px) {
                  .room-hub-boxes {
                      flex-direction: column;
@@ -1285,6 +1295,9 @@
              .l2-fruit-cell.found {
                  visibility: hidden;
              }
+
+             .l2-fruit-cell.kb-focus { outline: 3px solid var(--vine-green-dark); outline-offset: -2px; box-shadow: 0 0 0 3px rgba(46,125,50,0.25); }
+             #l2-finish-btn.kb-focus { outline: 3px solid var(--vine-green-dark); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(46,125,50,0.25); }
 
              .l2-level-overlay {
                  position: absolute;
@@ -1478,6 +1491,9 @@
                      opacity: .4;
                      cursor: not-allowed;
                  }
+
+             .l4-fruit-btn.kb-focus { outline: 3px solid var(--wood-dark); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(0,0,0,0.25); }
+             #l4-undo-btn.kb-focus, #l4-clear-btn.kb-focus, #l4-next-btn.kb-focus { outline: 3px solid var(--wood-dark); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(0,0,0,0.25); }
     </style>
 </head>
 <body>
@@ -1652,6 +1668,7 @@
                     <div class="fruit-row-decor" style="font-size:26px;">🍎 🍌 🍊 🍇 <strong>🍓</strong> 🍉 🍒</div>
                     <div class="home-lead-box">
                         <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，難度會逐漸提升，請盡量又快又準地找出所有草莓！注意畫面中可能出現外觀相似的櫻桃 🍒，請仔細分辨。</p>
+                        <p>也可以用<b>方向鍵</b>移動選取框、按 <b>Enter</b> 點擊目前選取的格子；就算找滿所有草莓，也不會自動結束，請用下鍵移到格子最下方的「完成」按鈕（或直接點擊畫面上的按鈕），再按一次 <b>Enter</b> 確認完成本小關。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l2-start-btn" onclick="L2.start()">開始本關</button></div>
                 </div>
@@ -1683,7 +1700,7 @@
 
                 <div class="crate-card" id="l3-game-screen" style="display:none;">
                     <div id="l3-info-bar" style="display:flex;justify-content:space-between;align-items:center;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:12px 12px 0 0;padding:10px 16px;font-size:14px;font-weight:bold;color:var(--wood-dark);">
-                        <div>階段 <span id="l3-stage-num">-</span> / 3　規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
+                        <div>階段 <span id="l3-stage-num">-</span> / 3 規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
                         <div>剩餘時間：<span id="l3-time-left">--</span>s</div>
                     </div>
                     <div style="height:6px;width:100%;background:#e9ecef;"><div id="l3-timer-bar-inner" style="height:100%;width:100%;background:var(--vine-green);transition:width .1s linear;"></div></div>
@@ -1702,6 +1719,7 @@
                     <div class="home-sub">工作記憶負荷測試</div>
                     <div class="home-lead-box">
                         <p>畫面會先出現一排水果，請記住它們的<b>種類與順序</b>。水果消失後，依序點擊按鈕重建正確序列。每題限時 10 秒作答，共 7 題，水果數量與記憶時間會逐題增加。</p>
+                        <p>也可以用<b>方向鍵</b>選取：在「水果列」按下鍵可切換至「回退／清空列」，再按下鍵切換至「送出／下一題列」，按 <b>Enter</b> 確認目前選取的按鈕。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l4-start-btn" onclick="L4.start()">開始本關</button></div>
                 </div>
@@ -1745,9 +1763,10 @@
                 <p style="text-align:center; margin-top:-6px;">四個關卡的表現已整合分析如下（滿分 100）</p>
                 <canvas id="radarCanvas" width="440" height="440" style="display:none;"></canvas>
                 <img id="radarImg" alt="專注力雷達圖" style="max-width:100%; width:440px; margin:0 auto; display:block; border-radius:12px; border:1px solid var(--kraft-border-light);">
-                <div class="radar-hint">💡 長按或點擊右鍵圖片即可保存到裝置</div>
                 <div class="score-list" id="scoreListEl"></div>
                 <div id="overallAdviceBox" class="home-lead-box" style="text-align:left;"></div>
+                <!-- 針對待加強面向的 AI 改善建議欄位 -->
+                <div id="aiSuggestionBox" class="home-lead-box" style="text-align:left; background:#fff8e8; border:2px solid var(--kraft-border-light);"></div>
                 <div class="btn-row">
                     <button class="btn-secondary" onclick="App.downloadRadar()">長按保存結果</button>
                     <button class="btn-primary" onclick="App.restartWholeQuiz()">再玩一次</button>
@@ -2137,8 +2156,9 @@
         document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
         document.getElementById('backToHistoryRow').style.display = 'none';
         renderScoreList('scoreListEl', scores);
-        drawRadarInto('radarCanvas', 'radarImg', scores);
         renderAdvice('overallAdviceBox', scores);
+        renderAISuggestion('aiSuggestionBox', scores);
+        drawRadarInto('radarCanvas', 'radarImg', scores);
         renderLevelDetailsInto('levelDetailsBox', levelDetails);
         saveHistory();
         }
@@ -2182,7 +2202,25 @@
         document.getElementById(elId).innerHTML = html;
         }
 
-        /* ---------------- 各關詳細結果（盡量保留原始檔案的呈現內容） ---------------- */
+        /* 針對待加強面向開立 AI 專業建議欄位 */
+        function getAISuggestionText(weakestIndex) {
+        const aiTips = {
+        1: "💡 <b>AI 專屬改善建議（針對注意力穩定度）：</b><br>1. <b>建立單一焦點習慣</b>：建議在工作或學習時，嘗試使用「番茄鐘工作法」（工作 25 分鐘，休息 5 分鐘），降低分心機率。<br>2. <b>環境減干擾</b>：開啟手機「勿擾模式」，關閉非必要網頁頁籤。<br>3. <b>自我覺察練習</b>：當發現自己發呆或恍神時，深呼吸三次以將注意力拉回當下。",
+        2: "💡 <b>AI 專屬改善建議（針對抗干擾能力）：</b><br>1. <b>優化視覺環境</b>：整理桌面與實體空間，移除周遭無關物件或雜物。<br>2. <b>聲音屏障策略</b>：在吵雜環境中可佩戴降噪耳機或播放無歌詞的「白噪音／輕音樂」。<br>3. <b>系統化搜尋法</b>：學習運用「從左至右、從上至下」的定點掃描順序，能大幅減少干擾目標的惑亂。",
+        3: "💡 <b>AI 專屬改善建議（針對反應控制與認知彈性）：</b><br>1. <b>任務切換緩衝</b>：從一項任務切換至下一項任務前，留出 1~2 分鐘寫下簡單待辦清單。<br>2. <b>三秒停頓原則</b>：遇到緊急或臨時切換的新規則時，先吸一口氣再行動，減少習慣性錯誤。<br>3. <b>多工減量訓練</b>：儘量避免同時進行兩件需要高度認知運算的事情。",
+        4: "💡 <b>AI 專屬改善建議（針對記憶負荷能力）：</b><br>1. <b>資訊區塊化 (Chunking)</b>：將較長的文字或數字拆分成 3~4 個一組的短區塊記憶。<br>2. <b>多感官輔助</b>：結合視覺筆記、心智圖或口頭覆誦來建立雙重記憶軌道。<br>3. <b>善用外在工具</b>：重要指引或多步驟任務請即時記錄在行事曆或數位備忘錄中。"
+        };
+        return aiTips[weakestIndex] || aiTips[1];
+        }
+
+        function renderAISuggestion(elId, sc){
+        const entries = [1,2,3,4].map(i => ({i, score: sc[i] ?? 0}));
+        entries.sort((a,b) => a.score - b.score);
+        const weakest = entries[0];
+        document.getElementById(elId).innerHTML = getAISuggestionText(weakest.i);
+        }
+
+        /* ---------------- 各關詳細結果 ---------------- */
         function statBox(label, value){
         return `<div class="detail-stat"><div class="label">${label}</div><div class="value">${value}</div></div>`;
         }
@@ -2204,8 +2242,8 @@
         ${statBox('平均反應時間', d.avgRT ? Math.round(d.avgRT)+' ms' : '無資料')}
         ${statBox('反應時間標準差', d.stdRT ? Math.round(d.stdRT)+' ms' : '無資料')}
         </div>
-        <div class="detail-note">草莓總數：<b>${d.totalTargets}</b>　成功點擊：<b>${d.hits}</b>　漏按：<b>${d.misses}</b><br>
-        其他水果總數：<b>${d.totalNonTargets}</b>　誤點：<b>${d.falseAlarms}</b>　正確忽略：<b>${d.correctRejections}</b></div>
+        <div class="detail-note">草莓總數：<b>${d.totalTargets}</b> 成功點擊：<b>${d.hits}</b> 漏按：<b>${d.misses}</b><br>
+        其他水果總數：<b>${d.totalNonTargets}</b> 誤點：<b>${d.falseAlarms}</b> 正確忽略：<b>${d.correctRejections}</b></div>
         </div>`;
         }
 
@@ -2236,8 +2274,8 @@
         ${statBox('持續性錯誤次數', d.perseverativeErrors)}
         ${statBox('平均切換代價 (Switch Cost)', d.totalSwitchCost+' ms')}
         </div>
-        <div class="detail-note">階段1 平均反應時間：<b>${d.stageAvgRT[0] ?? 'N/A'}${d.stageAvgRT[0]!=null?' ms':''}</b>　
-        階段2：<b>${d.stageAvgRT[1] ?? 'N/A'}${d.stageAvgRT[1]!=null?' ms':''}</b>　
+        <div class="detail-note">階段1 平均反應時間：<b>${d.stageAvgRT[0] ?? 'N/A'}${d.stageAvgRT[0]!=null?' ms':''}</b> 
+        階段2：<b>${d.stageAvgRT[1] ?? 'N/A'}${d.stageAvgRT[1]!=null?' ms':''}</b> 
         階段3：<b>${d.stageAvgRT[2] ?? 'N/A'}${d.stageAvgRT[2]!=null?' ms':''}</b></div>
         </div>`;
         }
@@ -2267,28 +2305,33 @@
         el.innerHTML = [1,2,3,4].map(i => renderLevelDetail(i, details[i])).join('');
         }
 
-        /* ---------------- 雷達圖繪製（高解析度，長按/下載更清晰） ---------------- */
+        /* ---------------- 雷達圖繪製（僅保留雷達圖） ---------------- */
         function drawRadarInto(canvasId, imgId, sc){
-        const SCALE = 3; // 以 3 倍像素密度繪製，匯出圖片更清晰銳利
+        const SCALE = 2;
         const canvas = document.getElementById(canvasId);
-        const baseSize = 440;
-        canvas.width = baseSize * SCALE;
-        canvas.height = baseSize * SCALE;
+        const W = 440, H = 380;
+        canvas.width = W * SCALE;
+        canvas.height = H * SCALE;
         const ctx = canvas.getContext('2d');
         ctx.save();
         ctx.scale(SCALE, SCALE);
 
-        const W = baseSize, H = baseSize;
-        const cx = W/2, cy = H/2 + 6;
-        const R = Math.min(W,H)/2 - 70;
+        ctx.fillStyle = '#fdf3dd';
+        ctx.fillRect(0,0,W,H);
+
+        // 標題
+        ctx.font = 'bold 20px "Microsoft JhengHei", sans-serif';
+        ctx.fillStyle = '#5c3a1e';
+        ctx.textAlign = 'center';
+        ctx.fillText('智慧型專注力分析報告', W/2, 35);
+
+        const cx = W/2, cy = 200;
+        const R = 110;
         const labels = [1,2,3,4].map(i => DIM_META[i].short);
         const values = [1,2,3,4].map(i => sc[i] ?? 0);
         const N = 4;
 
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = '#fdf3dd';
-        ctx.fillRect(0,0,W,H);
-
+        // 雷達網格
         const rings = 4;
         for (let r=1;r<=rings;r++){
         const rad = R * (r/rings);
@@ -2304,7 +2347,8 @@
         ctx.stroke();
         }
 
-        ctx.font = 'bold 15px "Microsoft JhengHei","PingFang TC",sans-serif';
+        // 雷達圖軸線與標籤
+        ctx.font = 'bold 13px "Microsoft JhengHei", sans-serif';
         ctx.fillStyle = '#5c3a1e';
         for (let k=0;k<N;k++){
         const angle = -Math.PI/2 + k*(2*Math.PI/N);
@@ -2316,18 +2360,14 @@
         ctx.strokeStyle = 'rgba(122,74,36,0.35)';
         ctx.stroke();
 
-        const lx = cx + (R+34)*Math.cos(angle);
-        const ly = cy + (R+34)*Math.sin(angle);
+        const lx = cx + (R+26)*Math.cos(angle);
+        const ly = cy + (R+26)*Math.sin(angle);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(labels[k], lx, ly);
-        ctx.font = '11px "Microsoft JhengHei","PingFang TC",sans-serif';
-        ctx.fillStyle = '#a9713f';
-        ctx.fillText(values[k] + ' 分', lx, ly + 16);
-        ctx.font = 'bold 15px "Microsoft JhengHei","PingFang TC",sans-serif';
-        ctx.fillStyle = '#5c3a1e';
+        ctx.fillText(labels[k] + ' ' + values[k] + '分', lx, ly);
         }
 
+        // 多邊形填色
         ctx.beginPath();
         for (let k=0;k<N;k++){
         const angle = -Math.PI/2 + k*(2*Math.PI/N);
@@ -2342,17 +2382,6 @@
         ctx.strokeStyle = '#3f7a2a';
         ctx.lineWidth = 2.5;
         ctx.stroke();
-
-        for (let k=0;k<N;k++){
-        const angle = -Math.PI/2 + k*(2*Math.PI/N);
-        const rad = R * (Math.max(0,Math.min(100,values[k]))/100);
-        const x = cx + rad*Math.cos(angle);
-        const y = cy + rad*Math.sin(angle);
-        ctx.beginPath();
-        ctx.arc(x,y,4,0,Math.PI*2);
-        ctx.fillStyle = '#2f5c1f';
-        ctx.fill();
-        }
 
         ctx.restore();
         document.getElementById(imgId).src = canvas.toDataURL('image/png');
@@ -2395,21 +2424,16 @@
         /* ---------------- 結果專區（localStorage，僅保存在使用者自己的裝置／瀏覽器） ---------------- */
         const HISTORY_KEY = 'focusLabHistory';
 
-        // ★ 設定完 Google Apps Script 後，把「網頁應用程式」網址貼在這裡（雙引號中間），
-        //    例如："https://script.google.com/macros/s/AKfycb.../exec"
-        //    留空字串 "" 代表不啟用雲端同步，資料只會存在使用者自己的裝置上。
         const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx07C9pJSP_d4V4TjZNvZAiPQFzaYevHWRvdUCuFSedklWMfXq1YsU005JaFQOYr3uq/exec";
 
         function sendToSheet(record){
-        if (!SHEET_WEBHOOK_URL) return; // 尚未設定後台網址，略過雲端同步
+        if (!SHEET_WEBHOOK_URL) return; 
         try{
-        // 注意：刻意不設定 headers（讓瀏覽器預設用 text/plain），
-        // 可避免觸發 CORS 預檢請求，讓 Apps Script 網頁應用程式能順利接收。
         fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
         body: JSON.stringify(record)
-        }).catch(()=>{ /* 網路異常時靜默略過，不影響使用者體驗 */ });
-        }catch(e){ /* 靜默略過 */ }
+        }).catch(()=>{});
+        }catch(e){}
         }
 
         function saveHistory(){
@@ -2425,9 +2449,9 @@
         const list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
         list.push(record);
         localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(-30)));
-        }catch(e){ /* localStorage 不可用時靜默略過 */ }
+        }catch(e){}
 
-        sendToSheet(record); // 同步一份到 Google 試算表（若已設定後台網址）
+        sendToSheet(record);
         }
 
         function renderHistory(){
@@ -2441,13 +2465,13 @@
         }
 
         el.innerHTML = list.slice().reverse().map((r, revIdx) => {
-        const idx = list.length - 1 - revIdx; // 還原成原始陣列索引
+        const idx = list.length - 1 - revIdx;
         const d = new Date(r.timestamp);
         const dateStr = d.toLocaleString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
         const who = r.player ? `${r.player.name}（${r.player.age} 歲）` : '匿名玩家';
         return `<button type="button" class="history-item" onclick="App.viewHistoryDetail(${idx})">
         <div>
-        <div class="hi-date">${dateStr}　<b>${who}</b></div>
+        <div class="hi-date">${dateStr}<b>${who}</b></div>
         <div class="hi-scores">穩定度 ${r.scores[1]} ・ 抗干擾 ${r.scores[2]} ・ 反應控制 ${r.scores[3]} ・ 記憶負荷 ${r.scores[4]}</div>
         </div>
         <div class="btn-outline" style="margin:0;padding:8px 16px;font-size:13px;">查看詳細結果 ▶</div>
@@ -2469,15 +2493,16 @@
         document.getElementById('backToHistoryRow').style.display = 'flex';
 
         renderScoreList('scoreListEl', record.scores);
-        drawRadarInto('radarCanvas', 'radarImg', record.scores);
         renderAdvice('overallAdviceBox', record.scores);
+        renderAISuggestion('aiSuggestionBox', record.scores);
+        drawRadarInto('radarCanvas', 'radarImg', record.scores);
         renderLevelDetailsInto('levelDetailsBox', record.levelDetails || {});
         }
 
         /* ---------------- Google 登入 ---------------- */
         const USER_KEY = 'focusLabUser';
         const JOINED_ROOM_KEY = 'focusLabJoinedRoom';
-        const JOINED_ROOMS_LIST_KEY = 'focusLabJoinedRoomsList'; // 累積「所有加入過」的房間清單
+        const JOINED_ROOMS_LIST_KEY = 'focusLabJoinedRoomsList';
 
         function loadJoinedRoomsList(){
         try{ return JSON.parse(localStorage.getItem(JOINED_ROOMS_LIST_KEY) || '[]'); }catch(e){ return []; }
@@ -2487,7 +2512,7 @@
         }
         function addJoinedRoomToList(room){
         let list = loadJoinedRoomsList();
-        list = list.filter(r => r.code !== room.code); // 避免同一間房間重複列出，改為更新到最新
+        list = list.filter(r => r.code !== room.code);
         list.unshift({ code: room.code, roomName: room.roomName, teacherName: room.teacherName, joinedAt: Date.now() });
         saveJoinedRoomsList(list);
         }
@@ -2529,7 +2554,7 @@
         try{ localStorage.setItem(USER_KEY, JSON.stringify(currentUser)); }catch(e){}
         document.getElementById('loginOverlay').classList.remove('show');
         updateAuthUI();
-        showPage('room-manage'); // 登入後直接看到「建立房間／加入房間」畫面
+        showPage('room-manage');
         }
 
         function logout(){
@@ -2572,7 +2597,7 @@
 
         /* ---------------- 房間：建立／加入／查詢 ---------------- */
         function generateCode(len){
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 避開易混淆字元 0/O、1/I
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let out = '';
         for (let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
         return out;
@@ -2614,13 +2639,11 @@
 
         sel.innerHTML = html;
 
-        // 若目前已經有作用中的房間（例如剛用「再測一次」進來），預先選取對應選項
         if (joinedRoom){
         const guess = 'joined:' + joinedRoom.code;
         if ([...sel.options].some(o => o.value === guess)) sel.value = guess;
         }
 
-        // 若使用者本身有建立房間，額外補上「我建立的房間」選項（非必要，但方便管理者測試自己的房間）
         if (currentUser && SHEET_WEBHOOK_URL){
         fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}`)
         .then(res => res.json())
@@ -2678,7 +2701,7 @@
         const errEl = document.getElementById('createRoomError');
         if (!currentUser){ errEl.textContent = '請先登入 Google 帳號才能建立房間。'; return; }
         if (!SHEET_WEBHOOK_URL){ errEl.textContent = '尚未設定雲端後台網址（SHEET_WEBHOOK_URL），無法建立房間。'; return; }
-        if (btn && btn.disabled) return; // 防止連點/重複觸發（例如 Enter 與滑鼠點擊同時發生）
+        if (btn && btn.disabled) return; 
         errEl.textContent = '';
 
         const roomName = document.getElementById('newRoomNameInput').value.trim();
@@ -2726,7 +2749,7 @@
         }
         box.innerHTML = data.rooms.map(r => `
         <div class="room-item">
-        <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.roomCode}</span></div>
+        <div><b>${r.roomName || '(未命名房間)'}</b> 代碼：<span style="font-family:monospace;">${r.roomCode}</span></div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
         <button class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;" onclick="App.viewRoomDashboard('${r.roomCode}')">查看數據 ▶</button>
         <button class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;color:var(--accent-red);border-color:var(--accent-red);" onclick="App.deleteRoom('${r.roomCode}', this)">🗑 刪除</button>
@@ -2736,10 +2759,9 @@
         }).catch(() => { box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入房間列表時發生網路錯誤。</p>'; });
         }
 
-        // 刪除房間（需要後台 Google Apps Script 支援 action:'deleteRoom'，詳見程式碼註解）
         function deleteRoom(roomCode, btnEl){
         if (!currentUser || !SHEET_WEBHOOK_URL) return;
-        if (btnEl && btnEl.disabled) return; // 防止重複點擊送出多次刪除請求
+        if (btnEl && btnEl.disabled) return; 
         if (!confirm(`確定要刪除房間 ${roomCode} 嗎？此動作無法復原，房間內所有成員的紀錄也會一併移除。`)) return;
 
         const originalLabel = btnEl ? btnEl.textContent : '';
@@ -2774,7 +2796,7 @@
 
         box.innerHTML = list.map(r => `
         <button type="button" class="room-item room-item-clickable" onclick="App.viewJoinedRoomDetail('${r.code}')">
-        <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.code}</span>${r.teacherName ? '　管理者：'+r.teacherName : ''}</div>
+        <div><b>${r.roomName || '(未命名房間)'}</b> 代碼：<span style="font-family:monospace;">${r.code}</span>${r.teacherName ? ' 管理者：'+r.teacherName : ''}</div>
         <div class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;">查看紀錄 ▶</div>
         </button>
         `).join('');
@@ -2788,7 +2810,7 @@
         showPage('joined-room-detail');
         document.getElementById('joinedRoomDetailTitle').textContent = `📄 ${room.roomName || '(未命名房間)'}`;
         document.getElementById('joinedRoomDetailSub').textContent =
-        `房間代碼：${room.code}${room.teacherName ? '　管理者：' + room.teacherName : ''}`;
+        `房間代碼：${room.code}${room.teacherName ? ' 管理者：' + room.teacherName : ''}`;
 
         let fullHistory = [];
         try{ fullHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){}
@@ -2814,7 +2836,6 @@
         document.getElementById('retestInRoomBtn').onclick = () => retestInRoom(room);
         }
 
-        // 再測一次：把目前作用中的房間設為這個房間，之後完成的測驗會自動綁定進來
         function retestInRoom(room){
         joinedRoom = { code: room.code, roomName: room.roomName, teacherName: room.teacherName };
         try{ localStorage.setItem(JOINED_ROOM_KEY, JSON.stringify(joinedRoom)); }catch(e){}
@@ -2827,7 +2848,7 @@
         const errEl = document.getElementById('joinRoomError');
         if (!currentUser){ errEl.textContent = '請先登入 Google 帳號才能加入房間。'; return; }
         if (!SHEET_WEBHOOK_URL){ errEl.textContent = '尚未設定雲端後台網址（SHEET_WEBHOOK_URL），無法加入房間。'; return; }
-        if (btn && btn.disabled) return; // 防止連點/重複觸發
+        if (btn && btn.disabled) return; 
 
         const code = document.getElementById('joinRoomCodeInput').value.trim().toUpperCase();
         if (!code){ errEl.textContent = '請輸入房間代碼。'; return; }
@@ -2874,7 +2895,7 @@
 
         showPage('room-dashboard');
         document.getElementById('roomDashboardTitle').textContent = `📈 ${data.roomName || '(未命名房間)'}`;
-        document.getElementById('roomDashboardSub').textContent = `房間代碼：${roomCode}　成員數：${data.members.length} 人`;
+        document.getElementById('roomDashboardSub').textContent = `房間代碼：${roomCode} 成員數：${data.members.length} 人`;
 
         const members = data.members || [];
         initRoomAnalysisDashboard(members, roomCode);
@@ -2905,20 +2926,29 @@
         }).catch(() => { alert('查詢房間數據時發生網路錯誤，請稍後再試一次。'); });
         }
 
-        /* ---------------- 全域鍵盤：Enter 快速確認 / 下一關 ---------------- */
+        /* ---------------- 全域鍵盤 ---------------- */
         document.addEventListener('keydown', function(e){
-        if (e.key !== 'Enter') return;
+        const isEnter = e.key === 'Enter';
+        const isSpace = e.code === 'Space';
+        const arrowDir = e.key === 'ArrowUp' ? 'up' : e.key === 'ArrowDown' ? 'down' :
+                          e.key === 'ArrowLeft' ? 'left' : e.key === 'ArrowRight' ? 'right' : null;
+
+        if (!isEnter && !isSpace && !arrowDir) return;
 
         const recap = document.getElementById('recapOverlay');
         if (recap.classList.contains('show')){
+        if (isEnter){
         e.preventDefault();
         document.getElementById('recapContinueBtn').click();
+        }
         return;
         }
 
         if (document.getElementById('page-quiz-entry').classList.contains('active')){
+        if (isEnter){
         e.preventDefault();
         startQuizFlow();
+        }
         return;
         }
 
@@ -2926,32 +2956,39 @@
 
         for (let i=1;i<=4;i++){
         if (levelContainers[i].classList.contains('active')){
+        if (isSpace && i !== 1) return;
+
         const startBtn = document.getElementById('l' + i + '-start-btn');
         if (startBtn && startBtn.offsetParent !== null){
+        if (isEnter){
         e.preventDefault();
         startBtn.click();
+        }
         return;
         }
-        // 注意：L1~L4 以 const 宣告，不會掛在 window 物件上，
-        // 所以直接以識別字參照（在同一份文件的多個 <script> 標籤間共用全域範疇）
+
         let module = null;
         if (i===1 && typeof L1!=='undefined') module = L1;
         else if (i===2 && typeof L2!=='undefined') module = L2;
         else if (i===3 && typeof L3!=='undefined') module = L3;
         else if (i===4 && typeof L4!=='undefined') module = L4;
-        if (module && typeof module.onEnter === 'function'){
+
+        if (arrowDir && module && typeof module.onArrow === 'function'){
+        e.preventDefault();
+        module.onArrow(arrowDir);
+        return;
+        }
+
+        if (isEnter && module && typeof module.onEnter === 'function'){
         e.preventDefault();
         module.onEnter();
+        return;
         }
         return;
         }
         }
         });
 
-        /* ---------------- 初始化：每次重新進站都必須重新登入 ----------------
-        （刻意不從 localStorage 還原 currentUser，即使使用者上次沒有按登出，
-        重新整理或關掉分頁再打開網站時，也會回到「未登入」狀態）
-        若使用者之前有加入過房間，仍會還原「已加入房間」的標記（僅供顯示參考）。 */
         try{
         const savedRoom = localStorage.getItem(JOINED_ROOM_KEY);
         if (savedRoom) joinedRoom = JSON.parse(savedRoom);
@@ -2959,7 +2996,6 @@
         updateAuthUI();
         updateJoinedRoomBadge();
 
-        /* ---------------- 建立／加入房間輸入框：可按 Enter 直接送出 ---------------- */
         const newRoomNameEl = document.getElementById('newRoomNameInput');
         if (newRoomNameEl) newRoomNameEl.addEventListener('keydown', e => {
         if (e.key === 'Enter'){ e.preventDefault(); createRoom(); }
@@ -3120,11 +3156,9 @@
         stdRT = Math.sqrt(variance);
         }
 
-        // 分數計算：以漏按率／誤點率／反應時間變異度為扣分依據
         const penalty = missRate*0.5 + faRate*0.5 + Math.min(stdRT/15, 20);
         const score = Math.max(0, Math.min(100, 100 - penalty));
 
-        // 重置畫面回說明頁，供下次「再玩一次」使用
         gameScreenEl.style.display = "none";
         instructionsEl.style.display = "block";
 
@@ -3139,17 +3173,14 @@
         }, () => App.goToLevel(2));
         }
 
-        // 遊戲進行中按 Enter：等同點擊圓圈（回應目前的水果）
         function onEnter(){ handleClick(); }
 
         return { start, onEnter };
         })();
     </script>
 
+    <!-- 第二關：水果搜尋 -->
     <script>
-        /* =========================================================================
-        第二關：水果搜尋 — 選擇性注意力 / 抗干擾能力
-        ========================================================================= */
         const L2 = (function(){
         const LEVELS = [
         { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5, strawberryCount:5 },
@@ -3162,6 +3193,11 @@
         let currentLevelIndex = 0;
         let foundCount = 0, totalStrawberriesThisLevel = 0, wrongClicksThisLevel = 0, cherryMisclicksThisLevel = 0;
         let timerInterval = null, startTime = 0, elapsedSeconds = 0;
+        let levelFinished = false;
+
+        let cursorRow = 0, cursorCol = 0;
+        let cursorOnFinish = false;
+        let cellsMatrix = [];
 
         const record = { totalSearchTime:0, totalWrongClicks:0, totalCherryMisclicks:0, totalCorrectClicks:0, totalMissedStrawberries:0, levelTimes:[] };
 
@@ -3211,6 +3247,7 @@
         timerDisplay.textContent = formatSeconds(elapsedSeconds);
         }, 100);
         }
+
         function stopTimer(){
         clearInterval(timerInterval); timerInterval = null;
         elapsedSeconds = (Date.now()-startTime)/1000;
@@ -3220,6 +3257,7 @@
         function renderLevel(levelIndex){
         const cfg = LEVELS[levelIndex];
         foundCount = 0; wrongClicksThisLevel = 0; cherryMisclicksThisLevel = 0;
+        levelFinished = false;
         levelTitle.textContent = cfg.name;
         wrongDisplay.textContent = "0";
         fruitGrid.style.gridTemplateColumns = `repeat(${cfg.cols}, 1fr)`;
@@ -3229,17 +3267,81 @@
         totalStrawberriesThisLevel = strawberryCount;
         foundDisplay.textContent = `0 / ${strawberryCount}`;
 
-        layout.forEach(fruit => {
+        cellsMatrix = [];
+        for (let r=0;r<cfg.rows;r++) cellsMatrix.push(new Array(cfg.cols).fill(null));
+
+        layout.forEach((fruit, idx) => {
+        const r = Math.floor(idx / cfg.cols);
+        const c = idx % cfg.cols;
         const cell = document.createElement("div");
         cell.className = "l2-fruit-cell";
         cell.textContent = fruit;
         cell.dataset.fruit = fruit;
         cell.addEventListener("click", () => handleFruitClick(cell, fruit));
         fruitGrid.appendChild(cell);
+        if (cellsMatrix[r]) cellsMatrix[r][c] = cell;
         });
+
+        cursorRow = 0; cursorCol = 0; cursorOnFinish = false;
+        updateCursorHighlight();
 
         levelCompleteOverlay.style.display = "none";
         startTimer();
+        }
+
+        function updateCursorHighlight(){
+        for (let r=0;r<cellsMatrix.length;r++){
+        for (let c=0;c<cellsMatrix[r].length;c++){
+        const cell = cellsMatrix[r][c];
+        if (cell) cell.classList.toggle("kb-focus", !cursorOnFinish && r === cursorRow && c === cursorCol);
+        }
+        }
+        if (finishBtn) finishBtn.classList.toggle("kb-focus", cursorOnFinish);
+        }
+
+        function moveCursor(direction){
+        if (levelFinished || !cellsMatrix.length) return;
+        const rows = cellsMatrix.length;
+
+        if (cursorOnFinish){
+        if (direction === "up" || direction === "down"){
+        cursorOnFinish = false;
+        cursorRow = direction === "up" ? rows - 1 : 0;
+        cursorCol = Math.min(cursorCol, cellsMatrix[cursorRow].length - 1);
+        }
+        updateCursorHighlight();
+        return;
+        }
+
+        let r = cursorRow, c = cursorCol;
+        if (direction === "up"){
+        r = (r - 1 + rows) % rows;
+        } else if (direction === "down"){
+        if (r === rows - 1){
+        cursorOnFinish = true;
+        updateCursorHighlight();
+        return;
+        }
+        r = r + 1;
+        } else if (direction === "left"){
+        c = (c - 1 + cellsMatrix[r].length) % cellsMatrix[r].length;
+        } else if (direction === "right"){
+        c = (c + 1) % cellsMatrix[r].length;
+        }
+        cursorRow = r; cursorCol = c;
+        updateCursorHighlight();
+        }
+
+        function activateCursorCell(){
+        if (levelFinished) return;
+        if (cursorOnFinish){
+        if (finishBtn) finishBtn.click();
+        return;
+        }
+        if (!cellsMatrix.length) return;
+        const cell = cellsMatrix[cursorRow] && cellsMatrix[cursorRow][cursorCol];
+        if (!cell) return;
+        handleFruitClick(cell, cell.dataset.fruit);
         }
 
         function handleFruitClick(cell, fruit){
@@ -3264,6 +3366,7 @@
 
         function finishLevel(missedCount){
         stopTimer();
+        levelFinished = true;
         record.totalSearchTime += elapsedSeconds;
         record.totalWrongClicks += wrongClicksThisLevel;
         record.totalCherryMisclicks += cherryMisclicksThisLevel;
@@ -3271,7 +3374,7 @@
         record.totalMissedStrawberries += missedCount;
         record.levelTimes.push({ name: LEVELS[currentLevelIndex].name, time: elapsedSeconds });
 
-        levelSummary.textContent = `搜尋時間：${formatSeconds(elapsedSeconds)}　錯誤點擊：${wrongClicksThisLevel} 次　漏掉草莓：${missedCount} 個`;
+        levelSummary.textContent = `搜尋時間：${formatSeconds(elapsedSeconds)} 錯誤點擊：${wrongClicksThisLevel} 次 漏掉草莓：${missedCount} 個`;
         levelCompleteOverlay.style.display = "flex";
 
         setTimeout(() => {
@@ -3301,11 +3404,9 @@
         const cherryConfusionRate = record.totalWrongClicks > 0 ? (record.totalCherryMisclicks/record.totalWrongClicks*100) : 0;
         const avgSpeed = record.totalSearchTime > 0 ? record.totalCorrectClicks/record.totalSearchTime : 0;
 
-        // 分數計算：以錯誤率／干擾誤判率／漏掉目標為扣分依據
         const penalty = errorRate*0.6 + cherryConfusionRate*0.3 + record.totalMissedStrawberries*8;
         const score = Math.max(0, Math.min(100, 100 - penalty));
 
-        // 能力分析文字（沿用原始檔案的判斷邏輯）
         const analysis = [];
         analysis.push(record.totalSearchTime > 60
         ? '搜尋時間較長：可能代表目標搜尋效率較低，建議加強視覺搜尋速度練習。'
@@ -3335,10 +3436,14 @@
         }, () => App.goToLevel(3));
         }
 
-        // 遊戲進行中按 Enter：等同按下「完成（結束本小關）」
-        function onEnter(){ if (finishBtn && timerInterval !== null) finishBtn.click(); }
+        function onArrow(direction){ moveCursor(direction); }
 
-        return { start, onEnter };
+        function onEnter(){
+        if (levelFinished) return;
+        activateCursorCell();
+        }
+
+        return { start, onEnter, onArrow };
         })();
     </script>
 
@@ -3567,7 +3672,6 @@
 
         const summary = computeSummary();
 
-        // 分數計算：以準確率為基礎，扣除持續性錯誤與切換代價(switch cost)
         const penalty = (100-summary.accuracy) + summary.perseverativeErrors*4 + Math.max(0,summary.totalSwitchCost)/10;
         const score = Math.max(0, Math.min(100, 100 - penalty * 0.6));
 
@@ -3591,9 +3695,9 @@
     </script>
 
     <script>
-        /* =========================================================================
+        /* =========================================================
         第四關：水果記憶鏈 — 工作記憶負荷能力
-        ========================================================================= */
+        ========================================================= */
         const L4 = (function(){
         const FRUITS = ['apple','banana','grape'];
         const FRUIT_EMOJI = { apple:'🍎', banana:'🍌', grape:'🍇' };
@@ -3606,7 +3710,9 @@
         let answerStartTime = 0, answerPhaseActive = false, results = [];
 
         let instructionsEl, playingArea, levelNumEl, timeLeftEl, timerNum, vineFill, phaseLabel,
-        memorizeArea, answerArea, slotsEl, nextBtn, footerEl, fruitButtons;
+        memorizeArea, answerArea, slotsEl, nextBtn, footerEl, fruitButtons, undoBtn, clearBtn;
+
+        let cursorRow = 0, cursorCol = 0;
 
         function cacheDom(){
         instructionsEl = document.getElementById('l4-instructions');
@@ -3622,30 +3728,98 @@
         nextBtn = document.getElementById('l4-next-btn');
         footerEl = document.getElementById('l4-footer');
         fruitButtons = document.querySelectorAll('.l4-fruit-btn');
+        undoBtn = document.getElementById('l4-undo-btn');
+        clearBtn = document.getElementById('l4-clear-btn');
 
         fruitButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-        if (!answerPhaseActive) return;
-        const emptyIndex = playerAnswer.indexOf(null);
-        if (emptyIndex === -1) return;
-        playerAnswer[emptyIndex] = btn.dataset.fruit;
-        renderSlots(); checkComplete();
+        btn.addEventListener('click', () => selectFruit(btn.dataset.fruit));
         });
-        });
-        document.getElementById('l4-undo-btn').addEventListener('click', () => {
-        if (!answerPhaseActive) return;
-        let lastFilled = -1;
-        for (let i=0;i<playerAnswer.length;i++) if (playerAnswer[i]!==null) lastFilled = i;
-        if (lastFilled !== -1){ playerAnswer[lastFilled] = null; renderSlots(); checkComplete(); }
-        });
-        document.getElementById('l4-clear-btn').addEventListener('click', () => {
-        if (!answerPhaseActive) return;
-        playerAnswer = playerAnswer.map(()=>null); renderSlots(); checkComplete();
-        });
+        undoBtn.addEventListener('click', undoLast);
+        clearBtn.addEventListener('click', clearAll);
         nextBtn.addEventListener('click', () => {
         if (nextBtn.disabled || !answerPhaseActive) return;
         submitAnswer();
         });
+        }
+
+        function selectFruit(fruit){
+        if (!answerPhaseActive) return;
+        const emptyIndex = playerAnswer.indexOf(null);
+        if (emptyIndex === -1) return;
+        playerAnswer[emptyIndex] = fruit;
+        renderSlots(); checkComplete();
+        }
+
+        function undoLast(){
+        if (!answerPhaseActive) return;
+        let lastFilled = -1;
+        for (let i=0;i<playerAnswer.length;i++) if (playerAnswer[i]!==null) lastFilled = i;
+        if (lastFilled !== -1){ playerAnswer[lastFilled] = null; renderSlots(); checkComplete(); }
+        }
+
+        function clearAll(){
+        if (!answerPhaseActive) return;
+        playerAnswer = playerAnswer.map(()=>null); renderSlots(); checkComplete();
+        }
+
+        function getRowButtons(row){
+        if (row === 0) return Array.from(fruitButtons);
+        if (row === 1) return [undoBtn, clearBtn];
+        return [nextBtn];
+        }
+
+        function updateCursorHighlight(){
+        fruitButtons.forEach(b => b.classList.remove('kb-focus'));
+        [undoBtn, clearBtn, nextBtn].forEach(b => b && b.classList.remove('kb-focus'));
+        const rowButtons = getRowButtons(cursorRow);
+        const btn = rowButtons[cursorCol];
+        if (btn) btn.classList.add('kb-focus');
+        }
+
+        function resetCursor(){
+        cursorRow = 0; cursorCol = 0;
+        updateCursorHighlight();
+        }
+
+        function moveCursor(direction){
+        if (!answerPhaseActive) return;
+        if (direction === 'left' || direction === 'right'){
+        const rowButtons = getRowButtons(cursorRow);
+        const len = rowButtons.length;
+        cursorCol = direction === 'left' ? (cursorCol - 1 + len) % len : (cursorCol + 1) % len;
+        } else if (direction === 'down'){
+        if (cursorRow === 0){
+        cursorRow = 1;
+        cursorCol = 0;
+        } else if (cursorRow === 1){
+        cursorRow = 2;
+        cursorCol = 0;
+        } else {
+        cursorRow = 0;
+        cursorCol = Math.min(cursorCol, getRowButtons(0).length - 1);
+        }
+        } else if (direction === 'up'){
+        if (cursorRow === 2){
+        cursorRow = 1;
+        cursorCol = 0;
+        } else if (cursorRow === 1){
+        cursorRow = 0;
+        cursorCol = 0;
+        } else {
+        cursorRow = 2;
+        cursorCol = 0;
+        }
+        }
+        updateCursorHighlight();
+        }
+
+        function activateCursorSelection(){
+        if (!answerPhaseActive) return;
+        const rowButtons = getRowButtons(cursorRow);
+        const btn = rowButtons[cursorCol];
+        if (!btn || btn.disabled) return;
+        if (cursorRow === 0) selectFruit(btn.dataset.fruit);
+        else btn.click();
         }
 
         function isValidSequence(seq){
@@ -3747,6 +3921,7 @@
         timeLeftEl.textContent = timeLeft;
         resetVineFull();
         answerStartTime = Date.now();
+        resetCursor();
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -3789,7 +3964,6 @@
         else endLevel();
         }
 
-        // 依「最大記憶長度」判斷工作記憶落在前段／中段／後段
         function getAbilityAssessment(maxMemory){
         if (maxMemory >= 7) return { tier:'前段', desc:'7 位數或以上：表現優異，代表短期記憶的「工作空間」大，具備同時處理大量資訊的天賦。' };
         if (maxMemory >= 5) return { tier:'中段', desc:'5-6 位數：專注力相當於全球平均水平。' };
@@ -3838,7 +4012,6 @@
         const accuracy = totalMax>0 ? (totalScore/totalMax*100) : 0;
         const avgReaction = results.reduce((s,r)=>s+r.reactionTime,0) / results.length;
 
-        // 分數計算：正確率為主要依據，並依最大記憶長度給予加成，反應時間過長則扣分
         const score = Math.max(0, Math.min(100, accuracy*0.7 + (maxMemory/9)*30 - Math.max(0,avgReaction-4)*2));
 
         const assessment = getAbilityAssessment(maxMemory);
@@ -3862,13 +4035,13 @@
         }, () => App.finishQuiz());
         }
 
-        // 遊戲進行中按 Enter：等同按下「下一題」（需先完成本題序列）
-        function onEnter(){ if (!nextBtn.disabled && answerPhaseActive) nextBtn.click(); }
+        function onEnter(){ activateCursorSelection(); }
+        function onArrow(direction){ moveCursor(direction); }
 
-        return { start, onEnter };
+        return { start, onEnter, onArrow };
         })();
         /* =========================================================
-        房間數據分析儀表板邏輯 (整合時間區間、雷達圖、直方圖、排名與趨勢圖)
+        房間數據分析儀表板邏輯
         ========================================================= */
         let currentAnalRecords = [];
         let definedPeriods = [];
@@ -3876,11 +4049,9 @@
         let radarChartObj = null, barChartObj = null, lineChartObj = null;
         let currentDistMetric = 'overall';
 
-    // 當開啟房間數據面板時被呼叫（請確保在你的房間渲染函數中呼叫此初始化）
         function initRoomAnalysisDashboard(membersData, roomCode) {
             if (!membersData || membersData.length === 0) return;
     
-    // 轉化房間成員資料為分析格式
     currentAnalRecords = membersData.map(m => {
         const s1 = Number(m.scores?.["1"] || m.scores?.[0] || 0);
         const s2 = Number(m.scores?.["2"] || m.scores?.[1] || 0);
@@ -3961,7 +4132,6 @@ function processAndRenderDashboard() {
     renderLineChart();
 }
 
-// 1. 等級對應人數佔比與點擊顯示暱稱
 function renderLevelDistribution(records) {
     const ranges = [
         { label: 'a. 高工作記憶力 (85-100)', min: 85, max: 100, bg: '#d4edda' },
@@ -3992,7 +4162,6 @@ function renderLevelDistribution(records) {
     });
 }
 
-// 2. 雷達圖
 function renderRadarChart(records) {
     const ctx = document.getElementById('radarChart')?.getContext('2d');
     if (!ctx) return;
@@ -4010,7 +4179,6 @@ function renderRadarChart(records) {
     });
 }
 
-// 2. 分數分布圖
 function renderDistributionChart(metricKey, records = getFilteredRecords()) {
     currentDistMetric = metricKey;
     const ctx = document.getElementById('barChart')?.getContext('2d');
@@ -4042,7 +4210,6 @@ function renderDistributionChart(metricKey, records = getFilteredRecords()) {
     });
 }
 
-// 3. 排名與標示低於平均
 function renderRankingTable(records) {
     const tbody = document.getElementById('ranking-table-body');
     if (!tbody) return;
@@ -4074,7 +4241,6 @@ function renderRankingTable(records) {
     });
 }
 
-// 5. 歷史折線圖
 function renderLineChart() {
     const ctx = document.getElementById('lineChart')?.getContext('2d');
     if (!ctx) return;
@@ -4138,7 +4304,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     </script>
-<!-- ===== 新增:左下角音樂開關 + 進度條自動連動 ===== -->
+
     <button id="musicToggleBtn" class="music-toggle-btn" onclick="toggleBgMusic()" title="背景音樂開關">
         <span id="musicToggleIcon">🔇</span>
     </button>
@@ -4177,7 +4343,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </style>
 
     <script>
-    /* 進度條依 dot 的 done / current 狀態自動更新填色,不需修改任何原有函式 */
     (function () {
         const fillEl = document.getElementById('quiz-progress-fill');
         if (!fillEl) return;
@@ -4196,16 +4361,14 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFill();
     })();
 
-/* 溫暖背景音樂:木質音樂盒風格 — 一顆持續的暖墊長音 + 輕柔五聲音階旋律 */
     let bgMusicOn = false, bgMusicInited = false;
     let bgPadSynth, bgMelodySynth, bgReverb, bgFilter, bgSequence;
 
-    // 五聲音階旋律,null 是休止符,營造放鬆的呼吸感
     const BG_MELODY_NOTES = [
         'C4', null, 'E4', 'D4', null, 'G4', 'E4', null,
         'A4', 'G4', null, 'E4', 'D4', null, 'C4', null
     ];
-    const BG_PAD_NOTES = ['C3', 'G3', 'C4']; // 底層暖墊和弦,只彈一次、持續到關閉為止
+    const BG_PAD_NOTES = ['C3', 'G3', 'C4']; 
 
     function initBgMusic() {
         if (bgMusicInited) return;
@@ -4214,14 +4377,12 @@ document.addEventListener('DOMContentLoaded', function() {
         bgReverb = new Tone.Reverb({ decay: 5, wet: 0.3 }).toDestination();
         bgFilter = new Tone.Filter({ frequency: 1100, type: 'lowpass', rolloff: -12 }).connect(bgReverb);
 
-        // 底層暖墊:只啟動一次,之後持續發聲到關閉為止,音量固定,不會重複觸發造成忽大忽小
         bgPadSynth = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'sine' },
             envelope: { attack: 4, decay: 0, sustain: 1, release: 4 },
             volume: -26
         }).connect(bgFilter);
 
-        // 旋律:木質音樂盒般的輕柔撥音,五聲音階,聽起來放鬆愉快不刺耳
         bgMelodySynth = new Tone.Synth({
             oscillator: { type: 'triangle' },
             envelope: { attack: 0.02, decay: 0.6, sustain: 0.1, release: 1.4 },
@@ -4245,7 +4406,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bgMusicOn = true;
             icon.textContent = '🎵';
             btn.classList.add('on');
-            bgPadSynth.triggerAttack(BG_PAD_NOTES); // 暖墊只彈一次,之後持續不斷
+            bgPadSynth.triggerAttack(BG_PAD_NOTES); 
             bgSequence.start(0);
             Tone.Transport.start();
         } else {
@@ -4258,6 +4419,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     </script>
-</body>
 </body>
 </html>
