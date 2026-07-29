@@ -272,6 +272,9 @@
                      position: relative;
                      z-index: 1;
                  }
+                 #about-section {
+                     display: none;
+                 }
 
              .home-fruit-bg {
                  position: absolute;
@@ -2033,8 +2036,12 @@
         document.querySelectorAll('.site-nav a').forEach(a => a.classList.remove('active'));
         document.getElementById('nav-about').classList.add('active');
         requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
         const el = document.getElementById('about-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (el) {
+        el.style.display = 'block';
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         });
         }
 
@@ -4394,8 +4401,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     </script>
 
-    <button id="musicToggleBtn" class="music-toggle-btn" onclick="toggleBgMusic()" title="背景音樂開關">
-        <span id="musicToggleIcon">🔇</span>
+    <button id="musicToggleBtn" class="music-toggle-btn on" onclick="toggleBgMusic()" title="背景音樂開關">
+        <span id="musicToggleIcon">🎵</span>
     </button>
 
     <style>
@@ -4507,6 +4514,14 @@ document.addEventListener('DOMContentLoaded', function() {
             Tone.Transport.stop();
         }
     }
+
+    /* 使用者第一次跟頁面互動時（點擊/觸控/按鍵皆可），自動悄悄開始播放音樂 */
+    function autoStartMusicOnce() {
+        if (bgMusicOn) return;
+        ['click', 'touchstart', 'keydown'].forEach(evt => document.removeEventListener(evt, autoStartMusicOnce));
+        toggleBgMusic();
+    }
+    ['click', 'touchstart', 'keydown'].forEach(evt => document.addEventListener(evt, autoStartMusicOnce));
     </script>
 
     <!-- ===== 新增：測驗進行中切換頁面時的「水果忍者」專心提醒 ===== -->
