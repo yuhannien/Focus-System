@@ -4193,17 +4193,39 @@ function applyPeriods() {
 }
 
 function getFilteredRecords() {
-    if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) return currentAnalRecords;
+    // 如果選擇「所有測驗結果」或未選擇區間，直接回傳全部資料
+    if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) {
+        return currentAnalRecords;
+    }
+    
     const p = definedPeriods[selectedPeriodIndex];
-    
-    // 將輸入的時間直接解析為 Date 物件（精確到分鐘）
-    const start = new Date(p.start);
-    const end = new Date(p.end);
-    
+    if (!p.start || !p.end) return currentAnalRecords;
+
+    // 將輸入框的 YYYY-MM-DDTHH:mm 轉為 Timestamp 毫秒數
+    const startMs = new Date(p.start).getTime();
+    const endMs = new Date(p.end).getTime();
+
     return currentAnalRecords.filter(r => {
-        // 解析資料中的時間字串，支援 'YYYY/MM/DD HH:mm:ss' 或 'YYYY-MM-DD HH:mm:ss'
-        const t = new Date(r.time.replace(/-/g, '/'));
-        return t >= start && t <= end;
+        if (!r.time) return false;
+
+        // 強制修復時間字串相容性（將斜線替換成橫線、移除多餘空格）
+        let formattedTimeStr = String(r.time).trim().replace(/\//g, '-');
+        
+        // 如果時間字串中間是空格，換成 'T' 方便 JavaScript 標準解析
+        if (formattedTimeStr.includes(' ') && !formattedTimeStr.includes('T')) {
+            formattedTimeStr = formattedTimeStr.replace(' ', 'T');
+        }
+
+        const recordMs = new Date(formattedTimeStr).getTime();
+
+        // 偵測是否成功轉換為時間
+        if (isNaN(recordMs)) {
+            console.warn('無法解析的時間格式：', r.time);
+            return false;
+        }
+
+        // 進行毫秒大小比較
+        return recordMs >= startMs && recordMs <= endMs;
     });
 }
 
