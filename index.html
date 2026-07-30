@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>專注力分析與改善系統</title>
+    <title>智慧型專注力分析與改善系統</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
@@ -49,7 +49,7 @@
              body {
                  font-family: "Microsoft JhengHei","PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,sans-serif;
                  color: var(--text-dark);
-                 background: repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 26px), linear-gradient(180deg, #e3bd80 0%, #c9974f 55%, #ad8047 100%);
+                 background: repeating-linear-gradient(90deg, rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 2px, transparent 2px, transparent 26px), linear-gradient(180deg, var(--wood-light) 0%, var(--wood-mid) 55%, var(--wood-deepest) 100%);
                  background-attachment: fixed;
                  min-height: 100vh;
                  display: flex;
@@ -123,6 +123,7 @@
                  display: flex;
                  gap: 6px;
                  flex-wrap: wrap;
+                 align-items: center;
              }
 
                  .site-nav a {
@@ -130,7 +131,11 @@
                      text-decoration: none;
                      font-size: 14.5px;
                      font-weight: bold;
-                     padding: 9px 16px;
+                     height: 38px;
+                     padding: 0 16px;
+                     box-sizing: border-box;
+                     display: inline-flex;
+                     align-items: center;
                      border-radius: 20px;
                      cursor: pointer;
                      border: 1px solid rgba(253,243,221,0.25);
@@ -146,6 +151,45 @@
                      .site-nav a.active {
                          background: var(--vine-green);
                          border-color: var(--vine-green-light);
+                     }
+
+                 /* 使用者頭像徽章：套用和 .site-nav a 完全相同的高度／內距，
+                    確保登入前後整排導覽列高度一致 */
+                 #nav-user-badge {
+                     color: #fdf3dd;
+                     font-size: 14.5px;
+                     font-weight: bold;
+                     height: 38px;
+                     padding: 0 14px;
+                     box-sizing: border-box;
+                     border-radius: 20px;
+                     border: 1px solid rgba(253,243,221,0.25);
+                     display: inline-flex;
+                     align-items: center;
+                     gap: 8px;
+                 }
+
+                     #nav-user-badge img {
+                         width: 24px;
+                         height: 24px;
+                         border-radius: 50%;
+                         object-fit: cover;
+                         display: block;
+                         flex-shrink: 0;
+                     }
+
+                     .nav-avatar-fallback {
+                         width: 24px;
+                         height: 24px;
+                         border-radius: 50%;
+                         background: var(--vine-green-light);
+                         color: #fff;
+                         font-size: 12px;
+                         font-weight: bold;
+                         display: flex;
+                         align-items: center;
+                         justify-content: center;
+                         flex-shrink: 0;
                      }
 
              /* ---------- Layout ---------- */
@@ -231,8 +275,6 @@
                  padding: 20px 22px;
                  margin: 18px 0 24px;
                  text-align: left;
-                 word-break: break-word;
-                 overflow-wrap: break-word;
              }
 
                  .home-lead-box p {
@@ -866,46 +908,6 @@
                      color: var(--tier-low);
                  }
 
-             /* ---------- 使用者登入徽章（頭像下拉選單） ---------- */
-             .nav-avatar-toggle {
-                 display: flex;
-                 align-items: center;
-                 justify-content: center;
-                 padding: 4px 10px;
-             }
-
-            /* 修改 1：調整大頭貼圖片的高度與寬度維持固定大小 */
-            .nav-avatar-toggle img {
-                width: 30px;
-                height: 30px; /* 確保高度不會隨父容器變高 */
-                border-radius: 50%;
-                border: 2px solid var(--kraft-border-light);
-                display: block;
-            }
-
-            /* 修改 2：調整未上傳頭貼時的備用圖示高度與寬度 */
-            .nav-avatar-fallback {
-                width: 30px;
-                height: 30px; /* 確保高度不會隨父容器變高 */
-                border-radius: 50%;
-                background: var(--vine-green);
-                color: #fdf3dd;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                font-size: 14px;
-                border: 2px solid var(--kraft-border-light);
-            }
-
-            /* 修改 3：確保導覽列的下拉選單容器不要強行撐高 */
-            .nav-dropdown {
-                position: relative;
-                display: flex;
-                align-items: center;
-                height: auto; /* 避免繼承外層高度 */
-            }
-
              .nav-dropdown-username {
                  display: block;
                  padding: 10px 18px 4px;
@@ -1146,14 +1148,6 @@
                      font-size: 40px;
                  }
 
-             /* 改善 AI 建議框文字換行設定 */
-             #aiSuggestionBox {
-                 word-break: break-word;
-                 overflow-wrap: break-word;
-                 white-space: pre-wrap;
-                 line-height: 1.6;
-             }
-
              @media (max-width:600px) {
                  .room-hub-boxes {
                      flex-direction: column;
@@ -1194,7 +1188,7 @@
                  font-size: 100px;
                  cursor: pointer;
                  user-select: none;
-                 transition: background .15s ease, border-color .15s ease;
+                 transition: background .15s ease, border-color .15s ease, transform .1s ease;
              }
 
                  .l1-fruit-stage.empty {
@@ -1428,6 +1422,7 @@
 
                  to {
                      transform: scale(1);
+                     opacity: 1;
                  }
              }
 
@@ -1514,24 +1509,14 @@
             <span class="logo-text">專注力分析與改善系統<small>Focus Fruit Lab</small></span>
         </div>
         <nav class="site-nav">
-            <a id="nav-about" onclick="App.scrollToAbout()">網站設立動機</a>
-            <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗專區</a>
+            <a id="nav-about" onclick="App.showPage('about')">網站設立動機</a>
+            <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
             <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
             <a id="nav-login" onclick="App.openLoginModal()">登入</a>
-            <div class="nav-dropdown nav-authed" style="display:none;">
-                <a class="nav-dropdown-toggle" id="nav-room">房間 ▾</a>
-                <div class="nav-dropdown-menu">
-                    <a onclick="App.showPage('room-manage')">建立 | 加入房間</a>
-                    <a onclick="App.showPage('room-view')">查看房間</a>
-                </div>
-            </div>
-            <div class="nav-dropdown nav-authed" style="display:none;">
-                <a class="nav-dropdown-toggle nav-avatar-toggle" id="nav-user-badge"></a>
-                <div class="nav-dropdown-menu">
-                    <span id="nav-user-name-label" class="nav-dropdown-username"></span>
-                    <a onclick="App.logout()">登出</a>
-                </div>
-            </div>
+            <a id="nav-room-manage" class="nav-authed" style="display:none;" onclick="App.showPage('room-manage')">建立/加入房間</a>
+            <a id="nav-room-view" class="nav-authed" style="display:none;" onclick="App.showPage('room-view')">查看房間</a>
+            <span id="nav-user-badge" class="nav-authed" style="display:none;"></span>
+            <a id="nav-logout" class="nav-authed" style="display:none;" onclick="App.logout()">登出</a>
         </nav>
     </header>
 
@@ -1558,23 +1543,24 @@
             </div>
 
             <div class="crate-card">
-                <h1>專注力分析與改善系統</h1>
+                <h1>🍓 智慧型專注力分析與改善系統</h1>
                 <div class="home-sub">遊戲化專注力評估平台</div>
                 <div class="fruit-row-decor home-fruit-row">
                     <span>🍓</span><span>🍌</span><span>🍇</span><span>🍊</span><span>🍉</span>
                 </div>
                 <div class="home-lead-box">
-                    <p style="margin-bottom: 20px; text-indent: 2em;">歡迎進入「專注力分析與改善系統」！本遊戲透過四個水果主題關卡，測驗你的注意力穩定度、抗干擾能力、反應控制能力與記憶負荷能力。你只需依照每關指示完成任務，系統將分析你的表現並提供個人化的專注改善建議。</p>
-                    <p style="margin-bottom: 20px; text-indent: 2em;">點選右上角的「登入」，使用 Google 帳號登入後即可使用建立以及加入房間功能喔！</p>
+                    <p style="margin-bottom: 20px; text-indent: 2em;">歡迎進入「智慧型專注力分析與改善系統」！本遊戲透過四個水果主題關卡，測驗你的注意力穩定度、抗干擾能力、反應控制能力與記憶負荷能力。你只需依照每關指示完成辨識、搜尋、規則切換與記憶重現等任務，系統將分析你的表現並以雷達圖呈現專注力特徵，提供個人化的專注改善建議。</p>
                 </div>
             </div>
 
             <div class="home-cta">
                 <button class="btn-primary btn-cta" onclick="App.goToQuizEntry()">開始測驗</button>
             </div>
+        </section>
 
-            <!-- ============ 網站設立動機（首頁下滑區塊） ============ -->
-            <div id="about-section" class="crate-card" style="margin-top:40px;">
+        <!-- ============ 網站設立動機 ============ -->
+        <section id="page-about" class="page">
+            <div class="crate-card">
                 <h2>💡 網站設立動機</h2>
                 <p style="margin-bottom: 20px; text-indent: 2em;">在現代資訊快速發展的社會中，人們長時間處於多工處理與高資訊量的環境，使注意力容易受到外界刺激影響，進而造成學習效率下降、工作表現降低等問題。然而，專注力變化往往逐漸累積，大眾難以及時察覺自身注意力狀態，也缺乏簡易且客觀的方法了解自身專注能力與改善方向。</p>
                 <p style="margin-bottom: 20px; text-indent: 2em;">因此，本專案致力於開發一套智慧型專注力分析與改善系統，提供使用者一個遊戲化自主評估平台，分析使用者於不同認知任務中的表現，協助使用者了解自身專注力特徵，並提供改善建議。</p>
@@ -1600,19 +1586,20 @@
                 <p>完成四關後，系統會將你的表現整理成雷達圖，並提供改善建議。開始之前，請先告訴我們你的暱稱與年齡：</p>
                 <div id="joinedRoomBadge" style="display:none; text-align:center; margin-bottom:10px;"></div>
                 <div class="player-form">
-                    <label>
-                        選擇房間進行測試？
-                        <select id="quizRoomSelect" onchange="App.onQuizRoomSelectChange()">
-                            <option value="">不選擇房間</option>
-                        </select>
-                    </label>
+                    <div id="quizRoomSelectWrapper" style="display:none;">
+                        <label>
+                            選擇房間進行測試？
+                            <select id="quizRoomSelect" onchange="App.onQuizRoomSelectChange()">
+                                <option value="">不選擇房間</option>
+                            </select>
+                        </label>
+                    </div>
                     <label>暱稱<input type="text" id="playerNameInput" maxlength="20" placeholder="例如：小水果"></label>
                     <label>年齡<input type="number" id="playerAgeInput" min="1" max="120" placeholder="例如：18"></label>
                 </div>
                 <div id="playerFormError" class="player-form-error"></div>
                 <div style="text-align:center;font-size:11.5px;color:var(--text-soft);margin-bottom:6px;">你的暱稱、年齡與測驗結果將被記錄，作為本系統的測驗資料。</div>
-                <p>遊戲中隨時可按 <b>Enter</b> 鍵快速進行下一步。</p>
-                <p style="text-align: center;">準備好了嗎？</p>
+                <p>準備好了嗎？遊戲中隨時可按 <b>Enter</b> 鍵快速進行下一步。</p>
                 <div class="btn-row"><button class="btn-primary" onclick="App.startQuizFlow()">開始遊戲</button></div>
             </div>
         </section>
@@ -1630,20 +1617,20 @@
             <!-- 各關卡容器將於後續段落插入 -->
             <div id="level1-container" class="level-container">
                 <div class="crate-card" id="l1-instructions">
-                    <h2 style="text-align:center;">第一關：水果守衛</h2>
+                    <h2 style="text-align:center;">🍓 第一關：水果守衛</h2>
                     <div class="home-sub">注意力訓練・選擇性反應</div>
                     <div class="home-lead-box">
-                        <p><span style="font-size:34px;">🍓</span> 看到「草莓」→ <b>立即點擊</b></p>
-                        <p><span style="font-size:34px;">🍌🍇🍊🍎🍉🍑</span> 其他水果 → <b>不要點擊</b></p>
+                        <p><span style="font-size:34px;">🍓</span> 看到「草莓」→ <b>立即點擊</b><span class="tag tag-click">要點擊</span></p>
+                        <p><span style="font-size:34px;">🍌🍇🍊🍎🍉🍑</span> 其他水果 → <b>不要點擊</b><span class="tag tag-noclick">不要點</span></p>
                     </div>
                     <p>水果會一個一個隨機出現在圓圈中，請保持專注：</p>
-                    <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，難度會隨階段提升</p>
+                    <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，結束後會顯示你的表現</p>
                     <div class="btn-row"><button class="btn-primary" id="l1-start-btn" onclick="L1.start()">開始本關</button></div>
                 </div>
 
                 <div class="crate-card" id="l1-game-screen" style="display:none;">
                     <div style="display:flex;justify-content:space-between;font-weight:bold;color:var(--text-mid);margin-bottom:10px;">
-                        <span><span id="l1-stage-label">階段 1</span></span>
+                        <span>回合 <span id="l1-trial-counter">0</span> / <span id="l1-trial-total">30</span></span>
                         <span>得分 <span id="l1-score-counter">0</span></span>
                     </div>
                     <div style="width:100%;height:10px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:10px;overflow:hidden;margin-bottom:20px;">
@@ -1655,12 +1642,11 @@
             </div>
             <div id="level2-container" class="level-container">
                 <div class="crate-card" id="l2-instructions">
-                    <h2 style="text-align:center;">第二關：水果搜尋</h2>
+                    <h2 style="text-align:center;">🔍 第二關：水果搜尋</h2>
                     <div class="home-sub">選擇性注意力訓練・抗干擾能力</div>
                     <div class="fruit-row-decor" style="font-size:26px;">🍎 🍌 🍊 🍇 <strong>🍓</strong> 🍉 🍒</div>
                     <div class="home-lead-box">
-                        <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，隨著關卡進行網格範圍與水果種類會增加。</p>
-                        <p>找到所有草莓後，可點擊下方「完成」按鈕或直接按下 <b>Enter</b> 鍵進行下一小關</p>
+                        <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，難度會逐漸提升，請盡量又快又準地找出所有草莓！注意畫面中可能出現外觀相似的櫻桃 🍒，請仔細分辨。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l2-start-btn" onclick="L2.start()">開始本關</button></div>
                 </div>
@@ -1669,11 +1655,11 @@
                     <h3 id="l2-level-title" style="text-align:center;color:var(--wood-dark);margin-top:0;">Level 1</h3>
                     <div id="l2-info-bar" style="display:flex;flex-wrap:wrap;justify-content:space-around;gap:8px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:14px;padding:10px 8px;margin-bottom:14px;font-weight:bold;color:var(--wood-dark);">
                         <div>時間<span id="l2-timer-display" style="display:block;font-size:1.2rem;">0.0s</span></div>
-                        <div>已找到<span id="l2-found-display" style="display:block;font-size:1.2rem;">0</span></div>
+                        <div>已找到<span id="l2-found-display" style="display:block;font-size:1.2rem;">0 / 0</span></div>
                         <div>錯誤點擊<span id="l2-wrong-display" style="display:block;font-size:1.2rem;">0</span></div>
                     </div>
                     <div id="l2-fruit-grid" class="l2-fruit-grid"></div>
-                    <div class="btn-row"><button class="btn-secondary" id="l2-finish-btn">完成</button></div>
+                    <div class="btn-row"><button class="btn-secondary" id="l2-finish-btn">完成（結束本小關）</button></div>
                     <div id="l2-level-complete-overlay" class="l2-level-overlay" style="display:none;">
                         <h2>🎉 小關完成！</h2>
                         <p id="l2-level-summary"></p>
@@ -1682,29 +1668,17 @@
             </div>
             <div id="level3-container" class="level-container">
                 <div class="crate-card" id="l3-instructions">
-                    <h2 style="text-align:center;">第三關：水果規則變換</h2>
+                    <h2 style="text-align:center;">🔄 第三關：水果規則變換</h2>
                     <div class="home-sub">認知彈性測試・反應控制能力</div>
                     <div class="home-lead-box">
-                        <p>畫面上會隨機出現各式水果，共有 4 個階段，水果出現的速度會越來越快，種類與判斷特徵也會隨階段增加！請依照當前指示迅速點擊「符合規則」的水果，不符規則者請勿點擊：</p>
-                        <p>
-                            • <b>階段 1（顏色）</b>：判斷特定顏色（紅／黃／綠）<br>
-                            • <b>階段 2（形狀）</b>：判斷特定形狀（圓形／長條）<br>
-                            • <b>階段 3（複合雙條件）</b>：同時符合「顏色 ＋ 形狀」<br>
-                            • <b>階段 4（複合三條件）</b>：同時符合「顏色 ＋ 形狀 ＋ 有無葉子」
-                        </p>
-                        <div style="font-size:13px; color:var(--text-soft); border-top:1px dashed var(--kraft-border-light); padding-top:8px; margin-top:8px;">
-                            <b>水果特徵對照表：</b><br>
-                            🔴 🍉 🍅 🌶️ ｜ 🟡 🌽 🍋 🍌 ｜ 🟢 🥝 🍈 🫛<br>
-                            ⭕ 🍅 🍋 🥝 🍈 ｜ 🥢 🌶️ 🌽 🍌 🫛 （西瓜 🍉 不屬於圓形也不屬於長條）<br>
-                            🌿 🍅 🌶️ 🌽 🍋 🫛 ｜ 🚫 🍉 🍌 🥝 🍈
-                        </div>
+                        <p>畫面會不斷出現不同顏色（紅／黃）與形狀（圓／長）的水果。請依照畫面指示的規則，點擊「符合規則」的水果；不符合規則的水果請不要點擊。規則會在遊戲過程中悄悄改變，請保持專注！</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l3-start-btn" onclick="L3.start()">開始本關</button></div>
                 </div>
 
                 <div class="crate-card" id="l3-game-screen" style="display:none;">
                     <div id="l3-info-bar" style="display:flex;justify-content:space-between;align-items:center;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:12px 12px 0 0;padding:10px 16px;font-size:14px;font-weight:bold;color:var(--wood-dark);">
-                        <div>階段 <span id="l3-stage-num">-</span> / 4 規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
+                        <div>階段 <span id="l3-stage-num">-</span> / 3　規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
                         <div>剩餘時間：<span id="l3-time-left">--</span>s</div>
                     </div>
                     <div style="height:6px;width:100%;background:#e9ecef;"><div id="l3-timer-bar-inner" style="height:100%;width:100%;background:var(--vine-green);transition:width .1s linear;"></div></div>
@@ -1722,8 +1696,7 @@
                     <h2 style="text-align:center;">🍎🍌🍇 第四關：水果記憶鏈</h2>
                     <div class="home-sub">工作記憶負荷測試</div>
                     <div class="home-lead-box">
-                        <p>考驗你的短期工作記憶容量與排序能力！每回合畫面會先展示一排水果序列，請在有限時間內專注記住它們的<b>種類與出現順序</b>。</p>
-                        <p>• 水果隱藏後，請點擊下方水果按鈕依序重建正確序列<br>• 每題限時 10 秒作答，共 7 題，隨著題目進行水果長度與記憶難度會逐題增加<br>• 排滿水果序列後可點擊「下一題」或直接按下 <b>Enter</b> 鍵送出本題答案</p>
+                        <p>畫面會先出現一排水果，請記住它們的<b>種類與順序</b>。水果消失後，依序點擊按鈕重建正確序列。每題限時 10 秒作答，共 7 題，水果數量與記憶時間會逐題增加。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l4-start-btn" onclick="L4.start()">開始本關</button></div>
                 </div>
@@ -1745,7 +1718,7 @@
                                 <button class="l4-fruit-btn" data-fruit="grape">🍇</button>
                             </div>
                             <div style="display:flex;gap:10px;">
-                                <button class="btn-outline" id="l4-undo-btn" style="padding:8px 16px;font-size:14px;margin:0;">↩ 刪除</button>
+                                <button class="btn-outline" id="l4-undo-btn" style="padding:8px 16px;font-size:14px;margin:0;">↩ 回退</button>
                                 <button class="btn-outline" id="l4-clear-btn" style="padding:8px 16px;font-size:14px;margin:0;">🗑 清空</button>
                             </div>
                         </div>
@@ -1764,13 +1737,12 @@
                     <button class="btn-outline" style="margin:0;" onclick="App.showPage('results-zone')">◀ 返回結果專區</button>
                 </div>
                 <h2 style="text-align:center;">🏆 你的專注力雷達圖</h2>
-                <p style="text-align:center; margin-top:-6px;">四個關卡的表現已整合分析如下</p>
+                <p style="text-align:center; margin-top:-6px;">四個關卡的表現已整合分析如下（滿分 100）</p>
                 <canvas id="radarCanvas" width="440" height="440" style="display:none;"></canvas>
                 <img id="radarImg" alt="專注力雷達圖" style="max-width:100%; width:440px; margin:0 auto; display:block; border-radius:12px; border:1px solid var(--kraft-border-light);">
+                <div class="radar-hint">💡 長按或點擊右鍵圖片即可保存到裝置</div>
                 <div class="score-list" id="scoreListEl"></div>
                 <div id="overallAdviceBox" class="home-lead-box" style="text-align:left;"></div>
-                <!-- 針對待加強面向的 AI 改善建議欄位 -->
-                <div id="aiSuggestionBox" class="home-lead-box" style="text-align:left; background:#fff8e8; border:2px solid var(--kraft-border-light);"></div>
                 <div class="btn-row">
                     <button class="btn-secondary" onclick="App.downloadRadar()">長按保存結果</button>
                     <button class="btn-primary" onclick="App.restartWholeQuiz()">再玩一次</button>
@@ -1876,7 +1848,7 @@
                 <p id="joinedRoomDetailSub" style="text-align:center; margin-top:-6px;"></p>
                 <div id="joinedRoomHistoryList" style="margin:16px 0;"></div>
                 <div class="btn-row" style="justify-content:center;">
-                    <button type="button" id="retestInRoomBtn" class="btn-primary">再測一次</button>
+                    <button type="button" id="retestInRoomBtn" class="btn-primary">🔁 再測一次</button>
                 </div>
             </div>
         </section>
@@ -1890,17 +1862,11 @@
                 <h2 id="roomDashboardTitle" style="text-align:center;">📈 房間數據分析儀表板</h2>
                 <p id="roomDashboardSub" style="text-align:center; margin-top:-6px;"></p>
 
-                <div id="roomDashboardLoading" style="display:none; text-align:center; padding:50px 10px; color:var(--text-soft);">
-                    <div style="font-size:34px; margin-bottom:10px;">⏳</div>
-                    <div>房間數據載入中，請稍候…</div>
-                </div>
-
-                <div id="roomDashboardContent" style="display:none;">
                 <div style="background:var(--kraft-bg2); padding:15px; border-radius:10px; border:1px solid var(--kraft-border); margin:15px 0; text-align:left;">
-                    <h4 style="margin-top:0; color:var(--wood-dark);">📅 設定追蹤區間</h4>
+                    <h4 style="margin-top:0; color:var(--wood-dark);">📅 劃分測驗時間區間 (設定第 1, 2, 3... 次測驗)</h4>
                     <div id="periods-container"></div>
                     <div style="margin-top:10px;">
-                        <button type="button" class="btn-primary" style="font-size:12px; padding:6px 12px;" onclick="addPeriodSetting()">➕ 新增測驗區間</button>
+                        <button type="button" class="btn-primary" style="font-size:12px; padding:6px 12px;" onclick="addPeriodSetting()">➕ 新增測驗次數區間</button>
                         <button type="button" class="btn-primary" style="font-size:12px; padding:6px 12px; background:var(--vine-green);" onclick="applyPeriods()">💾 儲存並套用區間</button>
                     </div>
                 </div>
@@ -1908,8 +1874,7 @@
                 <div id="period-selector-buttons" style="margin:15px 0; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;"></div>
 
                 <div style="margin:20px 0; text-align:left;">
-                    <h3 style="color:var(--wood-dark);">1. 等級人數佔比</h3>
-                    <p>點擊等級卡片可顯示名單</p>
+                    <h3 style="color:var(--wood-dark);">1. 等級人數佔比 (點擊等級卡片可顯示名單)</h3>
                     <div id="level-cards-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;"></div>
                     <div id="nicknames-display" style="display:none; background:#fff; padding:12px; border-radius:8px; border:1px solid var(--kraft-border-light); margin-top:10px;">
                         <strong id="nickname-title" style="color:var(--wood-dark);">玩家名單：</strong>
@@ -1971,9 +1936,6 @@
                     </div>
                 </div>
 
-                </div>
-                <!-- /#roomDashboardContent -->
-
                 <div id="classAdviceBox" class="home-lead-box" style="text-align:left; display:none;"></div>
                 <canvas id="teacherRadarCanvas" width="440" height="440" style="display:none;"></canvas>
                 <img id="teacherRadarImg" alt="房間平均雷達圖" style="display:none;">
@@ -2020,16 +1982,19 @@
         };
 
         let scores = {1:null, 2:null, 3:null, 4:null};
-        let displayedScores = {1:null, 2:null, 3:null, 4:null}; 
+        let displayedScores = {1:null, 2:null, 3:null, 4:null}; // 目前結果頁正在顯示的分數（本次結果或歷史紀錄）
         let levelDetails = {1:null, 2:null, 3:null, 4:null};
         let playerInfo = { name:'', age:'' };
         let pendingContinue = null;
-        let viewingHistoryIndex = null; 
+        let viewingHistoryIndex = null; // 目前結果專區正在檢視的紀錄索引（null = 檢視本次剛完成的結果）
 
+        // ★ 到 Google Cloud Console 建立 OAuth Client ID（應用程式類型選「網頁應用程式」）後，
+        //    把 Client ID 貼在這裡（雙引號中間），例如："123456-abc.apps.googleusercontent.com"
+        //    留空字串 "" 代表尚未啟用 Google 登入功能。
         const GOOGLE_CLIENT_ID = "245822345405-tn3a1tpnqm2e4elhqf5r2lj7jbcjh0t3.apps.googleusercontent.com";
 
-        let currentUser = null;   
-        let joinedRoom = null;    
+        let currentUser = null;   // { name, email, picture }（Google 登入後的使用者資訊）
+        let joinedRoom = null;    // { code, roomName, teacherName }（目前已加入的房間）
 
         const levelContainers = {
         1: document.getElementById('level1-container'),
@@ -2038,37 +2003,8 @@
         4: document.getElementById('level4-container')
         };
 
-        /* ---------------- 測驗進行中：切換頁面攔截提醒 ---------------- */
-        function isQuizPageActive(){
-        const el = document.getElementById('page-quiz');
-        return !!(el && el.classList.contains('active'));
-        }
-
-        function showFocusWarning(){
-        const toast = document.getElementById('focusWarningToast');
-        if (!toast) return;
-        toast.classList.remove('show');
-        void toast.offsetWidth; // 強制 reflow，讓連續觸發也能重新播放動畫
-        toast.classList.add('show');
-        clearTimeout(showFocusWarning._timer);
-        showFocusWarning._timer = setTimeout(() => toast.classList.remove('show'), 2200);
-        }
-
-        function scrollToAbout(){
-        if (isQuizPageActive()){ showFocusWarning(); return; }
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page-home').classList.add('active');
-        document.querySelectorAll('.site-nav a').forEach(a => a.classList.remove('active'));
-        document.getElementById('nav-about').classList.add('active');
-        requestAnimationFrame(() => {
-        const el = document.getElementById('about-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        }
-
         /* ---------------- 頁面切換 ---------------- */
         function showPage(name){
-        if (isQuizPageActive() && name !== 'quiz'){ showFocusWarning(); return; }
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const target = document.getElementById('page-' + name);
         if (target) target.classList.add('active');
@@ -2085,11 +2021,11 @@
         renderHistory();
         }
         if (name === 'room-manage'){
-        document.getElementById('nav-room').classList.add('active');
-        showRoomManageChoice(); 
+        document.getElementById('nav-room-manage').classList.add('active');
+        showRoomManageChoice(); // 每次進入都從「選擇建立/加入」畫面開始
         }
         if (name === 'room-view'){
-        document.getElementById('nav-room').classList.add('active');
+        document.getElementById('nav-room-view').classList.add('active');
         if (currentUser) loadMyRooms();
         renderJoinedRoomsList();
         }
@@ -2152,6 +2088,7 @@
         setActiveLevelContainer(1);
         }
 
+        // 每一關結束時呼叫：顯示 recap 覆蓋層、記錄分數與完整詳細數據
         function levelComplete(levelNum, statsArr, score, detail, nextAction){
         scores[levelNum] = Math.round(score);
         levelDetails[levelNum] = detail || null;
@@ -2195,9 +2132,8 @@
         document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
         document.getElementById('backToHistoryRow').style.display = 'none';
         renderScoreList('scoreListEl', scores);
-        renderAdvice('overallAdviceBox', scores);
-        renderAISuggestion('aiSuggestionBox', scores);
         drawRadarInto('radarCanvas', 'radarImg', scores);
+        renderAdvice('overallAdviceBox', scores);
         renderLevelDetailsInto('levelDetailsBox', levelDetails);
         saveHistory();
         }
@@ -2218,6 +2154,14 @@
         const weakest = entries[0];
         const strongest = entries[entries.length-1];
 
+        // 改善建議：針對較弱面向
+        const improveTips = {
+        1: '可以減少同時開啟的通知與分頁，練習「番茄鐘」等定時專注法，逐步拉長單一任務的持續時間。',
+        2: '可以整理實體與數位工作環境，移除不必要的干擾物，並可搭配白噪音或降噪耳機降低外界刺激。',
+        3: '可以在切換任務前，先寫下待辦清單並排定優先順序，減少臨時切換造成的反應延遲。',
+        4: '可以將複雜資訊拆解成小區塊（Chunking），並搭配重複覆誦或筆記輔助工作記憶。'
+        };
+        // 維持優勢的建議：針對較強面向
         const maintainTips = {
         1: '可以持續維持良好的作息與睡眠品質，並嘗試在較複雜或干擾較多的情境下延續這項優勢。',
         2: '可以在更多元的環境（如較吵雜或多工的場合）中練習，進一步鞏固這項抗干擾優勢。',
@@ -2227,30 +2171,13 @@
 
         const html = `
         <p><b>優勢面向：</b>在「${DIM_META[strongest.i].dim}」的表現最突出（${strongest.score} 分）。${maintainTips[strongest.i]}</p>
-        <p><b>待加強面向：</b>在「${DIM_META[weakest.i].dim}」相對較弱（${weakest.score} 分）。</p>
+        <p><b>待加強面向：</b>在「${DIM_META[weakest.i].dim}」相對較弱（${weakest.score} 分）。${improveTips[weakest.i]}</p>
         <p>此外，規律的作息、充足睡眠與適度的環境調整（如減少多工、安排專注時段）都有助於整體專注力的提升。本系統僅作為個人專注力管理與自我覺察的參考工具，並非醫療診斷。</p>
         `;
         document.getElementById(elId).innerHTML = html;
         }
 
-        function getAISuggestionText(weakestIndex) {
-        const aiTips = {
-        1: "💡 <b>AI 專屬改善建議（針對注意力穩定度）：</b><br>1. <b>建立單一焦點習慣</b>：建議在工作或學習時，嘗試使用「番茄鐘工作法」（工作 25 分鐘，休息 5 分鐘），降低分心機率。<br>2. <b>環境減干擾</b>：開啟手機「勿擾模式」，關閉非必要網頁頁籤。<br>3. <b>自我覺察練習</b>：當發現自己發呆或恍神時，深呼吸三次以將注意力拉回當下。",
-        2: "💡 <b>AI 專屬改善建議（針對抗干擾能力）：</b><br>1. <b>優化視覺環境</b>：整理桌面與實體空間，移除周遭無關物件或雜物。<br>2. <b>聲音屏障策略</b>：在吵雜環境中可佩戴降噪耳機或播放無歌詞的「白噪音／輕音樂」。<br>3. <b>系統化搜尋法</b>：學習運用「從左至右、從上至下」的定點掃描順序，能大幅減少干擾目標的惑亂。",
-        3: "💡 <b>AI 專屬改善建議（針對反應控制與認知彈性）：</b><br>1. <b>任務切換緩衝</b>：從一項任務切換至下一項任務前，留出 1~2 分鐘寫下簡單待辦清單。<br>2. <b>三秒停頓原則</b>：遇到緊急或臨時切換的新規則時，先吸一口氣再行動，減少習慣性錯誤。<br>3. <b>多工減量訓練</b>：儘量避免同時進行兩件需要高度認知運算的事情。",
-        4: "💡 <b>AI 專屬改善建議（針對記憶負荷能力）：</b><br>1. <b>資訊區塊化 (Chunking)</b>：將較長的文字或數字拆分成 3~4 個一組的短區塊記憶。<br>2. <b>多感官輔助</b>：結合視覺筆記、心智圖或口頭覆誦來建立雙重記憶軌道。<br>3. <b>善用外在工具</b>：重要指引或多步驟任務請即時記錄在行事曆或數位備忘錄中。"
-        };
-        return aiTips[weakestIndex] || aiTips[1];
-        }
-
-        function renderAISuggestion(elId, sc){
-        const entries = [1,2,3,4].map(i => ({i, score: sc[i] ?? 0}));
-        entries.sort((a,b) => a.score - b.score);
-        const weakest = entries[0];
-        document.getElementById(elId).innerHTML = getAISuggestionText(weakest.i);
-        }
-
-        /* ---------------- 各關詳細結果 ---------------- */
+        /* ---------------- 各關詳細結果（盡量保留原始檔案的呈現內容） ---------------- */
         function statBox(label, value){
         return `<div class="detail-stat"><div class="label">${label}</div><div class="value">${value}</div></div>`;
         }
@@ -2272,8 +2199,8 @@
         ${statBox('平均反應時間', d.avgRT ? Math.round(d.avgRT)+' ms' : '無資料')}
         ${statBox('反應時間標準差', d.stdRT ? Math.round(d.stdRT)+' ms' : '無資料')}
         </div>
-        <div class="detail-note">草莓總數：<b>${d.totalTargets}</b> 成功點擊：<b>${d.hits}</b> 漏按：<b>${d.misses}</b><br>
-        其他水果總數：<b>${d.totalNonTargets}</b> 誤點：<b>${d.falseAlarms}</b> 正確忽略：<b>${d.correctRejections}</b></div>
+        <div class="detail-note">草莓總數：<b>${d.totalTargets}</b>　成功點擊：<b>${d.hits}</b>　漏按：<b>${d.misses}</b><br>
+        其他水果總數：<b>${d.totalNonTargets}</b>　誤點：<b>${d.falseAlarms}</b>　正確忽略：<b>${d.correctRejections}</b></div>
         </div>`;
         }
 
@@ -2304,13 +2231,13 @@
         ${statBox('持續性錯誤次數', d.perseverativeErrors)}
         ${statBox('平均切換代價 (Switch Cost)', d.totalSwitchCost+' ms')}
         </div>
-        <div class="detail-note">階段1 平均反應時間：<b>${d.stageAvgRT[0] ?? 'N/A'}${d.stageAvgRT[0]!=null?' ms':''}</b> 
-        階段2：<b>${d.stageAvgRT[1] ?? 'N/A'}${d.stageAvgRT[1]!=null?' ms':''}</b> 
-        階段3：<b>${d.stageAvgRT[2] ?? 'N/A'}${d.stageAvgRT[2]!=null?' ms':''}</b>
-        階段4：<b>${d.stageAvgRT[3] ?? 'N/A'}${d.stageAvgRT[3]!=null?' ms':''}</b></div>
+        <div class="detail-note">階段1 平均反應時間：<b>${d.stageAvgRT[0] ?? 'N/A'}${d.stageAvgRT[0]!=null?' ms':''}</b>　
+        階段2：<b>${d.stageAvgRT[1] ?? 'N/A'}${d.stageAvgRT[1]!=null?' ms':''}</b>　
+        階段3：<b>${d.stageAvgRT[2] ?? 'N/A'}${d.stageAvgRT[2]!=null?' ms':''}</b></div>
         </div>`;
         }
 
+        // levelNum === 4
         const reviewHtml = (d.results||[]).map((r,idx) => `<span class="mini-q ${r.fullyCorrect?'ok':'bad'}">第${idx+1}題 ${r.fullyCorrect?'✅':'❌'}(${r.correct}/${r.n})</span>`).join(' ');
         return `<div class="detail-card">
         <h3>🍎🍌🍇 水果記憶鏈 - 詳細結果</h3>
@@ -2335,30 +2262,27 @@
         el.innerHTML = [1,2,3,4].map(i => renderLevelDetail(i, details[i])).join('');
         }
 
-        /* ---------------- 雷達圖繪製（僅保留雷達圖） ---------------- */
+        /* ---------------- 雷達圖繪製（高解析度，長按/下載更清晰） ---------------- */
         function drawRadarInto(canvasId, imgId, sc){
-        const SCALE = 2;
+        const SCALE = 3; // 以 3 倍像素密度繪製，匯出圖片更清晰銳利
         const canvas = document.getElementById(canvasId);
-        const W = 440, H = 380;
-        canvas.width = W * SCALE;
-        canvas.height = H * SCALE;
+        const baseSize = 440;
+        canvas.width = baseSize * SCALE;
+        canvas.height = baseSize * SCALE;
         const ctx = canvas.getContext('2d');
         ctx.save();
         ctx.scale(SCALE, SCALE);
 
-        ctx.fillStyle = '#fdf3dd';
-        ctx.fillRect(0,0,W,H);
-
-        ctx.font = 'bold 20px "Microsoft JhengHei", sans-serif';
-        ctx.fillStyle = '#5c3a1e';
-        ctx.textAlign = 'center';
-        ctx.fillText('智慧型專注力分析報告', W/2, 35);
-
-        const cx = W/2, cy = 200;
-        const R = 110;
+        const W = baseSize, H = baseSize;
+        const cx = W/2, cy = H/2 + 6;
+        const R = Math.min(W,H)/2 - 70;
         const labels = [1,2,3,4].map(i => DIM_META[i].short);
         const values = [1,2,3,4].map(i => sc[i] ?? 0);
         const N = 4;
+
+        ctx.clearRect(0,0,W,H);
+        ctx.fillStyle = '#fdf3dd';
+        ctx.fillRect(0,0,W,H);
 
         const rings = 4;
         for (let r=1;r<=rings;r++){
@@ -2375,7 +2299,7 @@
         ctx.stroke();
         }
 
-        ctx.font = 'bold 13px "Microsoft JhengHei", sans-serif';
+        ctx.font = 'bold 15px "Microsoft JhengHei","PingFang TC",sans-serif';
         ctx.fillStyle = '#5c3a1e';
         for (let k=0;k<N;k++){
         const angle = -Math.PI/2 + k*(2*Math.PI/N);
@@ -2387,11 +2311,16 @@
         ctx.strokeStyle = 'rgba(122,74,36,0.35)';
         ctx.stroke();
 
-        const lx = cx + (R+26)*Math.cos(angle);
-        const ly = cy + (R+26)*Math.sin(angle);
+        const lx = cx + (R+34)*Math.cos(angle);
+        const ly = cy + (R+34)*Math.sin(angle);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(labels[k] + ' ' + values[k] + '分', lx, ly);
+        ctx.fillText(labels[k], lx, ly);
+        ctx.font = '11px "Microsoft JhengHei","PingFang TC",sans-serif';
+        ctx.fillStyle = '#a9713f';
+        ctx.fillText(values[k] + ' 分', lx, ly + 16);
+        ctx.font = 'bold 15px "Microsoft JhengHei","PingFang TC",sans-serif';
+        ctx.fillStyle = '#5c3a1e';
         }
 
         ctx.beginPath();
@@ -2409,6 +2338,17 @@
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
+        for (let k=0;k<N;k++){
+        const angle = -Math.PI/2 + k*(2*Math.PI/N);
+        const rad = R * (Math.max(0,Math.min(100,values[k]))/100);
+        const x = cx + rad*Math.cos(angle);
+        const y = cy + rad*Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x,y,4,0,Math.PI*2);
+        ctx.fillStyle = '#2f5c1f';
+        ctx.fill();
+        }
+
         ctx.restore();
         document.getElementById(imgId).src = canvas.toDataURL('image/png');
         }
@@ -2417,17 +2357,7 @@
         const img = document.getElementById('radarImg');
         const a = document.createElement('a');
         a.href = img.src;
-        
-        // 修改檔名格式為「螢幕擷取畫面 YYYY-MM-DD HHMMSS」
-        const d = new Date();
-        const YYYY = d.getFullYear();
-        const MM = String(d.getMonth() + 1).padStart(2, '0');
-        const DD = String(d.getDate()).padStart(2, '0');
-        const hh = String(d.getHours()).padStart(2, '0');
-        const mm = String(d.getMinutes()).padStart(2, '0');
-        const ss = String(d.getSeconds()).padStart(2, '0');
-
-        a.download = `螢幕擷取畫面 ${YYYY}-${MM}-${DD} ${hh}${mm}${ss}.png`;
+        a.download = 'focus-radar-' + Date.now() + '.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -2457,19 +2387,24 @@
         goToQuizEntry();
         }
 
-        /* ---------------- 結果專區（localStorage） ---------------- */
+        /* ---------------- 結果專區（localStorage，僅保存在使用者自己的裝置／瀏覽器） ---------------- */
         const HISTORY_KEY = 'focusLabHistory';
 
+        // ★ 設定完 Google Apps Script 後，把「網頁應用程式」網址貼在這裡（雙引號中間），
+        //    例如："https://script.google.com/macros/s/AKfycb.../exec"
+        //    留空字串 "" 代表不啟用雲端同步，資料只會存在使用者自己的裝置上。
         const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx07C9pJSP_d4V4TjZNvZAiPQFzaYevHWRvdUCuFSedklWMfXq1YsU005JaFQOYr3uq/exec";
 
         function sendToSheet(record){
-        if (!SHEET_WEBHOOK_URL) return; 
+        if (!SHEET_WEBHOOK_URL) return; // 尚未設定後台網址，略過雲端同步
         try{
+        // 注意：刻意不設定 headers（讓瀏覽器預設用 text/plain），
+        // 可避免觸發 CORS 預檢請求，讓 Apps Script 網頁應用程式能順利接收。
         fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
         body: JSON.stringify(record)
-        }).catch(()=>{});
-        }catch(e){}
+        }).catch(()=>{ /* 網路異常時靜默略過，不影響使用者體驗 */ });
+        }catch(e){ /* 靜默略過 */ }
         }
 
         function saveHistory(){
@@ -2485,9 +2420,9 @@
         const list = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
         list.push(record);
         localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(-30)));
-        }catch(e){}
+        }catch(e){ /* localStorage 不可用時靜默略過 */ }
 
-        sendToSheet(record);
+        sendToSheet(record); // 同步一份到 Google 試算表（若已設定後台網址）
         }
 
         function renderHistory(){
@@ -2501,13 +2436,13 @@
         }
 
         el.innerHTML = list.slice().reverse().map((r, revIdx) => {
-        const idx = list.length - 1 - revIdx;
+        const idx = list.length - 1 - revIdx; // 還原成原始陣列索引
         const d = new Date(r.timestamp);
         const dateStr = d.toLocaleString('zh-TW', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
         const who = r.player ? `${r.player.name}（${r.player.age} 歲）` : '匿名玩家';
         return `<button type="button" class="history-item" onclick="App.viewHistoryDetail(${idx})">
         <div>
-        <div class="hi-date">${dateStr}<b>${who}</b></div>
+        <div class="hi-date">${dateStr}　<b>${who}</b></div>
         <div class="hi-scores">穩定度 ${r.scores[1]} ・ 抗干擾 ${r.scores[2]} ・ 反應控制 ${r.scores[3]} ・ 記憶負荷 ${r.scores[4]}</div>
         </div>
         <div class="btn-outline" style="margin:0;padding:8px 16px;font-size:13px;">查看詳細結果 ▶</div>
@@ -2529,16 +2464,15 @@
         document.getElementById('backToHistoryRow').style.display = 'flex';
 
         renderScoreList('scoreListEl', record.scores);
-        renderAdvice('overallAdviceBox', record.scores);
-        renderAISuggestion('aiSuggestionBox', record.scores);
         drawRadarInto('radarCanvas', 'radarImg', record.scores);
+        renderAdvice('overallAdviceBox', record.scores);
         renderLevelDetailsInto('levelDetailsBox', record.levelDetails || {});
         }
 
         /* ---------------- Google 登入 ---------------- */
         const USER_KEY = 'focusLabUser';
         const JOINED_ROOM_KEY = 'focusLabJoinedRoom';
-        const JOINED_ROOMS_LIST_KEY = 'focusLabJoinedRoomsList';
+        const JOINED_ROOMS_LIST_KEY = 'focusLabJoinedRoomsList'; // 累積「所有加入過」的房間清單
 
         function loadJoinedRoomsList(){
         try{ return JSON.parse(localStorage.getItem(JOINED_ROOMS_LIST_KEY) || '[]'); }catch(e){ return []; }
@@ -2548,7 +2482,7 @@
         }
         function addJoinedRoomToList(room){
         let list = loadJoinedRoomsList();
-        list = list.filter(r => r.code !== room.code);
+        list = list.filter(r => r.code !== room.code); // 避免同一間房間重複列出，改為更新到最新
         list.unshift({ code: room.code, roomName: room.roomName, teacherName: room.teacherName, joinedAt: Date.now() });
         saveJoinedRoomsList(list);
         }
@@ -2590,7 +2524,32 @@
         try{ localStorage.setItem(USER_KEY, JSON.stringify(currentUser)); }catch(e){}
         document.getElementById('loginOverlay').classList.remove('show');
         updateAuthUI();
-        showPage('room-manage');
+        syncJoinedRoomsFromServer(); // 登入時向後台補回這個帳號在其他裝置／清除快取前加入過的房間
+        showPage('room-manage'); // 登入後直接看到「建立房間／加入房間」畫面
+        }
+
+        // 向後台查詢這個 Google 帳號曾經加入過的所有房間，合併進本機清單
+        // （解決「換裝置、清快取、或本機清單被清空」後看不到已加入房間的問題）
+        function syncJoinedRoomsFromServer(){
+        if (!currentUser || !SHEET_WEBHOOK_URL) return;
+        fetch(`${SHEET_WEBHOOK_URL}?action=getJoinedRooms&memberEmail=${encodeURIComponent(currentUser.email)}`)
+        .then(res => res.json())
+        .then(data => {
+        if (data.status !== 'ok' || !data.rooms || !data.rooms.length) return;
+        let local = loadJoinedRoomsList();
+        let changed = false;
+        data.rooms.forEach(r => {
+        if (!local.some(x => x.code === r.roomCode)){
+        local.unshift({ code: r.roomCode, roomName: r.roomName, teacherName: r.teacherName, joinedAt: Date.now() });
+        changed = true;
+        }
+        });
+        if (changed){
+        saveJoinedRoomsList(local);
+        renderJoinedRoomsList();
+        populateQuizRoomSelect();
+        }
+        }).catch(() => { /* 後台查詢失敗時，維持本機原有清單即可 */ });
         }
 
         function logout(){
@@ -2612,15 +2571,13 @@
         document.querySelectorAll('.nav-authed').forEach(el => { el.style.display = loggedIn ? '' : 'none'; });
 
         const badge = document.getElementById('nav-user-badge');
-        const nameLabel = document.getElementById('nav-user-name-label');
         if (loggedIn){
-        badge.innerHTML = currentUser.picture
+        const avatarHtml = currentUser.picture
             ? `<img src="${currentUser.picture}" alt="${currentUser.name || ''}">`
             : `<span class="nav-avatar-fallback">${(currentUser.name || '?').charAt(0).toUpperCase()}</span>`;
-        if (nameLabel) nameLabel.textContent = currentUser.name || '';
+        badge.innerHTML = avatarHtml + `<span>${currentUser.name || ''}</span>`;
         } else {
         badge.innerHTML = '';
-        if (nameLabel) nameLabel.textContent = '';
         }
 
         document.getElementById('roomManageLoginNotice').style.display = loggedIn ? 'none' : 'block';
@@ -2628,12 +2585,21 @@
         document.getElementById('roomViewLoginNotice').style.display = loggedIn ? 'none' : 'block';
         document.getElementById('roomViewContent').style.display = loggedIn ? 'block' : 'none';
 
+        const quizRoomWrap = document.getElementById('quizRoomSelectWrapper');
+        if (quizRoomWrap) quizRoomWrap.style.display = loggedIn ? 'block' : 'none';
+        if (!loggedIn){
+        // 未登入：測驗一律視為個人測試，清掉目前選到的房間，避免殘留綁定
+        joinedRoom = null;
+        try{ localStorage.removeItem(JOINED_ROOM_KEY); }catch(e){}
+        updateJoinedRoomBadge();
+        }
+
         if (loggedIn) loadMyRooms();
         }
 
         /* ---------------- 房間：建立／加入／查詢 ---------------- */
         function generateCode(len){
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 避開易混淆字元 0/O、1/I
         let out = '';
         for (let i=0;i<len;i++) out += chars[Math.floor(Math.random()*chars.length)];
         return out;
@@ -2664,9 +2630,18 @@
         const sel = document.getElementById('quizRoomSelect');
         if (!sel) return;
 
+        // 未登入：不提供房間選擇，一律個人測試
+        if (!currentUser){
+        sel.innerHTML = '<option value="">不選擇房間（個人測試）</option>';
+        return;
+        }
+
+        sel.innerHTML = '<option value="">載入中…</option>';
+
+        // 先跟後台核對「我加入的房間」是否仍然存在（管理者可能已經刪除），再畫出下拉選單
+        syncJoinedRoomsList(function(joinedList){
         let html = '<option value="">不選擇房間（個人測試）</option>';
 
-        const joinedList = loadJoinedRoomsList();
         if (joinedList.length){
         html += '<optgroup label="我加入的房間">' + joinedList.map(r =>
         `<option value="joined:${r.code}">${escapeHtmlText(r.roomName || '(未命名房間)')}（${r.code}）</option>`
@@ -2675,12 +2650,14 @@
 
         sel.innerHTML = html;
 
+        // 若目前已經有作用中的房間（例如剛用「再測一次」進來），預先選取對應選項
         if (joinedRoom){
         const guess = 'joined:' + joinedRoom.code;
         if ([...sel.options].some(o => o.value === guess)) sel.value = guess;
         }
 
-        if (currentUser && SHEET_WEBHOOK_URL){
+        // 若使用者本身有建立房間，額外補上「我建立的房間」選項（非必要，但方便管理者測試自己的房間）
+        if (SHEET_WEBHOOK_URL){
         fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}`)
         .then(res => res.json())
         .then(data => {
@@ -2696,6 +2673,33 @@
         }
         }).catch(() => {});
         }
+        });
+        }
+
+        // 將本機「已加入房間」清單逐一向後台核對是否仍然存在；
+        // 只有在後台明確回覆「找不到」時才移除，網路失敗一律保留，避免誤刪。
+        function syncJoinedRoomsList(onDone){
+        const list = loadJoinedRoomsList();
+        if (!list.length || !SHEET_WEBHOOK_URL){ onDone(list); return; }
+
+        Promise.all(list.map(r =>
+        fetch(`${SHEET_WEBHOOK_URL}?action=checkRoom&roomCode=${encodeURIComponent(r.code)}`)
+        .then(res => res.json())
+        .then(data => ({ room: r, notFound: data.status === 'notfound' }))
+        .catch(() => ({ room: r, notFound: false })) // 網路錯誤：保守處理，視為仍存在
+        )).then(results => {
+        const stillValid = results.filter(x => !x.notFound).map(x => x.room);
+        if (stillValid.length !== list.length){
+        saveJoinedRoomsList(stillValid);
+        // 若目前作用中的房間剛好是被移除的那間，一併清掉，避免測驗結果綁到不存在的房間
+        if (joinedRoom && !stillValid.some(r => r.code === joinedRoom.code)){
+        joinedRoom = null;
+        try{ localStorage.removeItem(JOINED_ROOM_KEY); }catch(e){}
+        updateJoinedRoomBadge();
+        }
+        }
+        onDone(stillValid);
+        }).catch(() => { onDone(list); }); // 整批失敗：保留原始清單，不清空
         }
 
         function onQuizRoomSelectChange(){
@@ -2737,7 +2741,7 @@
         const errEl = document.getElementById('createRoomError');
         if (!currentUser){ errEl.textContent = '請先登入 Google 帳號才能建立房間。'; return; }
         if (!SHEET_WEBHOOK_URL){ errEl.textContent = '尚未設定雲端後台網址（SHEET_WEBHOOK_URL），無法建立房間。'; return; }
-        if (btn && btn.disabled) return; 
+        if (btn && btn.disabled) return; // 防止連點/重複觸發（例如 Enter 與滑鼠點擊同時發生）
         errEl.textContent = '';
 
         const roomName = document.getElementById('newRoomNameInput').value.trim();
@@ -2785,7 +2789,7 @@
         }
         box.innerHTML = data.rooms.map(r => `
         <div class="room-item">
-        <div><b>${r.roomName || '(未命名房間)'}</b> 代碼：<span style="font-family:monospace;">${r.roomCode}</span></div>
+        <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.roomCode}</span></div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
         <button class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;" onclick="App.viewRoomDashboard('${r.roomCode}')">查看數據 ▶</button>
         <button class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;color:var(--accent-red);border-color:var(--accent-red);" onclick="App.deleteRoom('${r.roomCode}', this)">🗑 刪除</button>
@@ -2795,9 +2799,10 @@
         }).catch(() => { box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入房間列表時發生網路錯誤。</p>'; });
         }
 
+        // 刪除房間（需要後台 Google Apps Script 支援 action:'deleteRoom'，詳見程式碼註解）
         function deleteRoom(roomCode, btnEl){
         if (!currentUser || !SHEET_WEBHOOK_URL) return;
-        if (btnEl && btnEl.disabled) return; 
+        if (btnEl && btnEl.disabled) return; // 防止重複點擊送出多次刪除請求
         if (!confirm(`確定要刪除房間 ${roomCode} 嗎？此動作無法復原，房間內所有成員的紀錄也會一併移除。`)) return;
 
         const originalLabel = btnEl ? btnEl.textContent : '';
@@ -2823,8 +2828,9 @@
         function renderJoinedRoomsList(){
         const box = document.getElementById('joinedRoomsBox');
         if (!box) return;
-        const list = loadJoinedRoomsList();
+        box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入中…</p>';
 
+        syncJoinedRoomsList(function(list){
         if (!list.length){
         box.innerHTML = '<p style="font-size:14px;color:var(--text-soft);text-align:center;">你目前還沒有加入任何房間</p>';
         return;
@@ -2832,10 +2838,11 @@
 
         box.innerHTML = list.map(r => `
         <button type="button" class="room-item room-item-clickable" onclick="App.viewJoinedRoomDetail('${r.code}')">
-        <div><b>${r.roomName || '(未命名房間)'}</b> 代碼：<span style="font-family:monospace;">${r.code}</span>${r.teacherName ? ' 管理者：'+r.teacherName : ''}</div>
+        <div><b>${r.roomName || '(未命名房間)'}</b>　代碼：<span style="font-family:monospace;">${r.code}</span>${r.teacherName ? '　管理者：'+r.teacherName : ''}</div>
         <div class="btn-outline" style="margin:0;padding:8px 14px;font-size:13px;">查看紀錄 ▶</div>
         </button>
         `).join('');
+        });
         }
 
         function viewJoinedRoomDetail(code){
@@ -2846,7 +2853,7 @@
         showPage('joined-room-detail');
         document.getElementById('joinedRoomDetailTitle').textContent = `📄 ${room.roomName || '(未命名房間)'}`;
         document.getElementById('joinedRoomDetailSub').textContent =
-        `房間代碼：${room.code}${room.teacherName ? ' 管理者：' + room.teacherName : ''}`;
+        `房間代碼：${room.code}${room.teacherName ? '　管理者：' + room.teacherName : ''}`;
 
         let fullHistory = [];
         try{ fullHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }catch(e){}
@@ -2872,6 +2879,7 @@
         document.getElementById('retestInRoomBtn').onclick = () => retestInRoom(room);
         }
 
+        // 再測一次：把目前作用中的房間設為這個房間，之後完成的測驗會自動綁定進來
         function retestInRoom(room){
         joinedRoom = { code: room.code, roomName: room.roomName, teacherName: room.teacherName };
         try{ localStorage.setItem(JOINED_ROOM_KEY, JSON.stringify(joinedRoom)); }catch(e){}
@@ -2884,7 +2892,7 @@
         const errEl = document.getElementById('joinRoomError');
         if (!currentUser){ errEl.textContent = '請先登入 Google 帳號才能加入房間。'; return; }
         if (!SHEET_WEBHOOK_URL){ errEl.textContent = '尚未設定雲端後台網址（SHEET_WEBHOOK_URL），無法加入房間。'; return; }
-        if (btn && btn.disabled) return; 
+        if (btn && btn.disabled) return; // 防止連點/重複觸發
 
         const code = document.getElementById('joinRoomCodeInput').value.trim().toUpperCase();
         if (!code){ errEl.textContent = '請輸入房間代碼。'; return; }
@@ -2905,6 +2913,12 @@
         addJoinedRoomToList(joinedRoom);
         updateJoinedRoomBadge();
 
+        // 同步告訴後台「這個人加入了這個房間」，之後換裝置或清快取都能從後台補回來
+        fetch(SHEET_WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action:'joinRoomSync', roomCode: code, memberEmail: currentUser.email, memberName: currentUser.name })
+        }).catch(() => {});
+
         const box = document.getElementById('joinRoomResultBox');
         box.style.display = 'block';
         box.innerHTML = `<div class="room-code-display">
@@ -2923,86 +2937,59 @@
         function viewRoomDashboard(roomCode){
         if (!currentUser || !SHEET_WEBHOOK_URL) return;
 
-        const loadingEl = document.getElementById('roomDashboardLoading');
-        const contentEl = document.getElementById('roomDashboardContent');
-
-        showPage('room-dashboard');
-        document.getElementById('roomDashboardTitle').textContent = '📈 載入中…';
-        document.getElementById('roomDashboardSub').textContent = '';
-        if (loadingEl) loadingEl.style.display = 'block';
-        if (contentEl) contentEl.style.display = 'none';
-
-        // 逾時保護：避免網路延遲或後台無回應時畫面一直卡在「載入中」
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-        fetch(`${SHEET_WEBHOOK_URL}?action=getRoomData&roomCode=${encodeURIComponent(roomCode)}&creatorEmail=${encodeURIComponent(currentUser.email)}`, { signal: controller.signal })
+        fetch(`${SHEET_WEBHOOK_URL}?action=getRoomData&roomCode=${encodeURIComponent(roomCode)}&creatorEmail=${encodeURIComponent(currentUser.email)}`)
         .then(res => res.json())
         .then(data => {
-        clearTimeout(timeoutId);
+        if (data.status === 'forbidden'){ alert('這個房間不是由你建立的，無法查看數據。'); return; }
+        if (data.status !== 'ok'){ alert('找不到這個房間。'); return; }
 
-        if (data.status === 'forbidden'){
-        if (loadingEl) loadingEl.style.display = 'none';
-        alert('這個房間不是由你建立的，無法查看數據。');
-        showPage('room-view');
-        return;
-        }
-        if (data.status !== 'ok'){
-        if (loadingEl) loadingEl.style.display = 'none';
-        alert('找不到這個房間，可能已經被刪除。');
-        showPage('room-view');
-        return;
-        }
-
+        showPage('room-dashboard');
         document.getElementById('roomDashboardTitle').textContent = `📈 ${data.roomName || '(未命名房間)'}`;
-        document.getElementById('roomDashboardSub').textContent = `房間代碼：${roomCode}　成員數：${(data.members || []).length} 人`;
+        document.getElementById('roomDashboardSub').textContent = `房間代碼：${roomCode}　成員數：${data.members.length} 人`;
 
         const members = data.members || [];
-        try{
-        // 繪製新版儀表板（雷達圖／分布圖／排名／折線圖等）
         initRoomAnalysisDashboard(members, roomCode);
-        }catch(renderErr){
-        // 圖表繪製本身若出錯，不應該影響「資料其實已經抓取成功」這件事，
-        // 所以這裡只記錄到 console、不再彈出容易誤導的「網路錯誤」訊息。
-        console.error('房間數據儀表板繪製時發生錯誤：', renderErr);
+        if (!members.length){
+        document.getElementById('rosterTable').innerHTML = '<tr><td>目前還沒有成員完成測驗。</td></tr>';
+        document.getElementById('classAdviceBox').innerHTML = '<p>等成員完成測驗後，這裡會顯示整體分析與建議。</p>';
+        drawRadarInto('teacherRadarCanvas', 'teacherRadarImg', {1:0,2:0,3:0,4:0});
+        return;
         }
 
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (contentEl) contentEl.style.display = 'block';
-        })
-        .catch(err => {
-        clearTimeout(timeoutId);
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (err && err.name === 'AbortError'){
-        alert('查詢房間數據逾時，請確認網路連線後再試一次。');
-        } else {
-        alert('查詢房間數據時發生網路錯誤，請稍後再試一次。');
-        }
-        showPage('room-view');
+        const avgScores = {1:0,2:0,3:0,4:0};
+        [1,2,3,4].forEach(i => {
+        avgScores[i] = Math.round(members.reduce((s,m) => s + (Number(m.scores[i]) || 0), 0) / members.length);
         });
+        drawRadarInto('teacherRadarCanvas', 'teacherRadarImg', avgScores);
+        renderAdvice('classAdviceBox', avgScores);
+
+        const rows = members.map(m => `
+        <tr>
+        <td>${m.time}</td><td>${m.name}</td><td>${m.age}</td>
+        <td>${m.scores[1]}</td><td>${m.scores[2]}</td><td>${m.scores[3]}</td><td>${m.scores[4]}</td>
+        </tr>
+        `).join('');
+        document.getElementById('rosterTable').innerHTML = `
+        <tr><th>時間</th><th>暱稱</th><th>年齡</th><th>穩定度</th><th>抗干擾</th><th>反應控制</th><th>記憶負荷</th></tr>
+        ${rows}
+        `;
+        }).catch(() => { alert('查詢房間數據時發生網路錯誤，請稍後再試一次。'); });
         }
 
-        /* ---------------- 全域鍵盤 ---------------- */
+        /* ---------------- 全域鍵盤：Enter 快速確認 / 下一關 ---------------- */
         document.addEventListener('keydown', function(e){
-        const isEnter = e.key === 'Enter';
-        const isSpace = e.code === 'Space';
-
-        if (!isEnter && !isSpace) return;
+        if (e.key !== 'Enter') return;
 
         const recap = document.getElementById('recapOverlay');
         if (recap.classList.contains('show')){
-        if (isEnter){
         e.preventDefault();
         document.getElementById('recapContinueBtn').click();
-        }
         return;
         }
 
         if (document.getElementById('page-quiz-entry').classList.contains('active')){
-        if (isEnter){
         e.preventDefault();
         startQuizFlow();
-        }
         return;
         }
 
@@ -3010,52 +2997,40 @@
 
         for (let i=1;i<=4;i++){
         if (levelContainers[i].classList.contains('active')){
-        if (isSpace && i !== 1) return;
-
         const startBtn = document.getElementById('l' + i + '-start-btn');
         if (startBtn && startBtn.offsetParent !== null){
-        if (isEnter){
         e.preventDefault();
         startBtn.click();
-        }
         return;
         }
-
+        // 注意：L1~L4 以 const 宣告，不會掛在 window 物件上，
+        // 所以直接以識別字參照（在同一份文件的多個 <script> 標籤間共用全域範疇）
         let module = null;
         if (i===1 && typeof L1!=='undefined') module = L1;
         else if (i===2 && typeof L2!=='undefined') module = L2;
         else if (i===3 && typeof L3!=='undefined') module = L3;
         else if (i===4 && typeof L4!=='undefined') module = L4;
-
-        if (isEnter && module && typeof module.onEnter === 'function'){
+        if (module && typeof module.onEnter === 'function'){
         e.preventDefault();
         module.onEnter();
-        return;
         }
         return;
         }
         }
         });
 
+        /* ---------------- 初始化：每次重新進站都必須重新登入 ----------------
+        （刻意不從 localStorage 還原 currentUser，即使使用者上次沒有按登出，
+        重新整理或關掉分頁再打開網站時，也會回到「未登入」狀態）
+        若使用者之前有加入過房間，仍會還原「已加入房間」的標記（僅供顯示參考）。 */
         try{
         const savedRoom = localStorage.getItem(JOINED_ROOM_KEY);
         if (savedRoom) joinedRoom = JSON.parse(savedRoom);
         }catch(e){}
-
-        // 安全網：如果「目前使用中的房間」還在，但「已加入房間清單」漏了它
-        // （例如清單資料被部分清掉），把它補回清單裡，避免這筆加入紀錄整個消失
-        try{
-        if (joinedRoom && joinedRoom.code){
-        const list = loadJoinedRoomsList();
-        if (!list.some(r => r.code === joinedRoom.code)){
-        addJoinedRoomToList(joinedRoom);
-        }
-        }
-        }catch(e){}
-
         updateAuthUI();
         updateJoinedRoomBadge();
 
+        /* ---------------- 建立／加入房間輸入框：可按 Enter 直接送出 ---------------- */
         const newRoomNameEl = document.getElementById('newRoomNameInput');
         if (newRoomNameEl) newRoomNameEl.addEventListener('keydown', e => {
         if (e.key === 'Enter'){ e.preventDefault(); createRoom(); }
@@ -3066,7 +3041,7 @@
         });
 
         return {
-        showPage, goHome, goToQuizEntry, scrollToAbout, startQuizFlow,
+        showPage, goHome, goToQuizEntry, startQuizFlow,
         levelComplete, continueFromRecap, goToLevel, finishQuiz,
         downloadRadar, shareResult, restartWholeQuiz, viewHistoryDetail,
         openLoginModal, logout, createRoom, joinRoom, leaveRoom, viewRoomDashboard,
@@ -3078,12 +3053,12 @@
 
     <script>
         /* =========================================================================
-        第一關：水果守衛 — 選擇性反應 / 注意力穩定度（漸進難度設定）
+        第一關：水果守衛 — 選擇性反應 / 注意力穩定度
         ========================================================================= */
         const L1 = (function(){
         const TOTAL_TRIALS = 30;
         const TARGET_PROB = 0.4;
-        const BASE_STIMULUS_DURATION = 1100; // 第一階段基礎反應時間
+        const STIMULUS_DURATION = 1100;
         const ISI_MIN = 400;
         const ISI_MAX = 750;
         const FEEDBACK_DURATION = 250;
@@ -3101,7 +3076,7 @@
         let hits = 0, misses = 0, falseAlarms = 0, correctRejections = 0;
         let reactionTimes = [];
 
-        let instructionsEl, gameScreenEl, fruitStageEl, trialCounterEl, trialTotalEl, scoreCounterEl, progressFillEl, hintTextEl, stageLabelEl;
+        let instructionsEl, gameScreenEl, fruitStageEl, trialCounterEl, trialTotalEl, scoreCounterEl, progressFillEl, hintTextEl;
 
         function cacheDom(){
         instructionsEl = document.getElementById("l1-instructions");
@@ -3112,7 +3087,6 @@
         scoreCounterEl = document.getElementById("l1-score-counter");
         progressFillEl = document.getElementById("l1-progress-fill");
         hintTextEl = document.getElementById("l1-hint-text");
-        stageLabelEl = document.getElementById("l1-stage-label");
         document.getElementById("l1-total-trials-hint").textContent = TOTAL_TRIALS;
         trialTotalEl.textContent = TOTAL_TRIALS;
         fruitStageEl.addEventListener("click", handleClick);
@@ -3130,7 +3104,6 @@
 
         fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
         fruitStageEl.classList.add("l1-fruit-stage", "empty");
-        fruitStageEl.style.transform = "none";
         fruitStageEl.textContent = "準備...";
         hintTextEl.textContent = "遊戲即將開始";
 
@@ -3150,29 +3123,6 @@
         fruitStageEl.textContent = fruit;
         hintTextEl.textContent = "";
 
-        // 計算階段難度：反應時間與旋轉角度
-        let currentDuration = BASE_STIMULUS_DURATION;
-        let rotationDegree = 0;
-
-        if (currentTrial <= 10) {
-            // 第一階段：正向，全速 (1100ms)
-            if (stageLabelEl) stageLabelEl.textContent = "階段 1";
-            currentDuration = BASE_STIMULUS_DURATION;
-            rotationDegree = 0;
-        } else if (currentTrial <= 20) {
-            // 第二階段：正向，時間砍到 2/3 (約 733ms)
-            if (stageLabelEl) stageLabelEl.textContent = "階段 2";
-            currentDuration = Math.round(BASE_STIMULUS_DURATION * (2 / 3));
-            rotationDegree = 0;
-        } else {
-            // 第三階段：直接呈現旋轉後的結果（靜態轉角），時間砍到 1/2 (550ms)
-            if (stageLabelEl) stageLabelEl.textContent = "階段 3";
-            currentDuration = Math.round(BASE_STIMULUS_DURATION * (1 / 2));
-            rotationDegree = Math.floor(Math.random() * 360);
-        }
-
-        fruitStageEl.style.transform = `rotate(${rotationDegree}deg)`;
-
         trialAnswered = false;
         trialActive = true;
         stimulusStartTime = performance.now();
@@ -3189,7 +3139,7 @@
         }
         goToNextAfterDelay();
         }
-        }, currentDuration);
+        }, STIMULUS_DURATION);
         }
 
         function handleClick(){
@@ -3220,7 +3170,6 @@
         setTimeout(() => {
         fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
         fruitStageEl.classList.add("empty");
-        fruitStageEl.style.transform = "none";
         fruitStageEl.textContent = "";
         const isi = ISI_MIN + Math.random() * (ISI_MAX - ISI_MIN);
         setTimeout(nextTrial, isi);
@@ -3242,14 +3191,11 @@
         stdRT = Math.sqrt(variance);
         }
 
-        // 分數計算：掛機判定 (hits=0 判定 0 分) + 命中率/誤點率扣分
-        let score = 0;
-        if (hits > 0) {
-            const rtPenalty = Math.min(stdRT / 15, 15) + (avgRT > 600 ? Math.min((avgRT - 600) / 20, 15) : 0);
-            const penalty = missRate * 0.7 + faRate * 0.7 + rtPenalty;
-            score = Math.max(0, Math.min(100, 100 - penalty));
-        }
+        // 分數計算：以漏按率／誤點率／反應時間變異度為扣分依據
+        const penalty = missRate*0.5 + faRate*0.5 + Math.min(stdRT/15, 20);
+        const score = Math.max(0, Math.min(100, 100 - penalty));
 
+        // 重置畫面回說明頁，供下次「再玩一次」使用
         gameScreenEl.style.display = "none";
         instructionsEl.style.display = "block";
 
@@ -3264,19 +3210,22 @@
         }, () => App.goToLevel(2));
         }
 
+        // 遊戲進行中按 Enter：等同點擊圓圈（回應目前的水果）
         function onEnter(){ handleClick(); }
 
         return { start, onEnter };
         })();
     </script>
 
-    <!-- 第二關：水果搜尋 -->
     <script>
+        /* =========================================================================
+        第二關：水果搜尋 — 選擇性注意力 / 抗干擾能力
+        ========================================================================= */
         const L2 = (function(){
         const LEVELS = [
-        { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5 },
-        { name:"Level 2", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉"], cols:7, rows:7 },
-        { name:"Level 3", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉","🍒"], cols:8, rows:8 }
+        { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5, strawberryCount:5 },
+        { name:"Level 2", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉"], cols:7, rows:7, strawberryCount:6 },
+        { name:"Level 3", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉","🍒"], cols:8, rows:8, strawberryCount:7 }
         ];
         const STRAWBERRY = "🍓";
         const CHERRY = "🍒";
@@ -3284,8 +3233,6 @@
         let currentLevelIndex = 0;
         let foundCount = 0, totalStrawberriesThisLevel = 0, wrongClicksThisLevel = 0, cherryMisclicksThisLevel = 0;
         let timerInterval = null, startTime = 0, elapsedSeconds = 0;
-        let levelFinished = false;
-        let generatedStrawberryCounts = [];
 
         const record = { totalSearchTime:0, totalWrongClicks:0, totalCherryMisclicks:0, totalCorrectClicks:0, totalMissedStrawberries:0, levelTimes:[] };
 
@@ -3315,27 +3262,9 @@
         return a;
         }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function generateFruitLayout(cfg, levelIndex){
+        function generateFruitLayout(cfg){
         const totalCells = cfg.cols*cfg.rows;
-        
-        let targetCount = 5;
-        if (levelIndex === 0) {
-            targetCount = getRandomInt(5, 11);
-        } else if (levelIndex === 1) {
-            const prev = generatedStrawberryCounts[0] || 5;
-            targetCount = getRandomInt(prev + 1, 13);
-        } else {
-            const prev = generatedStrawberryCounts[1] || 6;
-            targetCount = getRandomInt(prev + 1, 15);
-        }
-        
-        const strawberryCount = Math.min(targetCount, totalCells);
-        generatedStrawberryCounts[levelIndex] = strawberryCount;
-
+        const strawberryCount = Math.min(cfg.strawberryCount, totalCells);
         const otherFruits = cfg.fruitTypes.filter(f => f !== STRAWBERRY);
         const layout = [];
         for (let i=0;i<strawberryCount;i++) layout.push(STRAWBERRY);
@@ -3353,7 +3282,6 @@
         timerDisplay.textContent = formatSeconds(elapsedSeconds);
         }, 100);
         }
-
         function stopTimer(){
         clearInterval(timerInterval); timerInterval = null;
         elapsedSeconds = (Date.now()-startTime)/1000;
@@ -3363,17 +3291,16 @@
         function renderLevel(levelIndex){
         const cfg = LEVELS[levelIndex];
         foundCount = 0; wrongClicksThisLevel = 0; cherryMisclicksThisLevel = 0;
-        levelFinished = false;
         levelTitle.textContent = cfg.name;
         wrongDisplay.textContent = "0";
         fruitGrid.style.gridTemplateColumns = `repeat(${cfg.cols}, 1fr)`;
         fruitGrid.innerHTML = "";
 
-        const { layout, strawberryCount } = generateFruitLayout(cfg, levelIndex);
+        const { layout, strawberryCount } = generateFruitLayout(cfg);
         totalStrawberriesThisLevel = strawberryCount;
-        foundDisplay.textContent = `0`;
+        foundDisplay.textContent = `0 / ${strawberryCount}`;
 
-        layout.forEach((fruit) => {
+        layout.forEach(fruit => {
         const cell = document.createElement("div");
         cell.className = "l2-fruit-cell";
         cell.textContent = fruit;
@@ -3393,19 +3320,21 @@
         cell.classList.add("correct");
         setTimeout(() => cell.classList.add("found"), 380);
         foundCount++;
-        foundDisplay.textContent = `${foundCount}`;
+        foundDisplay.textContent = `${foundCount} / ${totalStrawberriesThisLevel}`;
+        if (foundCount >= totalStrawberriesThisLevel) finishLevel(0);
         } else {
         wrongClicksThisLevel++;
         wrongDisplay.textContent = wrongClicksThisLevel;
         if (fruit === CHERRY) cherryMisclicksThisLevel++;
-        cell.classList.add("correct");
-        setTimeout(() => cell.classList.add("found"), 380);
+        cell.classList.remove("wrong");
+        void cell.offsetWidth;
+        cell.classList.add("wrong");
+        setTimeout(() => cell.classList.remove("wrong"), 350);
         }
         }
 
         function finishLevel(missedCount){
         stopTimer();
-        levelFinished = true;
         record.totalSearchTime += elapsedSeconds;
         record.totalWrongClicks += wrongClicksThisLevel;
         record.totalCherryMisclicks += cherryMisclicksThisLevel;
@@ -3413,7 +3342,7 @@
         record.totalMissedStrawberries += missedCount;
         record.levelTimes.push({ name: LEVELS[currentLevelIndex].name, time: elapsedSeconds });
 
-        levelSummary.textContent = `搜尋時間：${formatSeconds(elapsedSeconds)} 錯誤點擊：${wrongClicksThisLevel} 次 漏掉草莓：${missedCount} 個`;
+        levelSummary.textContent = `搜尋時間：${formatSeconds(elapsedSeconds)}　錯誤點擊：${wrongClicksThisLevel} 次　漏掉草莓：${missedCount} 個`;
         levelCompleteOverlay.style.display = "flex";
 
         setTimeout(() => {
@@ -3431,7 +3360,6 @@
         instructionsEl.style.display = "none";
         gameScreenEl.style.display = "block";
         currentLevelIndex = 0;
-        generatedStrawberryCounts = [];
         record.totalSearchTime = 0; record.totalWrongClicks = 0; record.totalCherryMisclicks = 0;
         record.totalCorrectClicks = 0; record.totalMissedStrawberries = 0; record.levelTimes = [];
         renderLevel(currentLevelIndex);
@@ -3444,9 +3372,11 @@
         const cherryConfusionRate = record.totalWrongClicks > 0 ? (record.totalCherryMisclicks/record.totalWrongClicks*100) : 0;
         const avgSpeed = record.totalSearchTime > 0 ? record.totalCorrectClicks/record.totalSearchTime : 0;
 
+        // 分數計算：以錯誤率／干擾誤判率／漏掉目標為扣分依據
         const penalty = errorRate*0.6 + cherryConfusionRate*0.3 + record.totalMissedStrawberries*8;
         const score = Math.max(0, Math.min(100, 100 - penalty));
 
+        // 能力分析文字（沿用原始檔案的判斷邏輯）
         const analysis = [];
         analysis.push(record.totalSearchTime > 60
         ? '搜尋時間較長：可能代表目標搜尋效率較低，建議加強視覺搜尋速度練習。'
@@ -3476,10 +3406,8 @@
         }, () => App.goToLevel(3));
         }
 
-        function onEnter(){
-        if (levelFinished) return;
-        if (finishBtn) finishBtn.click();
-        }
+        // 遊戲進行中按 Enter：等同按下「完成（結束本小關）」
+        function onEnter(){ if (finishBtn && timerInterval !== null) finishBtn.click(); }
 
         return { start, onEnter };
         })();
@@ -3487,40 +3415,31 @@
 
     <script>
         /* =========================================================================
-        第三關：水果規則變換 — 認知彈性 / 反應控制能力（動態速度、20%正確率保證與點擊特效版）
+        第三關：水果規則變換 — 認知彈性 / 反應控制能力
         ========================================================================= */
         const L3 = (function(){
         const CONFIG = {
         stageDurationMs: 15000,
-        trialTimeoutMs: 1400,
-        instructionMs: 2500,
+        trialTimeoutMs: 1500,
+        isiMs: 400,
+        instructionMs: 2200,
+        fruitRadius: 34,
         canvasWidth: 800,
-        canvasHeight: 420,
-        fontSize: 70
+        canvasHeight: 420
         };
 
-        // 完整的水果資料庫定義
-        const ALL_FRUITS = [
-            { emoji: "🍉", color: "red",    shape: "none", leaf: false, name: "西瓜" },
-            { emoji: "🍅", color: "red",    shape: "round", leaf: true,  name: "番茄" },
-            { emoji: "🌶️", color: "red",    shape: "long",  leaf: true,  name: "辣椒" },
-            { emoji: "🌽", color: "yellow", shape: "long",  leaf: true,  name: "玉米" },
-            { emoji: "🍋", color: "yellow", shape: "round", leaf: true,  name: "檸檬" },
-            { emoji: "🍌", color: "yellow", shape: "long",  leaf: false, name: "香蕉" },
-            { emoji: "🥝", color: "green",  shape: "round", leaf: false, name: "奇異果" },
-            { emoji: "🍈", color: "green",  shape: "round", leaf: false, name: "哈密瓜" },
-            { emoji: "🫛", color: "green",  shape: "long",  leaf: true,  name: "甜豆" }
+        const STAGES = [
+        { id:1, label:"紅色水果 (RED)", instruction:"請點擊所有「紅色」的水果", rule:(f)=>f.color==="red" },
+        { id:2, label:"圓形水果 (ROUND)", instruction:"規則已改變！請點擊所有「圓形」的水果", rule:(f)=>f.shape==="round" },
+        { id:3, label:"黃色且圓形 (YELLOW + ROUND)", instruction:"規則再次改變！請點擊「黃色且圓形」的水果", rule:(f)=>f.color==="yellow"&&f.shape==="round" }
         ];
-
-        const COLOR_NAMES = { red: "紅色", yellow: "黃色", green: "綠色" };
-        const SHAPE_NAMES = { round: "圓形", long: "長條" };
-
-        let STAGES = [];
+        const COLORS = ["red","yellow"];
+        const SHAPES = ["round","long"];
+        const COLOR_HEX = { red:"#c0392b", yellow:"#e8a930" };
 
         const state = {
         stageIndex:0, stageStartTime:0, gameStartTime:0, running:false, paused:true,
-        currentTrial:null, trials:[], isiTimeoutId:null, rafId:null,
-        stageTrialCount:0, activeEffect: null
+        currentTrial:null, trials:[], isiTimeoutId:null, rafId:null
         };
 
         let instructionsEl, gameScreenEl, canvas, ctx, overlay, overlayTitle, overlayText, stageNumEl, ruleTextEl, timeLeftEl, timerBarInner;
@@ -3541,73 +3460,45 @@
         }
 
         function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-        // 生成隨機規則
-        function generateStages(){
-            const selectedColor1 = randChoice(["red", "yellow", "green"]);
-            const selectedShape = randChoice(["round", "long"]);
-            const selectedColor2 = randChoice(["red", "yellow", "green"]);
-            const selectedShape2 = randChoice(["round", "long"]);
-            const selectedColor3 = randChoice(["red", "yellow", "green"]);
-            const selectedShape3 = randChoice(["round", "long"]);
-            const selectedLeaf = Math.random() < 0.5;
-
-            STAGES = [
-                {
-                    id: 1,
-                    label: `${COLOR_NAMES[selectedColor1]}水果`,
-                    instruction: `階段 1：請點擊所有<b>「${COLOR_NAMES[selectedColor1]}」</b>的水果`,
-                    rule: (f) => f.color === selectedColor1,
-                    baseIsi: 500
-                },
-                {
-                    id: 2,
-                    label: `${SHAPE_NAMES[selectedShape]}水果`,
-                    instruction: `規則改變！請點擊所有<b>「${SHAPE_NAMES[selectedShape]}」</b>的水果`,
-                    rule: (f) => f.shape === selectedShape,
-                    baseIsi: 400
-                },
-                {
-                    id: 3,
-                    label: `${COLOR_NAMES[selectedColor2]} ＋ ${SHAPE_NAMES[selectedShape2]}`,
-                    instruction: `速度加快！請點擊<b>「${COLOR_NAMES[selectedColor2]} 且 ${SHAPE_NAMES[selectedShape2]}」</b>的水果`,
-                    rule: (f) => f.color === selectedColor2 && f.shape === selectedShape2,
-                    baseIsi: 320
-                },
-                {
-                    id: 4,
-                    label: `${COLOR_NAMES[selectedColor3]} ＋ ${SHAPE_NAMES[selectedShape3]} ＋ ${selectedLeaf?'有':'無'}葉子`,
-                    instruction: `極速挑戰！請點擊<b>「${COLOR_NAMES[selectedColor3]} ＋ ${SHAPE_NAMES[selectedShape3]} ＋ ${selectedLeaf?'有':'無'}葉子」</b>的水果`,
-                    rule: (f) => f.color === selectedColor3 && f.shape === selectedShape3 && f.leaf === selectedLeaf,
-                    baseIsi: 250
-                }
-            ];
-        }
-
+        function randomFruit(){ return { color: randChoice(COLORS), shape: randChoice(SHAPES) }; }
         function randomPosition(){
-        const margin = 60;
-        return {
-            x: margin + Math.random() * (CONFIG.canvasWidth - 2 * margin),
-            y: margin + Math.random() * (CONFIG.canvasHeight - 2 * margin)
-        };
+        const r = CONFIG.fruitRadius;
+        return { x: r + Math.random()*(CONFIG.canvasWidth-2*r), y: r + Math.random()*(CONFIG.canvasHeight-2*r) };
         }
 
         function clearCanvas(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
 
-        function drawFruit(fruit, scale = 1, alpha = 1){
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.font = `${Math.round(CONFIG.fontSize * scale)}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(fruit.emoji, fruit.x, fruit.y);
-        ctx.restore();
+        function drawFruit(fruit){
+        const { x, y, color, shape } = fruit;
+        const r = CONFIG.fruitRadius;
+        ctx.fillStyle = COLOR_HEX[color];
+        ctx.strokeStyle = "rgba(90,60,20,0.3)";
+        ctx.lineWidth = 2;
+
+        if (shape === "round"){
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        } else {
+        const w = r*2.1, h = r*1.1, rx = x-w/2, ry = y-h/2, rad = h/2;
+        ctx.beginPath();
+        ctx.moveTo(rx+rad, ry);
+        ctx.lineTo(rx+w-rad, ry);
+        ctx.arc(rx+w-rad, ry+rad, rad, -Math.PI/2, Math.PI/2);
+        ctx.lineTo(rx+rad, ry+h);
+        ctx.arc(rx+rad, ry+rad, rad, Math.PI/2, -Math.PI/2);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        }
+        ctx.fillStyle = "#3f7a2a";
+        ctx.beginPath(); ctx.ellipse(x, y-r*0.9, 5, 8, 0, 0, Math.PI*2); ctx.fill();
         }
 
-        function pointInFruit(px, py, fruit){
-        const radius = 40;
-        const dx = px - fruit.x, dy = py - fruit.y;
-        return dx*dx + dy*dy <= radius*radius;
+        function pointInFruit(px,py,fruit){
+        const r = CONFIG.fruitRadius;
+        if (fruit.shape === "round"){
+        const dx=px-fruit.x, dy=py-fruit.y;
+        return dx*dx+dy*dy <= r*r;
+        }
+        const w=r*2.1, h=r*1.1;
+        return px>=fruit.x-w/2 && px<=fruit.x+w/2 && py>=fruit.y-h/2 && py<=fruit.y+h/2;
         }
 
         function start(){
@@ -3615,12 +3506,10 @@
         instructionsEl.style.display = "none";
         gameScreenEl.style.display = "block";
 
-        generateStages();
         state.stageIndex = 0;
         state.trials = [];
         state.running = true;
         state.gameStartTime = performance.now();
-        state.activeEffect = null;
         overlay.style.display = "none";
         startStage(0);
         loop();
@@ -3629,9 +3518,7 @@
         function startStage(index){
         state.stageIndex = index;
         state.stageStartTime = performance.now();
-        state.stageTrialCount = 0;
         state.paused = true;
-        state.activeEffect = null;
         const stage = STAGES[index];
         stageNumEl.textContent = stage.id;
         ruleTextEl.textContent = stage.label;
@@ -3639,16 +3526,10 @@
         }
 
         function showInstruction(text, callback){
-        overlayTitle.textContent = "階段 " + STAGES[state.stageIndex].id + " / 4";
+        overlayTitle.textContent = "階段 " + STAGES[state.stageIndex].id + " / 3";
         overlayText.innerHTML = text;
         overlay.style.display = "flex";
         setTimeout(() => { overlay.style.display = "none"; callback(); }, CONFIG.instructionMs);
-        }
-
-        function getCurrentIsi(){
-            const stage = STAGES[state.stageIndex];
-            const accel = Math.min(120, state.stageTrialCount * 8);
-            return Math.max(150, stage.baseIsi - accel);
         }
 
         function scheduleNextTrial(delay){
@@ -3661,23 +3542,10 @@
 
         function spawnTrial(){
         if (isStageOver()){ advanceStageOrEnd(); return; }
-        state.stageTrialCount++;
-        
-        const currentRule = STAGES[state.stageIndex].rule;
-        const validFruits = ALL_FRUITS.filter(f => currentRule(f));
-
-        let selectedFruit;
-        // 確保至少有 20% 的機率生成符合條件的水果
-        if (validFruits.length > 0 && Math.random() < 0.25) {
-            selectedFruit = randChoice(validFruits);
-        } else {
-            selectedFruit = randChoice(ALL_FRUITS);
-        }
-
-        const fruitObj = { ...selectedFruit, ...randomPosition() };
+        const fruit = { ...randomFruit(), ...randomPosition() };
         const startTime = performance.now();
         const timeoutId = setTimeout(() => resolveTrial("timeout", performance.now()), CONFIG.trialTimeoutMs);
-        state.currentTrial = { fruit: fruitObj, startTime, timeoutId, stageIndex: state.stageIndex };
+        state.currentTrial = { fruit, startTime, timeoutId, stageIndex: state.stageIndex };
         }
 
         function resolveTrial(responseType, timestamp){
@@ -3690,14 +3558,6 @@
 
         if (responseType === "click"){
         RT = Math.round(timestamp - startTime);
-        
-        // 觸發放大閃爍點擊特效
-        state.activeEffect = {
-            fruit: { ...fruit },
-            startTime: performance.now(),
-            duration: 180
-        };
-
         if (matchesCurrent){ outcome = "hit"; }
         else {
         outcome = "commission_error";
@@ -3714,7 +3574,7 @@
         state.currentTrial = null;
 
         if (isStageOver()) advanceStageOrEnd();
-        else scheduleNextTrial(getCurrentIsi());
+        else scheduleNextTrial(CONFIG.isiMs);
         }
 
         function isStageOver(){ return performance.now() - state.stageStartTime >= CONFIG.stageDurationMs; }
@@ -3737,21 +3597,6 @@
         function loop(){
         clearCanvas();
         if (state.currentTrial) drawFruit(state.currentTrial.fruit);
-        
-        // 繪製點擊時的放大閃爍特效
-        if (state.activeEffect) {
-            const now = performance.now();
-            const elapsed = now - state.activeEffect.startTime;
-            if (elapsed < state.activeEffect.duration) {
-                const progress = elapsed / state.activeEffect.duration;
-                const scale = 1 + 0.4 * progress; // 放大至 1.4 倍
-                const alpha = 1 - progress;       // 漸隱
-                drawFruit(state.activeEffect.fruit, scale, alpha);
-            } else {
-                state.activeEffect = null;
-            }
-        }
-
         if (state.running && !state.paused){
         const elapsed = performance.now() - state.stageStartTime;
         const remain = Math.max(0, CONFIG.stageDurationMs - elapsed);
@@ -3793,6 +3638,7 @@
 
         const summary = computeSummary();
 
+        // 分數計算：以準確率為基礎，扣除持續性錯誤與切換代價(switch cost)
         const penalty = (100-summary.accuracy) + summary.perseverativeErrors*4 + Math.max(0,summary.totalSwitchCost)/10;
         const score = Math.max(0, Math.min(100, 100 - penalty * 0.6));
 
@@ -3811,19 +3657,14 @@
         }, () => App.goToLevel(4));
         }
 
-        function onEnter(){
-        if (!state.running || state.paused || !state.currentTrial) return;
-        resolveTrial("click", performance.now());
-        }
-
-        return { start, onEnter };
+        return { start };
         })();
     </script>
 
     <script>
-        /* =========================================================
+        /* =========================================================================
         第四關：水果記憶鏈 — 工作記憶負荷能力
-        ========================================================= */
+        ========================================================================= */
         const L4 = (function(){
         const FRUITS = ['apple','banana','grape'];
         const FRUIT_EMOJI = { apple:'🍎', banana:'🍌', grape:'🍇' };
@@ -3836,7 +3677,7 @@
         let answerStartTime = 0, answerPhaseActive = false, results = [];
 
         let instructionsEl, playingArea, levelNumEl, timeLeftEl, timerNum, vineFill, phaseLabel,
-        memorizeArea, answerArea, slotsEl, nextBtn, footerEl, fruitButtons, undoBtn, clearBtn;
+        memorizeArea, answerArea, slotsEl, nextBtn, footerEl, fruitButtons;
 
         function cacheDom(){
         instructionsEl = document.getElementById('l4-instructions');
@@ -3852,38 +3693,30 @@
         nextBtn = document.getElementById('l4-next-btn');
         footerEl = document.getElementById('l4-footer');
         fruitButtons = document.querySelectorAll('.l4-fruit-btn');
-        undoBtn = document.getElementById('l4-undo-btn');
-        clearBtn = document.getElementById('l4-clear-btn');
 
         fruitButtons.forEach(btn => {
-        btn.addEventListener('click', () => selectFruit(btn.dataset.fruit));
-        });
-        undoBtn.addEventListener('click', undoLast);
-        clearBtn.addEventListener('click', clearAll);
-        nextBtn.addEventListener('click', () => {
-        if (nextBtn.disabled || !answerPhaseActive) return;
-        submitAnswer();
-        });
-        }
-
-        function selectFruit(fruit){
+        btn.addEventListener('click', () => {
         if (!answerPhaseActive) return;
         const emptyIndex = playerAnswer.indexOf(null);
         if (emptyIndex === -1) return;
-        playerAnswer[emptyIndex] = fruit;
+        playerAnswer[emptyIndex] = btn.dataset.fruit;
         renderSlots(); checkComplete();
-        }
-
-        function undoLast(){
+        });
+        });
+        document.getElementById('l4-undo-btn').addEventListener('click', () => {
         if (!answerPhaseActive) return;
         let lastFilled = -1;
         for (let i=0;i<playerAnswer.length;i++) if (playerAnswer[i]!==null) lastFilled = i;
         if (lastFilled !== -1){ playerAnswer[lastFilled] = null; renderSlots(); checkComplete(); }
-        }
-
-        function clearAll(){
+        });
+        document.getElementById('l4-clear-btn').addEventListener('click', () => {
         if (!answerPhaseActive) return;
         playerAnswer = playerAnswer.map(()=>null); renderSlots(); checkComplete();
+        });
+        nextBtn.addEventListener('click', () => {
+        if (nextBtn.disabled || !answerPhaseActive) return;
+        submitAnswer();
+        });
         }
 
         function isValidSequence(seq){
@@ -4027,6 +3860,7 @@
         else endLevel();
         }
 
+        // 依「最大記憶長度」判斷工作記憶落在前段／中段／後段
         function getAbilityAssessment(maxMemory){
         if (maxMemory >= 7) return { tier:'前段', desc:'7 位數或以上：表現優異，代表短期記憶的「工作空間」大，具備同時處理大量資訊的天賦。' };
         if (maxMemory >= 5) return { tier:'中段', desc:'5-6 位數：專注力相當於全球平均水平。' };
@@ -4075,6 +3909,7 @@
         const accuracy = totalMax>0 ? (totalScore/totalMax*100) : 0;
         const avgReaction = results.reduce((s,r)=>s+r.reactionTime,0) / results.length;
 
+        // 分數計算：正確率為主要依據，並依最大記憶長度給予加成，反應時間過長則扣分
         const score = Math.max(0, Math.min(100, accuracy*0.7 + (maxMemory/9)*30 - Math.max(0,avgReaction-4)*2));
 
         const assessment = getAbilityAssessment(maxMemory);
@@ -4098,15 +3933,13 @@
         }, () => App.finishQuiz());
         }
 
-        function onEnter(){
-        if (!answerPhaseActive) return;
-        if (nextBtn && !nextBtn.disabled) nextBtn.click();
-        }
+        // 遊戲進行中按 Enter：等同按下「下一題」（需先完成本題序列）
+        function onEnter(){ if (!nextBtn.disabled && answerPhaseActive) nextBtn.click(); }
 
         return { start, onEnter };
         })();
         /* =========================================================
-        房間數據分析儀表板邏輯
+        房間數據分析儀表板邏輯 (整合時間區間、雷達圖、直方圖、排名與趨勢圖)
         ========================================================= */
         let currentAnalRecords = [];
         let definedPeriods = [];
@@ -4114,9 +3947,11 @@
         let radarChartObj = null, barChartObj = null, lineChartObj = null;
         let currentDistMetric = 'overall';
 
+    // 當開啟房間數據面板時被呼叫（請確保在你的房間渲染函數中呼叫此初始化）
         function initRoomAnalysisDashboard(membersData, roomCode) {
             if (!membersData || membersData.length === 0) return;
     
+    // 轉化房間成員資料為分析格式
     currentAnalRecords = membersData.map(m => {
         const s1 = Number(m.scores?.["1"] || m.scores?.[0] || 0);
         const s2 = Number(m.scores?.["2"] || m.scores?.[1] || 0);
@@ -4139,7 +3974,6 @@
     processAndRenderDashboard();
 }
 
-// 替換後的完整程式碼
 function renderPeriodControls() {
     const container = document.getElementById('periods-container');
     if (!container) return;
@@ -4150,8 +3984,8 @@ function renderPeriodControls() {
             <div style="margin-bottom:8px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:12px;">
                 <strong>第 ${idx+1} 次測驗：</strong>
                 名稱：<input type="text" value="${p.name}" onchange="definedPeriods[${idx}].name=this.value" style="width:90px; padding:2px 4px;">
-                開始：<input type="datetime-local" value="${p.start}" onchange="definedPeriods[${idx}].start=this.value" style="padding:2px 4px;">
-                結束：<input type="datetime-local" value="${p.end}" onchange="definedPeriods[${idx}].end=this.value" style="padding:2px 4px;">
+                開始：<input type="date" value="${p.start}" onchange="definedPeriods[${idx}].start=this.value" style="padding:2px 4px;">
+                結束：<input type="date" value="${p.end}" onchange="definedPeriods[${idx}].end=this.value" style="padding:2px 4px;">
                 <button type="button" class="btn-outline" style="padding:2px 6px; color:var(--accent-red); border-color:var(--accent-red);" onclick="definedPeriods.splice(${idx},1); renderPeriodControls();">刪除</button>
             </div>`;
     });
@@ -4166,20 +4000,8 @@ function renderPeriodControls() {
 }
 
 function addPeriodSetting() {
-    const now = new Date();
-    // 格式化目前時間為 YYYY-MM-DDTHH:mm (datetime-local 所需格式)
-    const formatDateTime = (date) => {
-        const pad = (n) => n.toString().padStart(2, '0');
-        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-    };
-
-    const startTime = formatDateTime(now);
-    
-    // 預設結束時間為 1 小時後
-    const end = new Date(now.getTime() + 60 * 60 * 1000);
-    const endTime = formatDateTime(end);
-
-    definedPeriods.push({ name: `第${definedPeriods.length+1}次測驗`, start: startTime, end: endTime });
+    const today = new Date().toISOString().split('T')[0];
+    definedPeriods.push({ name: `第${definedPeriods.length+1}次測驗`, start: today, end: today });
     renderPeriodControls();
 }
 
@@ -4191,40 +4013,13 @@ function applyPeriods() {
 }
 
 function getFilteredRecords() {
-    // 如果選擇「所有測驗結果」或未選擇區間，直接回傳全部資料
-    if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) {
-        return currentAnalRecords;
-    }
-
+    if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) return currentAnalRecords;
     const p = definedPeriods[selectedPeriodIndex];
-    if (!p.start || !p.end) return currentAnalRecords;
-
-    // 將輸入框的 YYYY-MM-DDTHH:mm 轉為 Timestamp 毫秒數
-    const startMs = new Date(p.start).getTime();
-    const endMs = new Date(p.end).getTime();
-
+    const start = new Date(p.start + 'T00:00:00');
+    const end = new Date(p.end + 'T23:59:59');
     return currentAnalRecords.filter(r => {
-
-        if (!r.time) return false;
-
-        // 強制修復時間字串相容性（將斜線替換成橫線、移除多餘空格）
-        let formattedTimeStr = String(r.time).trim().replace(/\//g, '-');
-        
-        // 如果時間字串中間是空格，換成 'T' 方便 JavaScript 標準解析
-        if (formattedTimeStr.includes(' ') && !formattedTimeStr.includes('T')) {
-            formattedTimeStr = formattedTimeStr.replace(' ', 'T');
-        }
-
-        const recordMs = new Date(formattedTimeStr).getTime();
-
-        // 偵測是否成功轉換為時間
-        if (isNaN(recordMs)) {
-            console.warn('無法解析的時間格式：', r.time);
-            return false;
-        }
-
-        // 進行毫秒大小比較
-        return recordMs >= startMs && recordMs <= endMs;
+        const t = new Date(r.time);
+        return t >= start && t <= end;
     });
 }
 
@@ -4237,17 +4032,14 @@ function processAndRenderDashboard() {
     renderLineChart();
 }
 
-// 全域變數：記錄當前開啟的等級區間 (用來判斷點擊的是否為同一個區間)
-let currentActiveLevel = null;
-
 // 1. 等級對應人數佔比與點擊顯示暱稱
 function renderLevelDistribution(records) {
     const ranges = [
-        { label: 'a. 高工作記憶力', min: 85, max: 100, bg: '#d4edda' },
-        { label: 'b. 表現良好', min: 70, max: 84, bg: '#cce5ff' },
-        { label: 'c. 平均區間', min: 55, max: 69, bg: '#fff3cd' },
-        { label: 'd. 須留意', min: 40, max: 54, bg: '#ffe8d6' },
-        { label: 'e. 建議關注', min: 0, max: 39, bg: '#f8d7da' }
+        { label: 'a. 高工作記憶力 (85-100)', min: 85, max: 100, bg: '#d4edda' },
+        { label: 'b. 表現良好 (70-84)', min: 70, max: 84, bg: '#cce5ff' },
+        { label: 'c. 平均區間 (55-69)', min: 55, max: 69, bg: '#fff3cd' },
+        { label: 'd. 須留意 (40-54)', min: 40, max: 54, bg: '#ffe8d6' },
+        { label: 'e. 建議關注 (0-39)', min: 0, max: 39, bg: '#f8d7da' }
     ];
     
     const container = document.getElementById('level-cards-container');
@@ -4261,27 +4053,17 @@ function renderLevelDistribution(records) {
         const div = document.createElement('div');
         div.style.cssText = `background:${r.bg}; padding:8px; border-radius:6px; text-align:center; cursor:pointer; font-size:12px; border:1px solid #ccc;`;
         div.innerHTML = `<strong>${r.label.split(' ')[0]} ${r.label.split(' ')[1]}</strong><h3 style="margin:4px 0; color:var(--wood-dark);">${players.length} 人</h3>(${pct}%)`;
-        
-        // 💡 修改這裏的點擊事件邏輯：
         div.onclick = () => {
             const nickBox = document.getElementById('nicknames-display');
-            
-            // 判斷：如果點擊的是「同一個等級區間」且「目前選單是打開的」
-            if (currentActiveLevel === r.label && nickBox.style.display === 'block') {
-                nickBox.style.display = 'none'; // 隱藏暱稱框 (收合)
-                currentActiveLevel = null;      // 清空紀錄
-            } else {
-                // 如果點擊的是不同區間，或是原本關閉狀態 -> 顯示內容並開啟
-                nickBox.style.display = 'block';
-                currentActiveLevel = r.label;  // 記錄當前開啟的區間
-                document.getElementById('nickname-title').innerText = `${r.label} 名單 (${players.length}人)：`;
-                document.getElementById('nickname-tags').innerHTML = players.length ? players.map(p => `<span style="background:var(--kraft-bg); border:1px solid var(--kraft-border-light); padding:2px 8px; border-radius:12px; font-size:12px;">👤 ${p}</span>`).join('') : '<span style="color:#888;">無玩家紀錄</span>';
-            }
+            nickBox.style.display = 'block';
+            document.getElementById('nickname-title').innerText = `${r.label} 名單 (${players.length}人)：`;
+            document.getElementById('nickname-tags').innerHTML = players.length ? players.map(p => `<span style="background:var(--kraft-bg); border:1px solid var(--kraft-border-light); padding:2px 8px; border-radius:12px; font-size:12px;">👤 ${p}</span>`).join('') : '<span style="color:#888;">無玩家紀錄</span>';
         };
         container.appendChild(div);
     });
 }
 
+// 2. 雷達圖
 function renderRadarChart(records) {
     const ctx = document.getElementById('radarChart')?.getContext('2d');
     if (!ctx) return;
@@ -4299,6 +4081,7 @@ function renderRadarChart(records) {
     });
 }
 
+// 2. 分數分布圖
 function renderDistributionChart(metricKey, records = getFilteredRecords()) {
     currentDistMetric = metricKey;
     const ctx = document.getElementById('barChart')?.getContext('2d');
@@ -4330,6 +4113,7 @@ function renderDistributionChart(metricKey, records = getFilteredRecords()) {
     });
 }
 
+// 3. 排名與標示低於平均
 function renderRankingTable(records) {
     const tbody = document.getElementById('ranking-table-body');
     if (!tbody) return;
@@ -4361,6 +4145,7 @@ function renderRankingTable(records) {
     });
 }
 
+// 5. 歷史折線圖
 function renderLineChart() {
     const ctx = document.getElementById('lineChart')?.getContext('2d');
     if (!ctx) return;
@@ -4424,7 +4209,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     </script>
-
+<!-- ===== 新增:左下角音樂開關 + 進度條自動連動 ===== -->
     <button id="musicToggleBtn" class="music-toggle-btn" onclick="toggleBgMusic()" title="背景音樂開關">
         <span id="musicToggleIcon">🔇</span>
     </button>
@@ -4463,6 +4248,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </style>
 
     <script>
+    /* 進度條依 dot 的 done / current 狀態自動更新填色,不需修改任何原有函式 */
     (function () {
         const fillEl = document.getElementById('quiz-progress-fill');
         if (!fillEl) return;
@@ -4481,14 +4267,16 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFill();
     })();
 
+/* 溫暖背景音樂:木質音樂盒風格 — 一顆持續的暖墊長音 + 輕柔五聲音階旋律 */
     let bgMusicOn = false, bgMusicInited = false;
     let bgPadSynth, bgMelodySynth, bgReverb, bgFilter, bgSequence;
 
+    // 五聲音階旋律,null 是休止符,營造放鬆的呼吸感
     const BG_MELODY_NOTES = [
         'C4', null, 'E4', 'D4', null, 'G4', 'E4', null,
         'A4', 'G4', null, 'E4', 'D4', null, 'C4', null
     ];
-    const BG_PAD_NOTES = ['C3', 'G3', 'C4']; 
+    const BG_PAD_NOTES = ['C3', 'G3', 'C4']; // 底層暖墊和弦,只彈一次、持續到關閉為止
 
     function initBgMusic() {
         if (bgMusicInited) return;
@@ -4497,12 +4285,14 @@ document.addEventListener('DOMContentLoaded', function() {
         bgReverb = new Tone.Reverb({ decay: 5, wet: 0.3 }).toDestination();
         bgFilter = new Tone.Filter({ frequency: 1100, type: 'lowpass', rolloff: -12 }).connect(bgReverb);
 
+        // 底層暖墊:只啟動一次,之後持續發聲到關閉為止,音量固定,不會重複觸發造成忽大忽小
         bgPadSynth = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'sine' },
             envelope: { attack: 4, decay: 0, sustain: 1, release: 4 },
             volume: -26
         }).connect(bgFilter);
 
+        // 旋律:木質音樂盒般的輕柔撥音,五聲音階,聽起來放鬆愉快不刺耳
         bgMelodySynth = new Tone.Synth({
             oscillator: { type: 'triangle' },
             envelope: { attack: 0.02, decay: 0.6, sustain: 0.1, release: 1.4 },
@@ -4526,7 +4316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bgMusicOn = true;
             icon.textContent = '🎵';
             btn.classList.add('on');
-            bgPadSynth.triggerAttack(BG_PAD_NOTES); 
+            bgPadSynth.triggerAttack(BG_PAD_NOTES); // 暖墊只彈一次,之後持續不斷
             bgSequence.start(0);
             Tone.Transport.start();
         } else {
@@ -4539,75 +4329,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     </script>
-
-    <!-- ===== 新增：測驗進行中切換頁面時的「水果忍者」專心提醒 ===== -->
-    <div id="focusWarningToast" class="focus-warning-toast">
-        <span class="focus-warning-slice"></span>
-        <span class="focus-warning-icon">🍉🔪</span>
-        <span class="focus-warning-text">專心一點！測驗進行中，請完成這一關再切換頁面喔！</span>
-    </div>
-
-    <style>
-        .focus-warning-toast {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-160%);
-            z-index: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, var(--wood-deepest), var(--wood-dark));
-            border: 3px solid var(--accent-gold);
-            border-radius: 16px;
-            padding: 14px 22px;
-            box-shadow: 0 10px 26px rgba(0,0,0,0.5);
-            color: #fdf3dd;
-            font-weight: bold;
-            font-size: 15px;
-            max-width: 90vw;
-            transition: transform .4s cubic-bezier(.34,1.56,.64,1);
-            pointer-events: none;
-            overflow: hidden;
-        }
-            .focus-warning-toast.show {
-                transform: translateX(-50%) translateY(0);
-            }
-            .focus-warning-icon {
-                font-size: 26px;
-                flex-shrink: 0;
-            }
-            .focus-warning-toast.show .focus-warning-icon {
-                animation: focusIconShake .4s ease-in-out 2;
-            }
-            .focus-warning-slice {
-                position: absolute;
-                top: -30%;
-                left: -20%;
-                width: 6px;
-                height: 220%;
-                background: #fff;
-                opacity: 0;
-                transform: rotate(20deg);
-                box-shadow: 0 0 12px 3px rgba(255,255,255,0.9);
-            }
-            .focus-warning-toast.show .focus-warning-slice {
-                animation: focusSliceSweep .5s ease-out .15s;
-            }
-        @keyframes focusSliceSweep {
-            0%   { left: -20%; opacity: 0; }
-            10%  { opacity: 1; }
-            90%  { opacity: 1; }
-            100% { left: 120%; opacity: 0; }
-        }
-        @keyframes focusIconShake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-12deg); }
-            75% { transform: rotate(12deg); }
-        }
-        @media (max-width: 600px) {
-            .focus-warning-toast { font-size: 13px; padding: 10px 16px; }
-        }
-    </style>
+</body>
 </body>
 </html>
