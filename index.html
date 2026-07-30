@@ -1901,7 +1901,7 @@
                     <div id="periods-container"></div>
                     <div style="margin-top:10px;">
                         <button type="button" class="btn-primary" style="font-size:12px; padding:6px 12px;" onclick="addPeriodSetting()">➕ 新增測驗區間</button>
-                        <button type="button" class="btn-primary" style="font-size:12px; padding:6px 12px; background:var(--vine-green);" onclick="applyPeriods()">💾 儲存並套用區間</button>
+                        <button type="button" id="btn-save-period" class="btn-primary" style="font-size:12px; padding:6px 12px; background:var(--vine-green);" onclick="applyPeriods()">💾 儲存並套用區間</button>
                     </div>
                 </div>
 
@@ -1944,32 +1944,38 @@
                 </div>
 
                 <div style="margin:25px 0; text-align:left;">
-                    <h3 style="color:var(--wood-dark);">3. 排名與低於平均清單 (全體平均：<span id="total-avg-display" style="color:var(--accent-red);">--</span> 分)</h3>
-                    <div style="overflow-x:auto;">
-                        <table class="roster-table" style="width:100%; border-collapse:collapse; background:#fff; font-size:13px;">
-                            <thead>
-                                <tr style="background:var(--kraft-bg2);">
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">名次</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">暱稱</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">整體總分</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">穩定度</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">抗干擾</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">反應控制</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">記憶負荷</th>
-                                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">狀態</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ranking-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
+    <h3 style="color:var(--wood-dark);">3. 歷次測驗歷史趨勢折線圖</h3>
+    <div style="background:#fff; padding:12px; border-radius:10px; border:1px solid var(--kraft-border-light); height:280px; position:relative;">
+        <canvas id="lineChart"></canvas>
+    </div>
+</div>
 
-                <div style="margin:25px 0; text-align:left;">
-                    <h3 style="color:var(--wood-dark);">5. 歷次測驗歷史趨勢折線圖</h3>
-                    <div style="background:#fff; padding:12px; border-radius:10px; border:1px solid var(--kraft-border-light); height:280px; position:relative;">
-                        <canvas id="lineChart"></canvas>
-                    </div>
-                </div>
+<div style="margin:25px 0; text-align:left;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h3 style="color:var(--wood-dark); margin:0;">4. 排名與低於平均清單 (全體平均：<span id="total-avg-display" style="color:var(--accent-red);">--</span> 分)</h3>
+        <button type="button" id="btn-toggle-expand-ranking" class="btn-outline" style="font-size:12px; padding:4px 10px;" onclick="toggleExpandRanking()">
+            ↔️ 完全展開
+        </button>
+    </div>
+
+    <div id="ranking-scroll-container" style="max-height:280px; overflow-y:auto; border:1px solid var(--kraft-border-light); border-radius:8px; background:#fff;">
+        <table class="roster-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead style="position:sticky; top:0; background:var(--kraft-bg2); z-index:1;">
+                <tr>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">名次</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">暱稱</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">整體總分</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">穩定度</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">抗干擾</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">反應控制</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">記憶負荷</th>
+                    <th style="padding:6px; border:1px solid var(--kraft-border-light);">狀態</th>
+                </tr>
+            </thead>
+            <tbody id="ranking-table-body"></tbody>
+        </table>
+    </div>
+</div>
 
                 </div>
                 <!-- /#roomDashboardContent -->
@@ -4139,7 +4145,16 @@
     processAndRenderDashboard();
 }
 
-// 替換後的完整程式碼
+// 測驗區間
+// 變更標記函數：只要任何欄位被修改，按鈕就變綠色
+function markPeriodAsModified() {
+    const saveBtn = document.getElementById('btn-save-period');
+    if (saveBtn) {
+        saveBtn.style.background = '#28a745'; // 綠色
+        saveBtn.innerText = '💾 儲存並套用區間 (未儲存)';
+    }
+}
+
 function renderPeriodControls() {
     const container = document.getElementById('periods-container');
     if (!container) return;
@@ -4149,10 +4164,10 @@ function renderPeriodControls() {
         container.innerHTML += `
             <div style="margin-bottom:8px; display:flex; gap:6px; align-items:center; flex-wrap:wrap; font-size:12px;">
                 <strong>第 ${idx+1} 次測驗：</strong>
-                名稱：<input type="text" value="${p.name}" onchange="definedPeriods[${idx}].name=this.value" style="width:90px; padding:2px 4px;">
-                開始：<input type="datetime-local" value="${p.start}" onchange="definedPeriods[${idx}].start=this.value" style="padding:2px 4px;">
-                結束：<input type="datetime-local" value="${p.end}" onchange="definedPeriods[${idx}].end=this.value" style="padding:2px 4px;">
-                <button type="button" class="btn-outline" style="padding:2px 6px; color:var(--accent-red); border-color:var(--accent-red);" onclick="definedPeriods.splice(${idx},1); renderPeriodControls();">刪除</button>
+                名稱：<input type="text" value="${p.name}" oninput="definedPeriods[${idx}].name=this.value; markPeriodAsModified();" style="width:90px; padding:2px 4px;">
+                開始：<input type="datetime-local" value="${p.start}" oninput="definedPeriods[${idx}].start=this.value; markPeriodAsModified();" style="padding:2px 4px;">
+                結束：<input type="datetime-local" value="${p.end}" oninput="definedPeriods[${idx}].end=this.value; markPeriodAsModified();" style="padding:2px 4px;">
+                <button type="button" class="btn-outline" style="padding:2px 6px; color:var(--accent-red); border-color:var(--accent-red);" onclick="definedPeriods.splice(${idx},1); markPeriodAsModified(); renderPeriodControls();">刪除</button>
             </div>`;
     });
 
@@ -4167,29 +4182,34 @@ function renderPeriodControls() {
 
 function addPeriodSetting() {
     const now = new Date();
-    // 格式化目前時間為 YYYY-MM-DDTHH:mm (datetime-local 所需格式)
     const formatDateTime = (date) => {
         const pad = (n) => n.toString().padStart(2, '0');
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
     };
 
     const startTime = formatDateTime(now);
-    
-    // 預設結束時間為 1 小時後
-    const end = new Date(now.getTime() + 60 * 60 * 1000);
+    const end = new Date(now.getTime() + 60 * 60 * 1000); // 預設 +1 小時
     const endTime = formatDateTime(end);
 
     definedPeriods.push({ name: `第${definedPeriods.length+1}次測驗`, start: startTime, end: endTime });
+    markPeriodAsModified(); // 觸發變綠
     renderPeriodControls();
 }
 
 function applyPeriods() {
     const currentCode = typeof currentRoomCode !== 'undefined' ? currentRoomCode : 'default';
     localStorage.setItem(`periods_${currentCode}`, JSON.stringify(definedPeriods));
+    
+    // 儲存成功後把按鈕變灰色
+    const saveBtn = document.getElementById('btn-save-period');
+    if (saveBtn) {
+        saveBtn.style.background = '#888888'; // 灰色
+        saveBtn.innerText = '✓ 已儲存區間';
+    }
+
     renderPeriodControls();
     processAndRenderDashboard();
 }
-
 function getFilteredRecords() {
     // 如果選擇「所有測驗結果」或未選擇區間，直接回傳全部資料
     if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) {
@@ -4361,6 +4381,29 @@ function renderRankingTable(records) {
     });
 }
 
+// 全域變數：記錄排名表格是否已完全展開
+let isRankingExpanded = false;
+
+// 完全展開 / 還原預設高度（6筆）的切換 logic
+function toggleExpandRanking() {
+    const container = document.getElementById('ranking-scroll-container');
+    const btn = document.getElementById('btn-toggle-expand-ranking');
+    if (!container || !btn) return;
+
+    isRankingExpanded = !isRankingExpanded;
+
+    if (isRankingExpanded) {
+        // 完全展開：移除最大高度限制
+        container.style.maxHeight = 'none';
+        btn.innerText = '↕️ 摺疊表格 (顯示前6筆)';
+    } else {
+        // 恢復 6 筆滾動模式
+        container.style.maxHeight = '280px';
+        btn.innerText = '↔️ 完全展開';
+    }
+}
+        
+// 5. 歷史折線圖 (已修復時間解析 Bug)
 function renderLineChart() {
     const ctx = document.getElementById('lineChart')?.getContext('2d');
     if (!ctx) return;
@@ -4372,15 +4415,32 @@ function renderLineChart() {
     const avgS1 = [], avgS2 = [], avgS3 = [], avgS4 = [];
 
     definedPeriods.forEach(p => {
-        const start = new Date(p.start + 'T00:00:00');
-        const end = new Date(p.end + 'T23:59:59');
-        const recs = currentAnalRecords.filter(r => { const t = new Date(r.time); return t >= start && t <= end; });
+        if (!p.start || !p.end) {
+            avgOverall.push(null); avgS1.push(null); avgS2.push(null); avgS3.push(null); avgS4.push(null);
+            return;
+        }
+
+        // 💡 修正關鍵：正確解析 datetime-local 時間 (不加多餘的 'T00:00:00')
+        const startMs = new Date(p.start).getTime();
+        const endMs = new Date(p.end).getTime();
+
+        const recs = currentAnalRecords.filter(r => {
+            if (!r.time) return false;
+            // 相容格式修復：將斜線換成橫線
+            let formattedTimeStr = String(r.time).trim().replace(/\//g, '-');
+            if (formattedTimeStr.includes(' ') && !formattedTimeStr.includes('T')) {
+                formattedTimeStr = formattedTimeStr.replace(' ', 'T');
+            }
+            const tMs = new Date(formattedTimeStr).getTime();
+            return !isNaN(tMs) && tMs >= startMs && tMs <= endMs;
+        });
+
         if (recs.length) {
-            avgOverall.push((recs.reduce((s, r) => s + r.overallScore, 0) / recs.length).toFixed(1));
-            avgS1.push((recs.reduce((s, r) => s + r.scores["1"], 0) / recs.length).toFixed(1));
-            avgS2.push((recs.reduce((s, r) => s + r.scores["2"], 0) / recs.length).toFixed(1));
-            avgS3.push((recs.reduce((s, r) => s + r.scores["3"], 0) / recs.length).toFixed(1));
-            avgS4.push((recs.reduce((s, r) => s + r.scores["4"], 0) / recs.length).toFixed(1));
+            avgOverall.push((recs.reduce((s, r) => s + Number(r.overallScore), 0) / recs.length).toFixed(1));
+            avgS1.push((recs.reduce((s, r) => s + Number(r.scores["1"]), 0) / recs.length).toFixed(1));
+            avgS2.push((recs.reduce((s, r) => s + Number(r.scores["2"]), 0) / recs.length).toFixed(1));
+            avgS3.push((recs.reduce((s, r) => s + Number(r.scores["3"]), 0) / recs.length).toFixed(1));
+            avgS4.push((recs.reduce((s, r) => s + Number(r.scores["4"]), 0) / recs.length).toFixed(1));
         } else {
             avgOverall.push(null); avgS1.push(null); avgS2.push(null); avgS3.push(null); avgS4.push(null);
         }
@@ -4391,16 +4451,17 @@ function renderLineChart() {
         data: {
             labels: labels,
             datasets: [
-                { label: '四項總平均', data: avgOverall, borderColor: '#c0392b', backgroundColor: '#c0392b', borderWidth: 3, fill: false },
-                { label: '穩定度', data: avgS1, borderColor: '#7a4a24', fill: false },
-                { label: '抗干擾', data: avgS2, borderColor: '#2980b9', fill: false },
-                { label: '反應控制', data: avgS3, borderColor: '#27ae60', fill: false },
-                { label: '記憶負荷', data: avgS4, borderColor: '#f39c12', fill: false }
+                { label: '四項總平均', data: avgOverall, borderColor: '#c0392b', backgroundColor: '#c0392b', borderWidth: 3, fill: false, spanGaps: true },
+                { label: '穩定度', data: avgS1, borderColor: '#7a4a24', fill: false, spanGaps: true },
+                { label: '抗干擾', data: avgS2, borderColor: '#2980b9', fill: false, spanGaps: true },
+                { label: '反應控制', data: avgS3, borderColor: '#27ae60', fill: false, spanGaps: true },
+                { label: '記憶負荷', data: avgS4, borderColor: '#f39c12', fill: false, spanGaps: true }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
     });
 }
+        
 document.addEventListener('DOMContentLoaded', function() {
             const roomToggle = document.getElementById('nav-room');
             const dropdownMenu = document.querySelector('.nav-dropdown-menu');
