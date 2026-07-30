@@ -1194,7 +1194,7 @@
                  font-size: 100px;
                  cursor: pointer;
                  user-select: none;
-                 transition: background .15s ease, border-color .15s ease;
+                 transition: background .15s ease, border-color .15s ease, transform .1s ease;
              }
 
                  .l1-fruit-stage.empty {
@@ -1305,6 +1305,9 @@
              .l2-fruit-cell.found {
                  visibility: hidden;
              }
+
+             .l2-fruit-cell.kb-focus { outline: 3px solid var(--vine-green-dark); outline-offset: -2px; box-shadow: 0 0 0 3px rgba(46,125,50,0.25); }
+             #l2-finish-btn.kb-focus { outline: 3px solid var(--vine-green-dark); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(46,125,50,0.25); }
 
              .l2-level-overlay {
                  position: absolute;
@@ -1497,6 +1500,9 @@
                      opacity: .4;
                      cursor: not-allowed;
                  }
+
+             .l4-fruit-btn.kb-focus { outline: 3px solid var(--wood-dark); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(0,0,0,0.25); }
+             #l4-undo-btn.kb-focus, #l4-clear-btn.kb-focus, #l4-next-btn.kb-focus { outline: 3px solid var(--wood-dark); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(0,0,0,0.25); }
     </style>
 </head>
 <body>
@@ -1631,17 +1637,17 @@
                     <h2 style="text-align:center;">🍓 第一關：水果守衛</h2>
                     <div class="home-sub">注意力訓練・選擇性反應</div>
                     <div class="home-lead-box">
-                        <p><span style="font-size:34px;">🍓</span> 看到「草莓」→ <b>立即點擊</b></p>
-                        <p><span style="font-size:34px;">🍌🍇🍊🍎🍉🍑</span> 其他水果 → <b>不要點擊</b></p>
+                        <p><span style="font-size:34px;">🍓</span> 看到「草莓」→ <b>立即點擊</b><span class="tag tag-click">要點擊</span></p>
+                        <p><span style="font-size:34px;">🍌🍇🍊🍎🍉🍑</span> 其他水果 → <b>不要點擊</b><span class="tag tag-noclick">不要點</span></p>
                     </div>
                     <p>水果會一個一個隨機出現在圓圈中，請保持專注：</p>
-                    <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，難度會隨階段提升</p>
+                    <p>• 看到草莓要盡快點擊圓圈<br>• 看到其他水果請忍住，不要點擊<br>• 遊戲共 <b id="l1-total-trials-hint">30</b> 回合，難度會隨階段提升（時間變短、水果旋轉）</p>
                     <div class="btn-row"><button class="btn-primary" id="l1-start-btn" onclick="L1.start()">開始本關</button></div>
                 </div>
 
                 <div class="crate-card" id="l1-game-screen" style="display:none;">
                     <div style="display:flex;justify-content:space-between;font-weight:bold;color:var(--text-mid);margin-bottom:10px;">
-                        <span><span id="l1-stage-label">階段 1</span></span>
+                        <span>回合 <span id="l1-trial-counter">0</span> / <span id="l1-trial-total">30</span></span>
                         <span>得分 <span id="l1-score-counter">0</span></span>
                     </div>
                     <div style="width:100%;height:10px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:10px;overflow:hidden;margin-bottom:20px;">
@@ -1657,8 +1663,8 @@
                     <div class="home-sub">選擇性注意力訓練・抗干擾能力</div>
                     <div class="fruit-row-decor" style="font-size:26px;">🍎 🍌 🍊 🍇 <strong>🍓</strong> 🍉 🍒</div>
                     <div class="home-lead-box">
-                        <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，隨著關卡進行網格範圍與水果種類會增加。</p>
-                        <p>• 仔細觀察畫面，避免誤點外觀相似的櫻桃 🍒<br>• 找完草莓後，可點擊下方「完成」按鈕或直接按下 <b>Enter</b> 鍵結算並進行下一小關</p>
+                        <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，難度會逐漸提升，請盡量又快又準地找出所有草莓！注意畫面中可能出現外觀相似的櫻桃 🍒，請仔細分辨。</p>
+                        <p>也可以用<b>方向鍵</b>移動選取框、按 <b>Enter</b> 點擊目前選取的格子；找完後，請用下鍵移到格子最下方的「完成」按鈕（或直接點擊畫面上的按鈕），再按一次 <b>Enter</b> 確認完成本小關。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l2-start-btn" onclick="L2.start()">開始本關</button></div>
                 </div>
@@ -1683,26 +1689,14 @@
                     <h2 style="text-align:center;">🔄 第三關：水果規則變換</h2>
                     <div class="home-sub">認知彈性測試・反應控制能力</div>
                     <div class="home-lead-box">
-                        <p>畫面上會隨機出現各式水果，共有 4 個階段，水果出現的速度會越來越快，種類與判斷特徵也會隨階段增加！請依照當前指示迅速點擊「符合規則」的水果，不符規則者請勿點擊：</p>
-                        <p>
-                            • <b>階段 1（顏色）</b>：判斷特定顏色（紅／黃／綠）<br>
-                            • <b>階段 2（形狀）</b>：判斷特定形狀（圓形／長條）<br>
-                            • <b>階段 3（複合雙條件）</b>：同時符合「顏色 ＋ 形狀」<br>
-                            • <b>階段 4（複合三條件）</b>：同時符合「顏色 ＋ 形狀 ＋ 有無葉子」
-                        </p>
-                        <div style="font-size:13px; color:var(--text-soft); border-top:1px dashed var(--kraft-border-light); padding-top:8px; margin-top:8px;">
-                            <b>水果特徵對照表：</b><br>
-                            🔴 🍉 🍅 🌶️ ｜ 🟡 🌽 🍋 🍌 ｜ 🟢 🥝 🍈 🫛<br>
-                            ⭕ 🍅 🍋 🥝 🍈 ｜ 🥢 🌶️ 🌽 🍌 🫛 （西瓜 🍉 不屬於圓形也不屬於長條）<br>
-                            🌿 🍅 🌶️ 🌽 🍋 🫛 ｜ 🚫 🍉 🍌 🥝 🍈
-                        </div>
+                        <p>畫面會不斷出現不同顏色（紅／黃）與形狀（圓／長）的水果。請依照畫面指示的規則，點擊「符合規則」的水果；不符合規則的水果請不要點擊。規則會在遊戲過程中悄悄改變，請保持專注！</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l3-start-btn" onclick="L3.start()">開始本關</button></div>
                 </div>
 
                 <div class="crate-card" id="l3-game-screen" style="display:none;">
                     <div id="l3-info-bar" style="display:flex;justify-content:space-between;align-items:center;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:12px 12px 0 0;padding:10px 16px;font-size:14px;font-weight:bold;color:var(--wood-dark);">
-                        <div>階段 <span id="l3-stage-num">-</span> / 4 規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
+                        <div>階段 <span id="l3-stage-num">-</span> / 3 規則：<span id="l3-rule-text" style="color:var(--vine-green-dark);">-</span></div>
                         <div>剩餘時間：<span id="l3-time-left">--</span>s</div>
                     </div>
                     <div style="height:6px;width:100%;background:#e9ecef;"><div id="l3-timer-bar-inner" style="height:100%;width:100%;background:var(--vine-green);transition:width .1s linear;"></div></div>
@@ -1720,8 +1714,8 @@
                     <h2 style="text-align:center;">🍎🍌🍇 第四關：水果記憶鏈</h2>
                     <div class="home-sub">工作記憶負荷測試</div>
                     <div class="home-lead-box">
-                        <p>考驗你的短期工作記憶容量與排序能力！每回合畫面會先展示一排水果序列，請在有限時間內專注記住它們的<b>種類與出現順序</b>。</p>
-                        <p>• 水果隱藏後，請點擊下方水果按鈕依序重建正確序列<br>• 每題限時 10 秒作答，共 7 題，隨著題目進行水果長度與記憶難度會逐題增加<br>• 排滿水果序列後可點擊「下一題」或直接按下 <b>Enter</b> 鍵快速送出本題答案</p>
+                        <p>畫面會先出現一排水果，請記住它們的<b>種類與順序</b>。水果消失後，依序點擊按鈕重建正確序列。每題限時 10 秒作答，共 7 題，水果數量與記憶時間會逐題增加。</p>
+                        <p>也可以用<b>方向鍵</b>選取：在「水果列」按下鍵可切換至「回退／清空列」，再按下鍵切換至「送出／下一題列」，按 <b>Enter</b> 確認目前選取的按鈕。</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l4-start-btn" onclick="L4.start()">開始本關</button></div>
                 </div>
@@ -2206,6 +2200,12 @@
         const weakest = entries[0];
         const strongest = entries[entries.length-1];
 
+        const improveTips = {
+        1: '可以減少同時開啟的通知與分頁，練習「番茄鐘」等定時專注法，逐步拉長單一任務的持續時間。',
+        2: '可以整理實體與數位工作環境，移除不必要的干擾物，並可搭配白噪音或降噪耳機降低外界刺激。',
+        3: '可以在切換任務前，先寫下待辦清單並排定優先順序，減少臨時切換造成的反應延遲。',
+        4: '可以將複雜資訊拆解成小區塊（Chunking），並搭配重複覆誦或筆記輔助工作記憶。'
+        };
         const maintainTips = {
         1: '可以持續維持良好的作息與睡眠品質，並嘗試在較複雜或干擾較多的情境下延續這項優勢。',
         2: '可以在更多元的環境（如較吵雜或多工的場合）中練習，進一步鞏固這項抗干擾優勢。',
@@ -2215,7 +2215,7 @@
 
         const html = `
         <p><b>優勢面向：</b>在「${DIM_META[strongest.i].dim}」的表現最突出（${strongest.score} 分）。${maintainTips[strongest.i]}</p>
-        <p><b>待加強面向：</b>在「${DIM_META[weakest.i].dim}」相對較弱（${weakest.score} 分）。</p>
+        <p><b>待加強面向：</b>在「${DIM_META[weakest.i].dim}」相對較弱（${weakest.score} 分）。${improveTips[weakest.i]}</p>
         <p>此外，規律的作息、充足睡眠與適度的環境調整（如減少多工、安排專注時段）都有助於整體專注力的提升。本系統僅作為個人專注力管理與自我覺察的參考工具，並非醫療診斷。</p>
         `;
         document.getElementById(elId).innerHTML = html;
@@ -2294,8 +2294,7 @@
         </div>
         <div class="detail-note">階段1 平均反應時間：<b>${d.stageAvgRT[0] ?? 'N/A'}${d.stageAvgRT[0]!=null?' ms':''}</b> 
         階段2：<b>${d.stageAvgRT[1] ?? 'N/A'}${d.stageAvgRT[1]!=null?' ms':''}</b> 
-        階段3：<b>${d.stageAvgRT[2] ?? 'N/A'}${d.stageAvgRT[2]!=null?' ms':''}</b>
-        階段4：<b>${d.stageAvgRT[3] ?? 'N/A'}${d.stageAvgRT[3]!=null?' ms':''}</b></div>
+        階段3：<b>${d.stageAvgRT[2] ?? 'N/A'}${d.stageAvgRT[2]!=null?' ms':''}</b></div>
         </div>`;
         }
 
@@ -2954,8 +2953,10 @@
         document.addEventListener('keydown', function(e){
         const isEnter = e.key === 'Enter';
         const isSpace = e.code === 'Space';
+        const arrowDir = e.key === 'ArrowUp' ? 'up' : e.key === 'ArrowDown' ? 'down' :
+                          e.key === 'ArrowLeft' ? 'left' : e.key === 'ArrowRight' ? 'right' : null;
 
-        if (!isEnter && !isSpace) return;
+        if (!isEnter && !isSpace && !arrowDir) return;
 
         const recap = document.getElementById('recapOverlay');
         if (recap.classList.contains('show')){
@@ -2994,6 +2995,12 @@
         else if (i===2 && typeof L2!=='undefined') module = L2;
         else if (i===3 && typeof L3!=='undefined') module = L3;
         else if (i===4 && typeof L4!=='undefined') module = L4;
+
+        if (arrowDir && module && typeof module.onArrow === 'function'){
+        e.preventDefault();
+        module.onArrow(arrowDir);
+        return;
+        }
 
         if (isEnter && module && typeof module.onEnter === 'function'){
         e.preventDefault();
@@ -3057,7 +3064,7 @@
         let hits = 0, misses = 0, falseAlarms = 0, correctRejections = 0;
         let reactionTimes = [];
 
-        let instructionsEl, gameScreenEl, fruitStageEl, trialCounterEl, trialTotalEl, scoreCounterEl, progressFillEl, hintTextEl, stageLabelEl;
+        let instructionsEl, gameScreenEl, fruitStageEl, trialCounterEl, trialTotalEl, scoreCounterEl, progressFillEl, hintTextEl;
 
         function cacheDom(){
         instructionsEl = document.getElementById("l1-instructions");
@@ -3068,7 +3075,6 @@
         scoreCounterEl = document.getElementById("l1-score-counter");
         progressFillEl = document.getElementById("l1-progress-fill");
         hintTextEl = document.getElementById("l1-hint-text");
-        stageLabelEl = document.getElementById("l1-stage-label");
         document.getElementById("l1-total-trials-hint").textContent = TOTAL_TRIALS;
         trialTotalEl.textContent = TOTAL_TRIALS;
         fruitStageEl.addEventListener("click", handleClick);
@@ -3112,17 +3118,14 @@
 
         if (currentTrial <= 10) {
             // 第一階段：正向，全速 (1100ms)
-            if (stageLabelEl) stageLabelEl.textContent = "階段 1";
             currentDuration = BASE_STIMULUS_DURATION;
             rotationDegree = 0;
         } else if (currentTrial <= 20) {
             // 第二階段：正向，時間砍到 2/3 (約 733ms)
-            if (stageLabelEl) stageLabelEl.textContent = "階段 2";
             currentDuration = Math.round(BASE_STIMULUS_DURATION * (2 / 3));
             rotationDegree = 0;
         } else {
-            // 第三階段：直接呈現旋轉後的結果（靜態轉角），時間砍到 1/2 (550ms)
-            if (stageLabelEl) stageLabelEl.textContent = "階段 3";
+            // 第三階段：隨機旋轉，時間砍到 1/2 (550ms)
             currentDuration = Math.round(BASE_STIMULUS_DURATION * (1 / 2));
             rotationDegree = Math.floor(Math.random() * 360);
         }
@@ -3243,6 +3246,10 @@
         let levelFinished = false;
         let generatedStrawberryCounts = [];
 
+        let cursorRow = 0, cursorCol = 0;
+        let cursorOnFinish = false;
+        let cellsMatrix = [];
+
         const record = { totalSearchTime:0, totalWrongClicks:0, totalCherryMisclicks:0, totalCorrectClicks:0, totalMissedStrawberries:0, levelTimes:[] };
 
         let instructionsEl, gameScreenEl, levelTitle, fruitGrid, timerDisplay, foundDisplay, wrongDisplay, levelCompleteOverlay, levelSummary, finishBtn;
@@ -3329,17 +3336,81 @@
         totalStrawberriesThisLevel = strawberryCount;
         foundDisplay.textContent = `0`;
 
-        layout.forEach((fruit) => {
+        cellsMatrix = [];
+        for (let r=0;r<cfg.rows;r++) cellsMatrix.push(new Array(cfg.cols).fill(null));
+
+        layout.forEach((fruit, idx) => {
+        const r = Math.floor(idx / cfg.cols);
+        const c = idx % cfg.cols;
         const cell = document.createElement("div");
         cell.className = "l2-fruit-cell";
         cell.textContent = fruit;
         cell.dataset.fruit = fruit;
         cell.addEventListener("click", () => handleFruitClick(cell, fruit));
         fruitGrid.appendChild(cell);
+        if (cellsMatrix[r]) cellsMatrix[r][c] = cell;
         });
+
+        cursorRow = 0; cursorCol = 0; cursorOnFinish = false;
+        updateCursorHighlight();
 
         levelCompleteOverlay.style.display = "none";
         startTimer();
+        }
+
+        function updateCursorHighlight(){
+        for (let r=0;r<cellsMatrix.length;r++){
+        for (let c=0;c<cellsMatrix[r].length;c++){
+        const cell = cellsMatrix[r][c];
+        if (cell) cell.classList.toggle("kb-focus", !cursorOnFinish && r === cursorRow && c === cursorCol);
+        }
+        }
+        if (finishBtn) finishBtn.classList.toggle("kb-focus", cursorOnFinish);
+        }
+
+        function moveCursor(direction){
+        if (levelFinished || !cellsMatrix.length) return;
+        const rows = cellsMatrix.length;
+
+        if (cursorOnFinish){
+        if (direction === "up" || direction === "down"){
+        cursorOnFinish = false;
+        cursorRow = direction === "up" ? rows - 1 : 0;
+        cursorCol = Math.min(cursorCol, cellsMatrix[cursorRow].length - 1);
+        }
+        updateCursorHighlight();
+        return;
+        }
+
+        let r = cursorRow, c = cursorCol;
+        if (direction === "up"){
+        r = (r - 1 + rows) % rows;
+        } else if (direction === "down"){
+        if (r === rows - 1){
+        cursorOnFinish = true;
+        updateCursorHighlight();
+        return;
+        }
+        r = r + 1;
+        } else if (direction === "left"){
+        c = (c - 1 + cellsMatrix[r].length) % cellsMatrix[r].length;
+        } else if (direction === "right"){
+        c = (c + 1) % cellsMatrix[r].length;
+        }
+        cursorRow = r; cursorCol = c;
+        updateCursorHighlight();
+        }
+
+        function activateCursorCell(){
+        if (levelFinished) return;
+        if (cursorOnFinish){
+        if (finishBtn) finishBtn.click();
+        return;
+        }
+        if (!cellsMatrix.length) return;
+        const cell = cellsMatrix[cursorRow] && cellsMatrix[cursorRow][cursorCol];
+        if (!cell) return;
+        handleFruitClick(cell, cell.dataset.fruit);
         }
 
         function handleFruitClick(cell, fruit){
@@ -3432,51 +3503,44 @@
         }, () => App.goToLevel(3));
         }
 
+        function onArrow(direction){ moveCursor(direction); }
+
         function onEnter(){
         if (levelFinished) return;
-        if (finishBtn) finishBtn.click();
+        activateCursorCell();
         }
 
-        return { start, onEnter };
+        return { start, onEnter, onArrow };
         })();
     </script>
 
     <script>
         /* =========================================================================
-        第三關：水果規則變換 — 認知彈性 / 反應控制能力（動態速度、20%正確率保證與點擊特效版）
+        第三關：水果規則變換 — 認知彈性 / 反應控制能力
         ========================================================================= */
         const L3 = (function(){
         const CONFIG = {
         stageDurationMs: 15000,
-        trialTimeoutMs: 1400,
-        instructionMs: 2500,
+        trialTimeoutMs: 1500,
+        isiMs: 400,
+        instructionMs: 2200,
+        fruitRadius: 34,
         canvasWidth: 800,
-        canvasHeight: 420,
-        fontSize: 70
+        canvasHeight: 420
         };
 
-        // 完整的水果資料庫定義
-        const ALL_FRUITS = [
-            { emoji: "🍉", color: "red",    shape: "none", leaf: false, name: "西瓜" },
-            { emoji: "🍅", color: "red",    shape: "round", leaf: true,  name: "番茄" },
-            { emoji: "🌶️", color: "red",    shape: "long",  leaf: true,  name: "辣椒" },
-            { emoji: "🌽", color: "yellow", shape: "long",  leaf: true,  name: "玉米" },
-            { emoji: "🍋", color: "yellow", shape: "round", leaf: true,  name: "檸檬" },
-            { emoji: "🍌", color: "yellow", shape: "long",  leaf: false, name: "香蕉" },
-            { emoji: "🥝", color: "green",  shape: "round", leaf: false, name: "奇異果" },
-            { emoji: "🍈", color: "green",  shape: "round", leaf: false, name: "哈密瓜" },
-            { emoji: "🫛", color: "green",  shape: "long",  leaf: true,  name: "甜豆" }
+        const STAGES = [
+        { id:1, label:"紅色水果 (RED)", instruction:"請點擊所有「紅色」的水果", rule:(f)=>f.color==="red" },
+        { id:2, label:"圓形水果 (ROUND)", instruction:"規則已改變！請點擊所有「圓形」的水果", rule:(f)=>f.shape==="round" },
+        { id:3, label:"黃色且圓形 (YELLOW + ROUND)", instruction:"規則再次改變！請點擊「黃色且圓形」的水果", rule:(f)=>f.color==="yellow"&&f.shape==="round" }
         ];
-
-        const COLOR_NAMES = { red: "紅色", yellow: "黃色", green: "綠色" };
-        const SHAPE_NAMES = { round: "圓形", long: "長條" };
-
-        let STAGES = [];
+        const COLORS = ["red","yellow"];
+        const SHAPES = ["round","long"];
+        const COLOR_HEX = { red:"#c0392b", yellow:"#e8a930" };
 
         const state = {
         stageIndex:0, stageStartTime:0, gameStartTime:0, running:false, paused:true,
-        currentTrial:null, trials:[], isiTimeoutId:null, rafId:null,
-        stageTrialCount:0, activeEffect: null
+        currentTrial:null, trials:[], isiTimeoutId:null, rafId:null
         };
 
         let instructionsEl, gameScreenEl, canvas, ctx, overlay, overlayTitle, overlayText, stageNumEl, ruleTextEl, timeLeftEl, timerBarInner;
@@ -3497,73 +3561,45 @@
         }
 
         function randChoice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-        // 生成隨機規則
-        function generateStages(){
-            const selectedColor1 = randChoice(["red", "yellow", "green"]);
-            const selectedShape = randChoice(["round", "long"]);
-            const selectedColor2 = randChoice(["red", "yellow", "green"]);
-            const selectedShape2 = randChoice(["round", "long"]);
-            const selectedColor3 = randChoice(["red", "yellow", "green"]);
-            const selectedShape3 = randChoice(["round", "long"]);
-            const selectedLeaf = Math.random() < 0.5;
-
-            STAGES = [
-                {
-                    id: 1,
-                    label: `${COLOR_NAMES[selectedColor1]}水果`,
-                    instruction: `階段 1：請點擊所有<b>「${COLOR_NAMES[selectedColor1]}」</b>的水果`,
-                    rule: (f) => f.color === selectedColor1,
-                    baseIsi: 500
-                },
-                {
-                    id: 2,
-                    label: `${SHAPE_NAMES[selectedShape]}水果`,
-                    instruction: `規則改變！請點擊所有<b>「${SHAPE_NAMES[selectedShape]}」</b>的水果`,
-                    rule: (f) => f.shape === selectedShape,
-                    baseIsi: 400
-                },
-                {
-                    id: 3,
-                    label: `${COLOR_NAMES[selectedColor2]} ＋ ${SHAPE_NAMES[selectedShape2]}`,
-                    instruction: `速度加快！請點擊<b>「${COLOR_NAMES[selectedColor2]} 且 ${SHAPE_NAMES[selectedShape2]}」</b>的水果`,
-                    rule: (f) => f.color === selectedColor2 && f.shape === selectedShape2,
-                    baseIsi: 320
-                },
-                {
-                    id: 4,
-                    label: `${COLOR_NAMES[selectedColor3]} ＋ ${SHAPE_NAMES[selectedShape3]} ＋ ${selectedLeaf?'有':'無'}葉子`,
-                    instruction: `極速挑戰！請點擊<b>「${COLOR_NAMES[selectedColor3]} ＋ ${SHAPE_NAMES[selectedShape3]} ＋ ${selectedLeaf?'有':'無'}葉子」</b>的水果`,
-                    rule: (f) => f.color === selectedColor3 && f.shape === selectedShape3 && f.leaf === selectedLeaf,
-                    baseIsi: 250
-                }
-            ];
-        }
-
+        function randomFruit(){ return { color: randChoice(COLORS), shape: randChoice(SHAPES) }; }
         function randomPosition(){
-        const margin = 60;
-        return {
-            x: margin + Math.random() * (CONFIG.canvasWidth - 2 * margin),
-            y: margin + Math.random() * (CONFIG.canvasHeight - 2 * margin)
-        };
+        const r = CONFIG.fruitRadius;
+        return { x: r + Math.random()*(CONFIG.canvasWidth-2*r), y: r + Math.random()*(CONFIG.canvasHeight-2*r) };
         }
 
         function clearCanvas(){ ctx.clearRect(0,0,canvas.width,canvas.height); }
 
-        function drawFruit(fruit, scale = 1, alpha = 1){
-        ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.font = `${Math.round(CONFIG.fontSize * scale)}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(fruit.emoji, fruit.x, fruit.y);
-        ctx.restore();
+        function drawFruit(fruit){
+        const { x, y, color, shape } = fruit;
+        const r = CONFIG.fruitRadius;
+        ctx.fillStyle = COLOR_HEX[color];
+        ctx.strokeStyle = "rgba(90,60,20,0.3)";
+        ctx.lineWidth = 2;
+
+        if (shape === "round"){
+        ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); ctx.stroke();
+        } else {
+        const w = r*2.1, h = r*1.1, rx = x-w/2, ry = y-h/2, rad = h/2;
+        ctx.beginPath();
+        ctx.moveTo(rx+rad, ry);
+        ctx.lineTo(rx+w-rad, ry);
+        ctx.arc(rx+w-rad, ry+rad, rad, -Math.PI/2, Math.PI/2);
+        ctx.lineTo(rx+rad, ry+h);
+        ctx.arc(rx+rad, ry+rad, rad, Math.PI/2, -Math.PI/2);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        }
+        ctx.fillStyle = "#3f7a2a";
+        ctx.beginPath(); ctx.ellipse(x, y-r*0.9, 5, 8, 0, 0, Math.PI*2); ctx.fill();
         }
 
-        function pointInFruit(px, py, fruit){
-        const radius = 40;
-        const dx = px - fruit.x, dy = py - fruit.y;
-        return dx*dx + dy*dy <= radius*radius;
+        function pointInFruit(px,py,fruit){
+        const r = CONFIG.fruitRadius;
+        if (fruit.shape === "round"){
+        const dx=px-fruit.x, dy=py-fruit.y;
+        return dx*dx+dy*dy <= r*r;
+        }
+        const w=r*2.1, h=r*1.1;
+        return px>=fruit.x-w/2 && px<=fruit.x+w/2 && py>=fruit.y-h/2 && py<=fruit.y+h/2;
         }
 
         function start(){
@@ -3571,12 +3607,10 @@
         instructionsEl.style.display = "none";
         gameScreenEl.style.display = "block";
 
-        generateStages();
         state.stageIndex = 0;
         state.trials = [];
         state.running = true;
         state.gameStartTime = performance.now();
-        state.activeEffect = null;
         overlay.style.display = "none";
         startStage(0);
         loop();
@@ -3585,9 +3619,7 @@
         function startStage(index){
         state.stageIndex = index;
         state.stageStartTime = performance.now();
-        state.stageTrialCount = 0;
         state.paused = true;
-        state.activeEffect = null;
         const stage = STAGES[index];
         stageNumEl.textContent = stage.id;
         ruleTextEl.textContent = stage.label;
@@ -3595,16 +3627,10 @@
         }
 
         function showInstruction(text, callback){
-        overlayTitle.textContent = "階段 " + STAGES[state.stageIndex].id + " / 4";
+        overlayTitle.textContent = "階段 " + STAGES[state.stageIndex].id + " / 3";
         overlayText.innerHTML = text;
         overlay.style.display = "flex";
         setTimeout(() => { overlay.style.display = "none"; callback(); }, CONFIG.instructionMs);
-        }
-
-        function getCurrentIsi(){
-            const stage = STAGES[state.stageIndex];
-            const accel = Math.min(120, state.stageTrialCount * 8);
-            return Math.max(150, stage.baseIsi - accel);
         }
 
         function scheduleNextTrial(delay){
@@ -3617,23 +3643,10 @@
 
         function spawnTrial(){
         if (isStageOver()){ advanceStageOrEnd(); return; }
-        state.stageTrialCount++;
-        
-        const currentRule = STAGES[state.stageIndex].rule;
-        const validFruits = ALL_FRUITS.filter(f => currentRule(f));
-
-        let selectedFruit;
-        // 確保至少有 20% 的機率生成符合條件的水果
-        if (validFruits.length > 0 && Math.random() < 0.25) {
-            selectedFruit = randChoice(validFruits);
-        } else {
-            selectedFruit = randChoice(ALL_FRUITS);
-        }
-
-        const fruitObj = { ...selectedFruit, ...randomPosition() };
+        const fruit = { ...randomFruit(), ...randomPosition() };
         const startTime = performance.now();
         const timeoutId = setTimeout(() => resolveTrial("timeout", performance.now()), CONFIG.trialTimeoutMs);
-        state.currentTrial = { fruit: fruitObj, startTime, timeoutId, stageIndex: state.stageIndex };
+        state.currentTrial = { fruit, startTime, timeoutId, stageIndex: state.stageIndex };
         }
 
         function resolveTrial(responseType, timestamp){
@@ -3646,14 +3659,6 @@
 
         if (responseType === "click"){
         RT = Math.round(timestamp - startTime);
-        
-        // 觸發放大閃爍點擊特效
-        state.activeEffect = {
-            fruit: { ...fruit },
-            startTime: performance.now(),
-            duration: 180
-        };
-
         if (matchesCurrent){ outcome = "hit"; }
         else {
         outcome = "commission_error";
@@ -3670,7 +3675,7 @@
         state.currentTrial = null;
 
         if (isStageOver()) advanceStageOrEnd();
-        else scheduleNextTrial(getCurrentIsi());
+        else scheduleNextTrial(CONFIG.isiMs);
         }
 
         function isStageOver(){ return performance.now() - state.stageStartTime >= CONFIG.stageDurationMs; }
@@ -3693,21 +3698,6 @@
         function loop(){
         clearCanvas();
         if (state.currentTrial) drawFruit(state.currentTrial.fruit);
-        
-        // 繪製點擊時的放大閃爍特效
-        if (state.activeEffect) {
-            const now = performance.now();
-            const elapsed = now - state.activeEffect.startTime;
-            if (elapsed < state.activeEffect.duration) {
-                const progress = elapsed / state.activeEffect.duration;
-                const scale = 1 + 0.4 * progress; // 放大至 1.4 倍
-                const alpha = 1 - progress;       // 漸隱
-                drawFruit(state.activeEffect.fruit, scale, alpha);
-            } else {
-                state.activeEffect = null;
-            }
-        }
-
         if (state.running && !state.paused){
         const elapsed = performance.now() - state.stageStartTime;
         const remain = Math.max(0, CONFIG.stageDurationMs - elapsed);
@@ -3767,12 +3757,7 @@
         }, () => App.goToLevel(4));
         }
 
-        function onEnter(){
-        if (!state.running || state.paused || !state.currentTrial) return;
-        resolveTrial("click", performance.now());
-        }
-
-        return { start, onEnter };
+        return { start };
         })();
     </script>
 
@@ -3793,6 +3778,8 @@
 
         let instructionsEl, playingArea, levelNumEl, timeLeftEl, timerNum, vineFill, phaseLabel,
         memorizeArea, answerArea, slotsEl, nextBtn, footerEl, fruitButtons, undoBtn, clearBtn;
+
+        let cursorRow = 0, cursorCol = 0;
 
         function cacheDom(){
         instructionsEl = document.getElementById('l4-instructions');
@@ -3840,6 +3827,66 @@
         function clearAll(){
         if (!answerPhaseActive) return;
         playerAnswer = playerAnswer.map(()=>null); renderSlots(); checkComplete();
+        }
+
+        function getRowButtons(row){
+        if (row === 0) return Array.from(fruitButtons);
+        if (row === 1) return [undoBtn, clearBtn];
+        return [nextBtn];
+        }
+
+        function updateCursorHighlight(){
+        fruitButtons.forEach(b => b.classList.remove('kb-focus'));
+        [undoBtn, clearBtn, nextBtn].forEach(b => b && b.classList.remove('kb-focus'));
+        const rowButtons = getRowButtons(cursorRow);
+        const btn = rowButtons[cursorCol];
+        if (btn) btn.classList.add('kb-focus');
+        }
+
+        function resetCursor(){
+        cursorRow = 0; cursorCol = 0;
+        updateCursorHighlight();
+        }
+
+        function moveCursor(direction){
+        if (!answerPhaseActive) return;
+        if (direction === 'left' || direction === 'right'){
+        const rowButtons = getRowButtons(cursorRow);
+        const len = rowButtons.length;
+        cursorCol = direction === 'left' ? (cursorCol - 1 + len) % len : (cursorCol + 1) % len;
+        } else if (direction === 'down'){
+        if (cursorRow === 0){
+        cursorRow = 1;
+        cursorCol = 0;
+        } else if (cursorRow === 1){
+        cursorRow = 2;
+        cursorCol = 0;
+        } else {
+        cursorRow = 0;
+        cursorCol = Math.min(cursorCol, getRowButtons(0).length - 1);
+        }
+        } else if (direction === 'up'){
+        if (cursorRow === 2){
+        cursorRow = 1;
+        cursorCol = 0;
+        } else if (cursorRow === 1){
+        cursorRow = 0;
+        cursorCol = 0;
+        } else {
+        cursorRow = 2;
+        cursorCol = 0;
+        }
+        }
+        updateCursorHighlight();
+        }
+
+        function activateCursorSelection(){
+        if (!answerPhaseActive) return;
+        const rowButtons = getRowButtons(cursorRow);
+        const btn = rowButtons[cursorCol];
+        if (!btn || btn.disabled) return;
+        if (cursorRow === 0) selectFruit(btn.dataset.fruit);
+        else btn.click();
         }
 
         function isValidSequence(seq){
@@ -3941,6 +3988,7 @@
         timeLeftEl.textContent = timeLeft;
         resetVineFull();
         answerStartTime = Date.now();
+        resetCursor();
 
         clearInterval(timerInterval);
         timerInterval = setInterval(() => {
@@ -4054,12 +4102,10 @@
         }, () => App.finishQuiz());
         }
 
-        function onEnter(){
-        if (!answerPhaseActive) return;
-        if (nextBtn && !nextBtn.disabled) nextBtn.click();
-        }
+        function onEnter(){ activateCursorSelection(); }
+        function onArrow(direction){ moveCursor(direction); }
 
-        return { start, onEnter };
+        return { start, onEnter, onArrow };
         })();
         /* =========================================================
         房間數據分析儀表板邏輯
@@ -4151,7 +4197,7 @@ function getFilteredRecords() {
     if (selectedPeriodIndex === 'all' || !definedPeriods[selectedPeriodIndex]) {
         return currentAnalRecords;
     }
-
+    
     const p = definedPeriods[selectedPeriodIndex];
     if (!p.start || !p.end) return currentAnalRecords;
 
@@ -4160,7 +4206,6 @@ function getFilteredRecords() {
     const endMs = new Date(p.end).getTime();
 
     return currentAnalRecords.filter(r => {
-
         if (!r.time) return false;
 
         // 強制修復時間字串相容性（將斜線替換成橫線、移除多餘空格）
