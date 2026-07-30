@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧型專注力分析與改善系統</title>
+    <title>專注力分析與改善系統</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
@@ -1515,7 +1515,7 @@
         </div>
         <nav class="site-nav">
             <a id="nav-about" onclick="App.scrollToAbout()">網站設立動機</a>
-            <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗</a>
+            <a id="nav-quiz" onclick="App.goToQuizEntry()">測驗專區</a>
             <a id="nav-results" onclick="App.showPage('results-zone')">結果專區</a>
             <a id="nav-login" onclick="App.openLoginModal()">登入</a>
             <div class="nav-dropdown nav-authed" style="display:none;">
@@ -1558,13 +1558,14 @@
             </div>
 
             <div class="crate-card">
-                <h1>🍓 智慧型專注力分析與改善系統</h1>
+                <h1>專注力分析與改善系統</h1>
                 <div class="home-sub">遊戲化專注力評估平台</div>
                 <div class="fruit-row-decor home-fruit-row">
                     <span>🍓</span><span>🍌</span><span>🍇</span><span>🍊</span><span>🍉</span>
                 </div>
                 <div class="home-lead-box">
-                    <p style="margin-bottom: 20px; text-indent: 2em;">歡迎進入「智慧型專注力分析與改善系統」！本遊戲透過四個水果主題關卡，測驗你的注意力穩定度、抗干擾能力、反應控制能力與記憶負荷能力。你只需依照每關指示完成辨識、搜尋、規則切換與記憶重現等任務，系統將分析你的表現並以雷達圖呈現專注力特徵，提供個人化的專注改善建議。</p>
+                    <p style="margin-bottom: 20px; text-indent: 2em;">歡迎進入「專注力分析與改善系統」！本遊戲透過四個水果主題關卡，測驗你的注意力穩定度、抗干擾能力、反應控制能力與記憶負荷能力。你只需依照每關指示完成辨識、搜尋、規則切換與記憶重現等任務，系統將分析你的表現並以雷達圖呈現專注力特徵，提供個人化的專注改善建議。</p>
+                    <p style="margin-bottom: 20px; text-indent: 2em;">點選右上角的「登入」，使用 Google 帳號登入後即可使用建立以及加入房間功能喔！</p>
                 </div>
             </div>
 
@@ -1610,7 +1611,8 @@
                 </div>
                 <div id="playerFormError" class="player-form-error"></div>
                 <div style="text-align:center;font-size:11.5px;color:var(--text-soft);margin-bottom:6px;">你的暱稱、年齡與測驗結果將被記錄，作為本系統的測驗資料。</div>
-                <p>準備好了嗎？遊戲中隨時可按 <b>Enter</b> 鍵快速進行下一步。</p>
+                <p>遊戲中隨時可按 <b>Enter</b> 鍵快速進行下一步。</p>
+                <p class="text-center">準備好了嗎？</p>
                 <div class="btn-row"><button class="btn-primary" onclick="App.startQuizFlow()">開始遊戲</button></div>
             </div>
         </section>
@@ -1658,7 +1660,7 @@
                     <div class="fruit-row-decor" style="font-size:26px;">🍎 🍌 🍊 🍇 <strong>🍓</strong> 🍉 🍒</div>
                     <div class="home-lead-box">
                         <p>請找出畫面中的<b>所有草莓 🍓</b>並點擊它們。共有三個小關卡，隨著關卡進行網格範圍與水果種類會增加。</p>
-                        <p>• 仔細觀察畫面，避免誤點外觀相似的櫻桃 🍒<br>• 找完草莓後，可點擊下方「完成」按鈕或直接按下 <b>Enter</b> 鍵結算並進行下一小關</p>
+                        <p>找完所有草莓後，可點擊下方「完成」按鈕或直接按下 <b>Enter</b> 鍵以進行下一小關</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l2-start-btn" onclick="L2.start()">開始本關</button></div>
                 </div>
@@ -1671,7 +1673,7 @@
                         <div>錯誤點擊<span id="l2-wrong-display" style="display:block;font-size:1.2rem;">0</span></div>
                     </div>
                     <div id="l2-fruit-grid" class="l2-fruit-grid"></div>
-                    <div class="btn-row"><button class="btn-secondary" id="l2-finish-btn">完成（結束本小關）</button></div>
+                    <div class="btn-row"><button class="btn-secondary" id="l2-finish-btn">完成</button></div>
                     <div id="l2-level-complete-overlay" class="l2-level-overlay" style="display:none;">
                         <h2>🎉 小關完成！</h2>
                         <p id="l2-level-summary"></p>
@@ -1721,7 +1723,7 @@
                     <div class="home-sub">工作記憶負荷測試</div>
                     <div class="home-lead-box">
                         <p>考驗你的短期工作記憶容量與排序能力！每回合畫面會先展示一排水果序列，請在有限時間內專注記住它們的<b>種類與出現順序</b>。</p>
-                        <p>• 水果隱藏後，請點擊下方水果按鈕依序重建正確序列<br>• 每題限時 10 秒作答，共 7 題，隨著題目進行水果長度與記憶難度會逐題增加<br>• 排滿水果序列後可點擊「下一題」或直接按下 <b>Enter</b> 鍵快速送出本題答案</p>
+                        <p>• 水果隱藏後，請點擊下方水果按鈕依序重建正確序列<br>• 每題限時 10 秒作答，共 7 題，隨著題目進行水果長度與記憶難度會逐題增加<br>• 排滿水果序列後可點擊「下一題」或直接按下 <b>Enter</b> 鍵送出本題答案</p>
                     </div>
                     <div class="btn-row"><button class="btn-primary" id="l4-start-btn" onclick="L4.start()">開始本關</button></div>
                 </div>
