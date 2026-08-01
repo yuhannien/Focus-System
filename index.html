@@ -1629,6 +1629,7 @@
             </div>
 
             <!-- 各關卡容器將於後續段落插入 -->
+            <!-- 第一關容器修正版 -->
             <div id="level1-container" class="level-container">
                 <div class="crate-card" id="l1-instructions">
                     <h2 style="text-align:center;">第一關：水果守衛</h2>
@@ -1644,7 +1645,7 @@
 
                 <div class="crate-card" id="l1-game-screen" style="display:none;">
                     <div style="display:flex;justify-content:space-between;font-weight:bold;color:var(--text-mid);margin-bottom:10px;">
-                        <span><span id="l1-stage-label">階段 1</span></span>
+                        <span><span id="l1-stage-label">階段 1</span> （回合 <span id="l1-trial-counter">0</span> / <span id="l1-trial-total">30</span>）</span>
                         <span>得分 <span id="l1-score-counter">0</span></span>
                     </div>
                     <div style="width:100%;height:10px;background:var(--kraft-bg2);border:1px solid var(--kraft-border-light);border-radius:10px;overflow:hidden;margin-bottom:20px;">
@@ -3088,8 +3089,8 @@
     </script>
 
     <script>
-        /* =========================================================================
-        第一關：水果守衛 — 選擇性反應 / 注意力穩定度（漸進難度設定）
+/* =========================================================================
+        第一關：水果守衛 — 選擇性反應 / 注意力穩定度（漸進難度設定修正版）
         ========================================================================= */
         const L1 = (function(){
         const TOTAL_TRIALS = 30;
@@ -3124,26 +3125,34 @@
         progressFillEl = document.getElementById("l1-progress-fill");
         hintTextEl = document.getElementById("l1-hint-text");
         stageLabelEl = document.getElementById("l1-stage-label");
-        document.getElementById("l1-total-trials-hint").textContent = TOTAL_TRIALS;
-        trialTotalEl.textContent = TOTAL_TRIALS;
-        fruitStageEl.addEventListener("click", handleClick);
+
+        const totalHintEl = document.getElementById("l1-total-trials-hint");
+        if (totalHintEl) totalHintEl.textContent = TOTAL_TRIALS;
+        if (trialTotalEl) trialTotalEl.textContent = TOTAL_TRIALS;
+
+        if (fruitStageEl) {
+            fruitStageEl.removeEventListener("click", handleClick);
+            fruitStageEl.addEventListener("click", handleClick);
+        }
         }
 
         function start(){
-        if (!instructionsEl) cacheDom();
+        cacheDom();
 
         currentTrial = 0; hits = 0; misses = 0; falseAlarms = 0; correctRejections = 0;
         reactionTimes = [];
-        scoreCounterEl.textContent = "0";
+        if (scoreCounterEl) scoreCounterEl.textContent = "0";
 
-        instructionsEl.style.display = "none";
-        gameScreenEl.style.display = "block";
+        if (instructionsEl) instructionsEl.style.display = "none";
+        if (gameScreenEl) gameScreenEl.style.display = "block";
 
-        fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
-        fruitStageEl.classList.add("l1-fruit-stage", "empty");
-        fruitStageEl.style.transform = "none";
-        fruitStageEl.textContent = "準備...";
-        hintTextEl.textContent = "遊戲即將開始";
+        if (fruitStageEl) {
+            fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
+            fruitStageEl.classList.add("l1-fruit-stage", "empty");
+            fruitStageEl.style.transform = "none";
+            fruitStageEl.textContent = "準備...";
+        }
+        if (hintTextEl) hintTextEl.textContent = "遊戲即將開始";
 
         setTimeout(nextTrial, 800);
         }
@@ -3151,38 +3160,37 @@
         function nextTrial(){
         if (currentTrial >= TOTAL_TRIALS){ endLevel(); return; }
         currentTrial++;
-        trialCounterEl.textContent = currentTrial;
-        progressFillEl.style.width = ((currentTrial - 1) / TOTAL_TRIALS * 100) + "%";
+        if (trialCounterEl) trialCounterEl.textContent = currentTrial;
+        if (progressFillEl) progressFillEl.style.width = ((currentTrial - 1) / TOTAL_TRIALS * 100) + "%";
 
         isCurrentTarget = Math.random() < TARGET_PROB;
         const fruit = isCurrentTarget ? TARGET_FRUIT : NON_TARGET_FRUITS[Math.floor(Math.random() * NON_TARGET_FRUITS.length)];
 
-        fruitStageEl.classList.remove("empty", "flash-correct", "flash-wrong", "flash-miss");
-        fruitStageEl.textContent = fruit;
-        hintTextEl.textContent = "";
+        if (fruitStageEl) {
+            fruitStageEl.classList.remove("empty", "flash-correct", "flash-wrong", "flash-miss");
+            fruitStageEl.textContent = fruit;
+        }
+        if (hintTextEl) hintTextEl.textContent = "";
 
         // 計算階段難度：反應時間與旋轉角度
         let currentDuration = BASE_STIMULUS_DURATION;
         let rotationDegree = 0;
 
         if (currentTrial <= 10) {
-            // 第一階段：正向，全速 (1100ms)
             if (stageLabelEl) stageLabelEl.textContent = "階段 1";
             currentDuration = BASE_STIMULUS_DURATION;
             rotationDegree = 0;
         } else if (currentTrial <= 20) {
-            // 第二階段：正向，時間砍到 2/3 (約 733ms)
             if (stageLabelEl) stageLabelEl.textContent = "階段 2";
             currentDuration = Math.round(BASE_STIMULUS_DURATION * (2 / 3));
             rotationDegree = 0;
         } else {
-            // 第三階段：直接呈現旋轉後的結果（靜態轉角），時間砍到 1/2 (550ms)
             if (stageLabelEl) stageLabelEl.textContent = "階段 3";
             currentDuration = Math.round(BASE_STIMULUS_DURATION * (1 / 2));
             rotationDegree = Math.floor(Math.random() * 360);
         }
 
-        fruitStageEl.style.transform = `rotate(${rotationDegree}deg)`;
+        if (fruitStageEl) fruitStageEl.style.transform = `rotate(${rotationDegree}deg)`;
 
         trialAnswered = false;
         trialActive = true;
@@ -3194,7 +3202,7 @@
         if (isCurrentTarget){
         misses++;
         flashStage("flash-miss");
-        hintTextEl.textContent = "漏按了！這是草莓";
+        if (hintTextEl) hintTextEl.textContent = "漏按了！這是草莓";
         } else {
         correctRejections++;
         }
@@ -3214,32 +3222,36 @@
         if (isCurrentTarget){
         hits++;
         reactionTimes.push(rt);
-        scoreCounterEl.textContent = hits;
+        if (scoreCounterEl) scoreCounterEl.textContent = hits;
         flashStage("flash-correct");
-        hintTextEl.textContent = "答對了！反應時間 " + Math.round(rt) + " ms";
+        if (hintTextEl) hintTextEl.textContent = "答對了！反應時間 " + Math.round(rt) + " ms";
         } else {
         falseAlarms++;
         flashStage("flash-wrong");
-        hintTextEl.textContent = "誤點了！這不是草莓";
+        if (hintTextEl) hintTextEl.textContent = "誤點了！這不是草莓";
         }
         goToNextAfterDelay();
         }
 
-        function flashStage(cls){ fruitStageEl.classList.add(cls); }
+        function flashStage(cls){ 
+            if (fruitStageEl) fruitStageEl.classList.add(cls); 
+        }
 
         function goToNextAfterDelay(){
         setTimeout(() => {
-        fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
-        fruitStageEl.classList.add("empty");
-        fruitStageEl.style.transform = "none";
-        fruitStageEl.textContent = "";
+        if (fruitStageEl) {
+            fruitStageEl.classList.remove("flash-correct", "flash-wrong", "flash-miss");
+            fruitStageEl.classList.add("empty");
+            fruitStageEl.style.transform = "none";
+            fruitStageEl.textContent = "";
+        }
         const isi = ISI_MIN + Math.random() * (ISI_MAX - ISI_MIN);
         setTimeout(nextTrial, isi);
         }, FEEDBACK_DURATION);
         }
 
         function endLevel(){
-        progressFillEl.style.width = "100%";
+        if (progressFillEl) progressFillEl.style.width = "100%";
 
         const totalTargets = hits + misses;
         const totalNonTargets = falseAlarms + correctRejections;
@@ -3253,7 +3265,6 @@
         stdRT = Math.sqrt(variance);
         }
 
-        // 分數計算：掛機判定 (hits=0 判定 0 分) + 命中率/誤點率扣分
         let score = 0;
         if (hits > 0) {
             const rtPenalty = Math.min(stdRT / 15, 15) + (avgRT > 600 ? Math.min((avgRT - 600) / 20, 15) : 0);
@@ -3261,8 +3272,8 @@
             score = Math.max(0, Math.min(100, 100 - penalty));
         }
 
-        gameScreenEl.style.display = "none";
-        instructionsEl.style.display = "block";
+        if (gameScreenEl) gameScreenEl.style.display = "none";
+        if (instructionsEl) instructionsEl.style.display = "block";
 
         App.levelComplete(1, [
         { label:'漏按率', value: missRate.toFixed(1)+'%' },
