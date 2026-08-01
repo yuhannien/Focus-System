@@ -121,6 +121,7 @@
 
              .site-nav {
                  display: flex;
+                 align-items: center;
                  gap: 6px;
                  flex-wrap: wrap;
              }
@@ -2008,6 +2009,8 @@
         let pendingContinue = null;
         let viewingHistoryIndex = null; 
 
+        let allowQuizExitOnce = false;   // 新增：允許測驗完成後跳轉結果頁一次
+
         const GOOGLE_CLIENT_ID = "245822345405-tn3a1tpnqm2e4elhqf5r2lj7jbcjh0t3.apps.googleusercontent.com";
 
         let currentUser = null;   
@@ -2050,7 +2053,8 @@
 
         /* ---------------- 頁面切換 ---------------- */
         function showPage(name){
-        if (isQuizPageActive() && name !== 'quiz'){ showFocusWarning(); return; }
+            if (isQuizPageActive() && name !== 'quiz' && !allowQuizExitOnce){ showFocusWarning(); return; }
+            allowQuizExitOnce = false; // 用掉就重置，避免之後被濫用
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const target = document.getElementById('page-' + name);
         if (target) target.classList.add('active');
@@ -2171,9 +2175,10 @@
 
         /* ---------------- 綜合結果 ---------------- */
         function finishQuiz(){
-        viewingHistoryIndex = null;
-        displayedScores = scores;
-        showPage('results');
+            viewingHistoryIndex = null;
+            displayedScores = scores;
+            allowQuizExitOnce = true;   // 新增：允許這次跳轉不被防分心機制攔截
+            showPage('results');
         document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
         document.getElementById('backToHistoryRow').style.display = 'none';
         renderScoreList('scoreListEl', scores);
