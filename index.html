@@ -1601,12 +1601,14 @@
                 <p>完成四關後，系統會將你的表現整理成雷達圖，並提供改善建議。開始之前，請先告訴我們你的暱稱與年齡：</p>
                 <div id="joinedRoomBadge" style="display:none; text-align:center; margin-bottom:10px;"></div>
                 <div class="player-form">
-                    <label>
-                        選擇房間進行測試？
-                        <select id="quizRoomSelect" onchange="App.onQuizRoomSelectChange()">
-                            <option value="">不選擇房間</option>
-                        </select>
-                    </label>
+                    <div id="quizRoomSelectWrapper" style="display:none;">
+                        <label>
+                            選擇房間進行測試？
+                            <select id="quizRoomSelect" onchange="App.onQuizRoomSelectChange()">
+                                <option value="">不選擇房間</option>
+                            </select>
+                        </label>
+                    </div>
                     <label>暱稱<input type="text" id="playerNameInput" maxlength="20" placeholder="例如：小水果"></label>
                     <label>年齡<input type="number" id="playerAgeInput" min="1" max="120" placeholder="例如：18"></label>
                 </div>
@@ -2598,7 +2600,7 @@
         function handleCredentialResponse(response){
         const payload = parseJwt(response.credential);
         if (!payload) return;
-        currentUser = { name: payload.name, email: payload.email, picture: payload.picture };
+        currentUser = { name: payload.name, email: payload.email, picture: payload.picture, idToken: response.credential };
         try{ localStorage.setItem(USER_KEY, JSON.stringify(currentUser)); }catch(e){}
         document.getElementById('loginOverlay').classList.remove('show');
         updateAuthUI();
@@ -2639,6 +2641,15 @@
         document.getElementById('roomManageContent').style.display = loggedIn ? 'block' : 'none';
         document.getElementById('roomViewLoginNotice').style.display = loggedIn ? 'none' : 'block';
         document.getElementById('roomViewContent').style.display = loggedIn ? 'block' : 'none';
+
+        const quizRoomWrap = document.getElementById('quizRoomSelectWrapper');
+        if (quizRoomWrap) quizRoomWrap.style.display = loggedIn ? 'block' : 'none';
+        if (!loggedIn){
+        // 未登入：測驗一律視為個人測試，清掉目前選到的房間，避免殘留綁定
+        joinedRoom = null;
+        try{ localStorage.removeItem(JOINED_ROOM_KEY); }catch(e){}
+        updateJoinedRoomBadge();
+        }
 
         if (loggedIn) loadMyRooms();
         }
@@ -2693,7 +2704,7 @@
         }
 
         if (currentUser && SHEET_WEBHOOK_URL){
-        fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}`)
+        fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
         .then(res => res.json())
         .then(data => {
         if (data.status === 'ok' && data.rooms && data.rooms.length){
@@ -2760,8 +2771,12 @@
 
         fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
-        body: JSON.stringify({ action:'createRoom', roomName, creatorName: currentUser.name, creatorEmail: currentUser.email, roomCode })
-        }).then(() => {
+        body: JSON.stringify({ action:'createRoom', roomName, creatorName: currentUser.name, creatorEmail: currentUser.email, roomCode, idToken: currentUser.idToken })
+        }).then(res => res.json()).then(data => {
+        if (data.status === 'unauthorized'){
+        errEl.textContent = '登入狀態已過期，請重新登入後再試一次。';
+        return;
+        }
         const box = document.getElementById('newRoomResultBox');
         box.style.display = 'block';
         box.innerHTML = `<div class="room-code-display">
@@ -2788,7 +2803,7 @@
 
         box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入中…</p>';
 
-        fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}`)
+        fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
         .then(res => res.json())
         .then(data => {
         if (data.status !== 'ok' || !data.rooms || !data.rooms.length){
@@ -2817,8 +2832,13 @@
 
         fetch(SHEET_WEBHOOK_URL, {
         method: 'POST',
-        body: JSON.stringify({ action:'deleteRoom', roomCode, creatorEmail: currentUser.email })
+        body: JSON.stringify({ action:'deleteRoom', roomCode, creatorEmail: currentUser.email, idToken: currentUser.idToken })
         }).then(res => res.json()).then(data => {
+        if (data.status === 'unauthorized'){
+        alert('登入狀態已過期，請重新登入後再試一次。');
+        if (btnEl){ btnEl.disabled = false; btnEl.textContent = originalLabel; }
+        return;
+        }
         if (data.status === 'ok'){
         loadMyRooms();
         } else {
@@ -2905,9 +2925,13 @@
         const originalLabel = btn ? btn.textContent : '';
         if (btn){ btn.disabled = true; btn.textContent = '查詢中…'; }
 
-        fetch(`${SHEET_WEBHOOK_URL}?action=checkRoom&roomCode=${encodeURIComponent(code)}`)
+        fetch(`${SHEET_WEBHOOK_URL}?action=checkRoom&roomCode=${encodeURIComponent(code)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
         .then(res => res.json())
         .then(data => {
+        if (data.status === 'unauthorized'){
+        errEl.textContent = '登入狀態已過期，請重新登入後再試一次。';
+        return;
+        }
         if (data.status !== 'ok'){
         errEl.textContent = '找不到這個房間代碼，請確認後再試一次。';
         return;
@@ -2948,11 +2972,17 @@
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-        fetch(`${SHEET_WEBHOOK_URL}?action=getRoomData&roomCode=${encodeURIComponent(roomCode)}&creatorEmail=${encodeURIComponent(currentUser.email)}`, { signal: controller.signal })
+        fetch(`${SHEET_WEBHOOK_URL}?action=getRoomData&roomCode=${encodeURIComponent(roomCode)}&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`, { signal: controller.signal })
         .then(res => res.json())
         .then(data => {
         clearTimeout(timeoutId);
 
+        if (data.status === 'unauthorized'){
+        if (loadingEl) loadingEl.style.display = 'none';
+        alert('登入狀態已過期，請重新登入後再試一次。');
+        logout();
+        return;
+        }
         if (data.status === 'forbidden'){
         if (loadingEl) loadingEl.style.display = 'none';
         alert('這個房間不是由你建立的，無法查看數據。');
@@ -4687,4 +4717,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     </style>
 </body>
-</html>
+</html> 
