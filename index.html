@@ -2806,6 +2806,12 @@
         fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
         .then(res => res.json())
         .then(data => {
+        if (data.status === 'unauthorized'){
+        // 登入驗證失敗：房間其實還在，只是這次請求沒有通過驗證，
+        // 不能顯示「尚未建立房間」，否則會誤導使用者以為資料不見了
+        box.innerHTML = '<p style="font-size:14px;color:var(--accent-red);text-align:center;">登入狀態已過期，請重新登入後再試一次（你的房間資料仍然保留，並沒有消失）。</p>';
+        return;
+        }
         if (data.status !== 'ok' || !data.rooms || !data.rooms.length){
         box.innerHTML = '<p style="font-size:14px;color:var(--text-soft);text-align:center;">尚未建立房間</p>';
         return;
@@ -4717,4 +4723,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     </style>
 </body>
-</html> 
+</html>F
