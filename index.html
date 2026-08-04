@@ -7,6 +7,7 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
              /* =========================================================
         全站共用主題：水果攤／木箱風格
@@ -1767,14 +1768,16 @@
                 <div id="backToHistoryRow" style="display:none; justify-content:flex-start; margin-bottom:10px;">
                     <button class="btn-outline" style="margin:0;" onclick="App.showPage('results-zone')">◀ 返回結果專區</button>
                 </div>
-                <h2 style="text-align:center;">🏆 你的專注力雷達圖</h2>
-                <p style="text-align:center; margin-top:-6px;">四個關卡的表現已整合分析如下</p>
-                <canvas id="radarCanvas" width="440" height="440" style="display:none;"></canvas>
-                <img id="radarImg" alt="專注力雷達圖" style="max-width:100%; width:440px; margin:0 auto; display:block; border-radius:12px; border:1px solid var(--kraft-border-light);">
-                <div class="score-list" id="scoreListEl"></div>
-                <div id="overallAdviceBox" class="home-lead-box" style="text-align:left;"></div>
-                <!-- 針對待加強面向的 AI 改善建議欄位 -->
-                <div id="aiSuggestionBox" class="home-lead-box" style="text-align:left; background:#fff8e8; border:2px solid var(--kraft-border-light);"></div>
+                <div id="resultsCaptureArea" style="background:var(--kraft-bg); padding:4px 2px;">
+                    <h2 style="text-align:center;">🏆 你的專注力雷達圖</h2>
+                    <p style="text-align:center; margin-top:-6px;">四個關卡的表現已整合分析如下</p>
+                    <canvas id="radarCanvas" width="440" height="440" style="display:none;"></canvas>
+                    <img id="radarImg" alt="專注力雷達圖" style="max-width:100%; width:440px; margin:0 auto; display:block; border-radius:12px; border:1px solid var(--kraft-border-light);">
+                    <div class="score-list" id="scoreListEl"></div>
+                    <div id="overallAdviceBox" class="home-lead-box" style="text-align:left;"></div>
+                    <!-- 針對待加強面向的 AI 改善建議欄位 -->
+                    <div id="aiSuggestionBox" class="home-lead-box" style="text-align:left; background:#fff8e8; border:2px solid var(--kraft-border-light);"></div>
+                </div>
                 <div class="btn-row">
                     <button class="btn-secondary" onclick="App.downloadRadar()">長按保存結果</button>
                     <button class="btn-primary" onclick="App.restartWholeQuiz()">再玩一次</button>
@@ -2427,12 +2430,7 @@
         document.getElementById(imgId).src = canvas.toDataURL('image/png');
         }
 
-        function downloadRadar(){
-        const img = document.getElementById('radarImg');
-        const a = document.createElement('a');
-        a.href = img.src;
-        
-        // 修改檔名格式為「螢幕擷取畫面 YYYY-MM-DD HHMMSS」
+        function buildDownloadFilename(){
         const d = new Date();
         const YYYY = d.getFullYear();
         const MM = String(d.getMonth() + 1).padStart(2, '0');
@@ -2440,11 +2438,37 @@
         const hh = String(d.getHours()).padStart(2, '0');
         const mm = String(d.getMinutes()).padStart(2, '0');
         const ss = String(d.getSeconds()).padStart(2, '0');
+        return `螢幕擷取畫面 ${YYYY}-${MM}-${DD} ${hh}${mm}${ss}.png`;
+        }
 
-        a.download = `螢幕擷取畫面 ${YYYY}-${MM}-${DD} ${hh}${mm}${ss}.png`;
+        function triggerImageDownload(dataUrl){
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = buildDownloadFilename();
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        }
+
+        function downloadRadar(){
+        const area = document.getElementById('resultsCaptureArea');
+        if (!area || typeof html2canvas === 'undefined'){
+        // 備援：若 html2canvas 尚未載入，退回只存雷達圖
+        const img = document.getElementById('radarImg');
+        triggerImageDownload(img.src);
+        return;
+        }
+        html2canvas(area, {
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--kraft-bg') || '#fdf3dd',
+        useCORS: true,
+        scale: window.devicePixelRatio > 1 ? 2 : 1.5
+        }).then(canvas => {
+        triggerImageDownload(canvas.toDataURL('image/png'));
+        }).catch(() => {
+        // 若擷取整個結果區塊失敗，退回只存雷達圖，避免完全無法保存
+        const img = document.getElementById('radarImg');
+        triggerImageDownload(img.src);
+        });
         }
 
         function shareResult(){
