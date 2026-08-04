@@ -2133,7 +2133,7 @@
         if (name === 'room-view'){
         document.getElementById('nav-room').classList.add('active');
         if (currentUser) loadMyRooms();
-        renderJoinedRoomsList();
+        syncJoinedRoomsList();
         }
         window.scrollTo({top:0, behavior:'smooth'});
         }
@@ -2906,6 +2906,49 @@
         }
 
         /* ---------------- 查看房間：我加入的房間 ---------------- */
+
+        let joinedRoomsSyncing = false; // 避免快速切換頁面時同時打出好幾個一樣的查詢
+
+        /**
+         * 本機的「已加入房間」清單只是使用者自己裝置上的紀錄，房間管理者刪除房間時
+         * 完全不會通知到這裡，所以清單裡可能留著早就被刪掉的房間。
+         * 這裡會拿目前清單裡的所有房間代碼，一次跟後端核對哪些代碼還存在，
+         * 不存在的就從本機清單移除；如果目前綁定要測驗的房間也被刪了，一併解除綁定。
+         */
+        function syncJoinedRoomsList(){
+        renderJoinedRoomsList(); // 先用本機既有資料立即顯示，避免等待網路回應時畫面空白
+
+        if (!currentUser || !SHEET_WEBHOOK_URL || joinedRoomsSyncing) return;
+
+        const list = loadJoinedRoomsList();
+        const codes = list.map(r => r.code);
+        if (joinedRoom && joinedRoom.code && !codes.includes(joinedRoom.code)) codes.push(joinedRoom.code);
+        if (!codes.length) return;
+
+        joinedRoomsSyncing = true;
+        fetch(`${SHEET_WEBHOOK_URL}?action=checkRoomsExist&codes=${encodeURIComponent(codes.join(','))}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
+        .then(res => res.json())
+        .then(data => {
+        if (data.status !== 'ok') return; // 查詢失敗（例如未登入或網路問題）就維持本機清單，不要誤刪使用者紀錄
+
+        const existing = new Set(data.existingCodes || []);
+        const filtered = list.filter(r => existing.has(r.code));
+        if (filtered.length !== list.length){
+        saveJoinedRoomsList(filtered);
+        renderJoinedRoomsList();
+        }
+
+        if (joinedRoom && joinedRoom.code && !existing.has(joinedRoom.code)){
+        // 目前綁定要送測驗結果的房間已經被管理者刪除了，一併解除綁定，避免繼續往一個不存在的房間送資料
+        joinedRoom = null;
+        try{ localStorage.removeItem(JOINED_ROOM_KEY); }catch(e){}
+        updateJoinedRoomBadge();
+        }
+        })
+        .catch(() => {}) // 網路錯誤時保留本機既有清單，不做任何清除
+        .finally(() => { joinedRoomsSyncing = false; });
+        }
+
         function renderJoinedRoomsList(){
         const box = document.getElementById('joinedRoomsBox');
         if (!box) return;
