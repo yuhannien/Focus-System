@@ -2043,6 +2043,32 @@
         let currentUser = null;   
         let joinedRoom = null;    
 
+        /* ---------------- 新增：「我的房間」清單快取，避免短時間內重複打後端造成逾時 ---------------- */
+        let myRoomsCacheData = null;
+        let myRoomsCacheTime = 0;
+        let myRoomsFetchPromise = null;
+        const MY_ROOMS_CACHE_TTL = 20000; // 20 秒內重複使用快取，不重新打 API
+
+        function fetchMyRoomsCached(forceRefresh){
+        if (!currentUser || !SHEET_WEBHOOK_URL) return Promise.resolve({ status:'ok', rooms:[] });
+        const now = Date.now();
+        if (!forceRefresh && myRoomsCacheData && (now - myRoomsCacheTime) < MY_ROOMS_CACHE_TTL){
+        return Promise.resolve(myRoomsCacheData);
+        }
+        if (myRoomsFetchPromise) return myRoomsFetchPromise; // 已有相同請求在進行中，直接共用結果，不重複發送
+        myRoomsFetchPromise = fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
+        .then(res => res.json())
+        .then(data => {
+        if (data.status === 'ok'){
+        myRoomsCacheData = data;
+        myRoomsCacheTime = Date.now();
+        }
+        return data;
+        })
+        .finally(() => { myRoomsFetchPromise = null; });
+        return myRoomsFetchPromise;
+        }
+
         const levelContainers = {
         1: document.getElementById('level1-container'),
         2: document.getElementById('level2-container'),
@@ -2704,8 +2730,7 @@
         }
 
         if (currentUser && SHEET_WEBHOOK_URL){
-        fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
-        .then(res => res.json())
+        fetchMyRoomsCached()
         .then(data => {
         if (data.status === 'ok' && data.rooms && data.rooms.length){
         const optgroup = '<optgroup label="我建立的房間">' + data.rooms.map(r =>
@@ -2788,7 +2813,7 @@
         </div>
         </div>`;
         document.getElementById('newRoomNameInput').value = '';
-        loadMyRooms();
+        loadMyRooms(true);
         }).catch(() => {
         errEl.textContent = '建立房間時發生網路錯誤，請稍後再試一次。';
         }).finally(() => {
@@ -2796,15 +2821,14 @@
         });
         }
 
-        function loadMyRooms(){
+        function loadMyRooms(forceRefresh){
         const box = document.getElementById('myRoomsBox');
         if (!box) return;
         if (!currentUser || !SHEET_WEBHOOK_URL){ box.innerHTML = ''; return; }
 
         box.innerHTML = '<p style="font-size:13px;color:var(--text-soft);text-align:center;">載入中…</p>';
 
-        fetch(`${SHEET_WEBHOOK_URL}?action=getMyRooms&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`)
-        .then(res => res.json())
+        fetchMyRoomsCached(forceRefresh)
         .then(data => {
         if (data.status === 'unauthorized'){
         // 登入驗證失敗：房間其實還在，只是這次請求沒有通過驗證，
@@ -2846,7 +2870,7 @@
         return;
         }
         if (data.status === 'ok'){
-        loadMyRooms();
+        loadMyRooms(true);
         } else {
         alert('刪除房間失敗：' + (data.message || '請確認後台 Apps Script 是否已加入 deleteRoom 的處理邏輯。'));
         if (btnEl){ btnEl.disabled = false; btnEl.textContent = originalLabel; }
@@ -2962,8 +2986,12 @@
         });
         }
 
+        let dashboardLoading = false; // 新增：避免連續點擊「查看數據」造成多個並發請求互相卡住
+
         function viewRoomDashboard(roomCode){
         if (!currentUser || !SHEET_WEBHOOK_URL) return;
+        if (dashboardLoading) return; // 上一筆查詢還沒回來，先忽略這次點擊
+        dashboardLoading = true;
 
         const loadingEl = document.getElementById('roomDashboardLoading');
         const contentEl = document.getElementById('roomDashboardContent');
@@ -2975,8 +3003,9 @@
         if (contentEl) contentEl.style.display = 'none';
 
         // 逾時保護：避免網路延遲或後台無回應時畫面一直卡在「載入中」
+        // 15000 → 30000：房間資料量較大時，Apps Script 讀取彙總需要較長時間，避免誤判逾時
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
 
         fetch(`${SHEET_WEBHOOK_URL}?action=getRoomData&roomCode=${encodeURIComponent(roomCode)}&creatorEmail=${encodeURIComponent(currentUser.email)}&idToken=${encodeURIComponent(currentUser.idToken || '')}`, { signal: controller.signal })
         .then(res => res.json())
@@ -3022,12 +3051,13 @@
         clearTimeout(timeoutId);
         if (loadingEl) loadingEl.style.display = 'none';
         if (err && err.name === 'AbortError'){
-        alert('查詢房間數據逾時，請確認網路連線後再試一次。');
+        alert('查詢房間數據逾時，請確認網路連線後再試一次（雲端資料量較大時，查詢可能需要較長時間）。');
         } else {
         alert('查詢房間數據時發生網路錯誤，請稍後再試一次。');
         }
         showPage('room-view');
-        });
+        })
+        .finally(() => { dashboardLoading = false; }); // 新增：無論成功或失敗都要解除鎖定，允許下次點擊
         }
 
         /* ---------------- 全域鍵盤 ---------------- */
@@ -4723,4 +4753,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     </style>
 </body>
-</html>F
+</html>
