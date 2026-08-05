@@ -3426,25 +3426,27 @@
         return { start, onEnter };
         })();
     </script>
+      /* =========================================================
+        第二關：水果搜尋
+        ========================================================= */
 
-    <!-- 第二關：水果搜尋 -->
-    <script>
-        const L2 = (function(){
+<script>
+    const L2 = (function(){
         const LEVELS = [
         { name:"Level 1", fruitTypes:["🍎","🍓"], cols:5, rows:5 },
         { name:"Level 2", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉"], cols:7, rows:7 },
         { name:"Level 3", fruitTypes:["🍎","🍌","🍊","🍇","🍓","🍉","🍒"], cols:8, rows:8 }
         ];
         const STRAWBERRY = "🍓";
-        const CHERRY = "🍒";
+        const WATERMELON = "🍉";
 
         let currentLevelIndex = 0;
-        let foundCount = 0, totalStrawberriesThisLevel = 0, wrongClicksThisLevel = 0, cherryMisclicksThisLevel = 0;
+        let foundCount = 0, totalStrawberriesThisLevel = 0, wrongClicksThisLevel = 0, watermelonMisclicksThisLevel = 0;
         let timerInterval = null, startTime = 0, elapsedSeconds = 0;
         let levelFinished = false;
         let generatedStrawberryCounts = [];
 
-        const record = { totalSearchTime:0, totalWrongClicks:0, totalCherryMisclicks:0, totalCorrectClicks:0, totalMissedStrawberries:0, levelTimes:[] };
+        const record = { totalSearchTime:0, totalWrongClicks:0, totalWatermelonMisclicks:0, totalCorrectClicks:0, totalMissedStrawberries:0, levelTimes:[] };
 
         let instructionsEl, gameScreenEl, levelTitle, fruitGrid, timerDisplay, foundDisplay, wrongDisplay, levelCompleteOverlay, levelSummary, finishBtn;
 
@@ -3519,7 +3521,7 @@
 
         function renderLevel(levelIndex){
         const cfg = LEVELS[levelIndex];
-        foundCount = 0; wrongClicksThisLevel = 0; cherryMisclicksThisLevel = 0;
+        foundCount = 0; wrongClicksThisLevel = 0; watermelonMisclicksThisLevel = 0;
         levelFinished = false;
         levelTitle.textContent = cfg.name;
         wrongDisplay.textContent = "0";
@@ -3554,7 +3556,7 @@
         } else {
         wrongClicksThisLevel++;
         wrongDisplay.textContent = wrongClicksThisLevel;
-        if (fruit === CHERRY) cherryMisclicksThisLevel++;
+        if (fruit === WATERMELON) watermelonMisclicksThisLevel++;
         cell.classList.add("correct");
         setTimeout(() => cell.classList.add("found"), 380);
         }
@@ -3565,7 +3567,7 @@
         levelFinished = true;
         record.totalSearchTime += elapsedSeconds;
         record.totalWrongClicks += wrongClicksThisLevel;
-        record.totalCherryMisclicks += cherryMisclicksThisLevel;
+        record.totalWatermelonMisclicks += watermelonMisclicksThisLevel;
         record.totalCorrectClicks += foundCount;
         record.totalMissedStrawberries += missedCount;
         record.levelTimes.push({ name: LEVELS[currentLevelIndex].name, time: elapsedSeconds });
@@ -3589,7 +3591,7 @@
         gameScreenEl.style.display = "block";
         currentLevelIndex = 0;
         generatedStrawberryCounts = [];
-        record.totalSearchTime = 0; record.totalWrongClicks = 0; record.totalCherryMisclicks = 0;
+        record.totalSearchTime = 0; record.totalWrongClicks = 0; record.totalWatermelonMisclicks = 0;
         record.totalCorrectClicks = 0; record.totalMissedStrawberries = 0; record.levelTimes = [];
         renderLevel(currentLevelIndex);
         }
@@ -3598,10 +3600,10 @@
         const totalClicks = record.totalCorrectClicks + record.totalWrongClicks;
         const accuracy = totalClicks > 0 ? (record.totalCorrectClicks/totalClicks*100) : 0;
         const errorRate = totalClicks > 0 ? (record.totalWrongClicks/totalClicks*100) : 0;
-        const cherryConfusionRate = record.totalWrongClicks > 0 ? (record.totalCherryMisclicks/record.totalWrongClicks*100) : 0;
+        const watermelonConfusionRate = record.totalWrongClicks > 0 ? (record.totalWatermelonMisclicks/record.totalWrongClicks*100) : 0;
         const avgSpeed = record.totalSearchTime > 0 ? record.totalCorrectClicks/record.totalSearchTime : 0;
 
-        const penalty = errorRate*0.6 + cherryConfusionRate*0.3 + record.totalMissedStrawberries*8;
+        const penalty = errorRate*0.6 + watermelonConfusionRate*0.3 + record.totalMissedStrawberries*8;
         const score = Math.max(0, Math.min(100, 100 - penalty));
 
         const analysis = [];
@@ -3611,9 +3613,9 @@
         analysis.push(errorRate > 15
         ? '錯誤率偏高：可能代表抗干擾能力較弱，容易被非目標物件吸引而誤觸。'
         : '錯誤率偏低，抗干擾能力表現良好。');
-        if (cherryConfusionRate > 30) analysis.push('干擾誤判率偏高：容易將外觀相似的櫻桃（🍒）誤認為草莓（🍓），顯示對相似特徵的區辨能力仍可加強。');
-        else if (record.totalCherryMisclicks > 0) analysis.push('偶有將櫻桃誤認為草莓的情形，但整體區辨能力仍屬穩定。');
-        else analysis.push('沒有將櫻桃誤認為草莓，對相似特徵的區辨能力表現優異。');
+        if (watermelonConfusionRate > 30) analysis.push('干擾誤判率偏高：容易將外觀相似的西瓜（🍉）誤認為草莓（🍓），顯示對相似特徵的區辨能力仍可加強。');
+        else if (record.totalWatermelonMisclicks > 0) analysis.push('偶有將西瓜誤認為草莓的情形，但整體區辨能力仍屬穩定。');
+        else analysis.push('沒有將西瓜誤認為草莓，對相似特徵的區辨能力表現優異。');
         analysis.push(record.totalMissedStrawberries > 0
         ? '漏掉目標較多：可能代表視覺掃描範圍不足，建議練習系統性掃描策略。'
         : '沒有漏掉任何目標，視覺掃描範圍表現優異。');
@@ -3627,7 +3629,7 @@
         { label:'錯誤率', value: errorRate.toFixed(1)+'%' },
         { label:'平均搜尋速度', value: avgSpeed.toFixed(2)+' 個/秒' }
         ], score, {
-        totalSearchTime: record.totalSearchTime, accuracy, errorRate, cherryConfusionRate,
+        totalSearchTime: record.totalSearchTime, accuracy, errorRate, watermelonConfusionRate,
         totalMissed: record.totalMissedStrawberries, avgSpeed,
         levelTimes: record.levelTimes.slice(), analysis
         }, () => App.goToLevel(3));
@@ -3641,8 +3643,8 @@
         return { start, onEnter };
         })();
     </script>
-
-    <script>
+</script>
+    
         /* =========================================================================
         第三關：水果規則變換 — 認知彈性 / 反應控制能力（動態速度、20%正確率保證與點擊特效版）
         ========================================================================= */
