@@ -2434,14 +2434,18 @@
             displayedScores = scores;
             allowQuizExitOnce = true;   // 新增：允許這次跳轉不被防分心機制攔截
             showPage('results');
-        document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
-        document.getElementById('backToHistoryRow').style.display = 'none';
-        renderScoreList('scoreListEl', scores);
-        renderAdvice('overallAdviceBox', scores);
-        renderAISuggestion('aiSuggestionBox', scores);
-        drawRadarInto('radarCanvas', 'radarImg', scores);
-        renderLevelDetailsInto('levelDetailsBox', levelDetails);
-        saveHistory();
+            document.querySelector('#page-results h2').textContent = '🏆 你的專注力雷達圖';
+            document.getElementById('backToHistoryRow').style.display = 'none';
+
+            // 修正：個別包裹每個繪製步驟，避免任一步驟出錯時
+            // 導致後面的 saveHistory()（結果專區 + Google Sheet）完全沒有執行
+            try{ renderScoreList('scoreListEl', scores); }catch(err){ console.error('[finishQuiz] renderScoreList 錯誤：', err); }
+            try{ renderAdvice('overallAdviceBox', scores); }catch(err){ console.error('[finishQuiz] renderAdvice 錯誤：', err); }
+            try{ renderAISuggestion('aiSuggestionBox', scores); }catch(err){ console.error('[finishQuiz] renderAISuggestion 錯誤：', err); }
+            try{ drawRadarInto('radarCanvas', 'radarImg', scores); }catch(err){ console.error('[finishQuiz] drawRadarInto 錯誤：', err); }
+            try{ renderLevelDetailsInto('levelDetailsBox', levelDetails); }catch(err){ console.error('[finishQuiz] renderLevelDetailsInto 錯誤：', err); }
+
+            saveHistory();
         }
 
         function renderScoreList(elId, sc){
