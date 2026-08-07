@@ -1417,19 +1417,20 @@
                  align-items: center;
                  justify-content: center;
                  position: relative;
-                 overflow: hidden;
+                 overflow: visible;
                  margin-bottom: 18px;
                  padding: 8px;
              }
 
              .l4-memorize-area {
                  display: flex;
-                 flex-wrap: nowrap;
+                 flex-wrap: wrap;
                  align-items: center;
                  justify-content: center;
                  gap: 8px;
                  width: 100%;
                  padding: 6px;
+                 row-gap: 6px;
              }
 
                  .l4-memorize-area span {
@@ -1461,10 +1462,11 @@
 
              .l4-slots {
                  display: flex;
-                 flex-wrap: nowrap;
+                 flex-wrap: wrap;
                  gap: 6px;
+                 row-gap: 6px;
                  justify-content: center;
-                 max-width: 100%;
+                 width: 100%;
              }
 
              .l4-slot {
@@ -1501,6 +1503,8 @@
                  height: 68px;
                  cursor: pointer;
                  transition: transform .1s, border-color .2s;
+                 touch-action: manipulation;
+                 -webkit-tap-highlight-color: transparent;
              }
 
                  .l4-fruit-btn:hover:not(:disabled) {
@@ -4091,8 +4095,24 @@
         return seq;
         }
 
+        function computeFit(n, containerWidth, opts){
+        const maxItem = opts.maxItem, minItem = opts.minItem, maxGap = opts.maxGap, minGap = opts.minGap;
+        const safeWidth = Math.max(0, containerWidth) * 0.96;
+        let gap = maxGap;
+        let item = (safeWidth - gap * Math.max(0,n-1)) / n;
+        if (item < minItem){
+        gap = minGap;
+        item = (safeWidth - gap * Math.max(0,n-1)) / n;
+        }
+        item = Math.max(minItem, Math.min(maxItem, item));
+        return { item: Math.floor(item), gap: Math.floor(gap) };
+        }
+
         function getFruitFontSize(n){
-        if (n<=5) return 50; if (n===6) return 42; if (n===7) return 38; if (n===8) return 34; return 30;
+        const containerWidth = memorizeArea.clientWidth - 12;
+        const fit = computeFit(n, containerWidth, { maxItem:50, minItem:20, maxGap:8, minGap:3 });
+        memorizeArea.style.gap = fit.gap + 'px';
+        return fit.item;
         }
 
         function renderMemorizeFruits(seq){
@@ -4173,9 +4193,17 @@
 
         function renderSlots(){
         slotsEl.innerHTML = '';
+        const n = playerAnswer.length;
+        const containerWidth = answerArea.clientWidth - 16;
+        const fit = computeFit(n, containerWidth, { maxItem:44, minItem:28, maxGap:6, minGap:3 });
+        slotsEl.style.gap = fit.gap + 'px';
+        const slotFont = Math.max(15, Math.round(fit.item * 0.58));
         playerAnswer.forEach(fruit => {
         const div = document.createElement('div');
         div.className = 'l4-slot' + (fruit ? ' filled' : '');
+        div.style.width = fit.item + 'px';
+        div.style.height = fit.item + 'px';
+        div.style.fontSize = slotFont + 'px';
         div.textContent = fruit ? FRUIT_EMOJI[fruit] : '';
         slotsEl.appendChild(div);
         });
@@ -4277,6 +4305,16 @@
         if (!answerPhaseActive) return;
         if (nextBtn && !nextBtn.disabled) nextBtn.click();
         }
+
+        let l4ResizeTimer = null;
+        window.addEventListener('resize', () => {
+        clearTimeout(l4ResizeTimer);
+        l4ResizeTimer = setTimeout(() => {
+        if (!playingArea || playingArea.style.display === 'none') return;
+        if (answerPhaseActive) renderSlots();
+        else if (correctSequence.length) renderMemorizeFruits(correctSequence);
+        }, 150);
+        });
 
         return { start, onEnter };
         })();
