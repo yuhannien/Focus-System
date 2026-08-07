@@ -3060,6 +3060,12 @@
         try{ localStorage.setItem(JOINED_ROOM_KEY, JSON.stringify(joinedRoom)); }catch(e){}
         addJoinedRoomToList(joinedRoom);
         updateJoinedRoomBadge();
+        // 修正：把「加入房間」同步寫進 Google Sheet 的 RoomMembers 分頁
+        // （後端 joinRoomSync 這支 API 本來就存在，只是前端一直沒呼叫）
+        fetch(SHEET_WEBHOOK_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action:'joinRoomSync', roomCode: code, memberName: currentUser.name, idToken: currentUser.idToken })
+        }).catch(err => console.error('[joinRoom] joinRoomSync 送出失敗：', err));
 
         const box = document.getElementById('joinRoomResultBox');
         box.style.display = 'block';
