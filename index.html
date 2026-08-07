@@ -542,6 +542,23 @@
                         box-shadow: 0 0 0 5px rgba(201,151,79,0.35), 0 4px 12px rgba(0,0,0,0.5);
                     }
 
+                    .quiz-progress .dot .dot-num {
+                        font-family: "Microsoft JhengHei","PingFang TC","Noto Sans TC",-apple-system,BlinkMacSystemFont,sans-serif;
+                        font-size: 20px;
+                        font-weight: 900;
+                        color: #fdf3dd;
+                        text-shadow: 0 1px 2px rgba(0,0,0,0.55), 0 0 4px rgba(0,0,0,0.25);
+                        line-height: 1;
+                    }
+
+                    .quiz-progress .dot.done .dot-num {
+                        color: #f3fbe9;
+                    }
+
+                    .quiz-progress .dot.current .dot-num {
+                        color: #fff8e6;
+                    }
+
                     .quiz-progress .dot .fruit-label {
                         position: absolute;
                         top: 100%;
@@ -1627,10 +1644,10 @@
         <section id="page-quiz" class="page">
             <div class="quiz-progress">
                 <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
-                <div class="dot" id="dot-1">🍓<span class="fruit-label">第一關</span></div>
-                <div class="dot" id="dot-2">🍊<span class="fruit-label">第二關</span></div>
-                <div class="dot" id="dot-3">🍇<span class="fruit-label">第三關</span></div>
-                <div class="dot" id="dot-4">🍌<span class="fruit-label">第四關</span></div>
+                <div class="dot" id="dot-1"><span class="dot-num">1</span><span class="fruit-label">第一關</span></div>
+                <div class="dot" id="dot-2"><span class="dot-num">2</span><span class="fruit-label">第二關</span></div>
+                <div class="dot" id="dot-3"><span class="dot-num">3</span><span class="fruit-label">第三關</span></div>
+                <div class="dot" id="dot-4"><span class="dot-num">4</span><span class="fruit-label">第四關</span></div>
             </div>
 
             <!-- 各關卡容器將於後續段落插入 -->
