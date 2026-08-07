@@ -1817,6 +1817,178 @@
                 <h2>結果專區</h2>
                 <p>這裡會保存你在此瀏覽器上完成過的測驗紀錄。點選任一筆紀錄即可查看該次的雷達圖與詳細結果。</p>
                 <div id="historyList"></div>
+                <!-- ==================== 即時排行榜 ==================== -->
+                <div id="liveLeaderboard" style="
+            margin-top:24px;
+            padding:18px;
+            background:#fffaf0;
+            border:2px solid var(--kraft-border-light);
+            border-radius:16px;
+        ">
+
+                    <h2 style="
+                text-align:center;
+                margin:0 0 14px;
+                color:var(--wood-dark);
+            ">
+                        🏆 即時排行榜
+                    </h2>
+
+                    <!-- 房間 / 全體 -->
+                    <div style="
+                display:flex;
+                justify-content:center;
+                gap:8px;
+                flex-wrap:wrap;
+                margin-bottom:10px;
+            ">
+
+                        <button type="button"
+                                id="btn-scope-room"
+                                class="btn-primary"
+                                style="font-size:12px;padding:7px 14px;margin:3px;"
+                                onclick="App.switchLeaderboardScope('room')">
+                            🏫 同房間玩家
+                        </button>
+
+                        <button type="button"
+                                id="btn-scope-all"
+                                class="btn-outline"
+                                style="font-size:12px;padding:7px 14px;margin:3px;"
+                                onclick="App.switchLeaderboardScope('all')">
+                            🌐 全體玩家
+                        </button>
+
+                    </div>
+
+                    <!-- 排名依據 -->
+                    <div style="
+                display:flex;
+                justify-content:center;
+                gap:6px;
+                flex-wrap:wrap;
+                margin-bottom:14px;
+            ">
+
+                        <button type="button"
+                                class="btn-primary leaderboard-metric"
+                                data-metric="overall"
+                                onclick="App.switchLeaderboardMetric('overall')">
+                            整體總分
+                        </button>
+
+                        <button type="button"
+                                class="btn-outline leaderboard-metric"
+                                data-metric="1"
+                                onclick="App.switchLeaderboardMetric('1')">
+                            穩定度
+                        </button>
+
+                        <button type="button"
+                                class="btn-outline leaderboard-metric"
+                                data-metric="2"
+                                onclick="App.switchLeaderboardMetric('2')">
+                            抗干擾
+                        </button>
+
+                        <button type="button"
+                                class="btn-outline leaderboard-metric"
+                                data-metric="3"
+                                onclick="App.switchLeaderboardMetric('3')">
+                            反應控制
+                        </button>
+
+                        <button type="button"
+                                class="btn-outline leaderboard-metric"
+                                data-metric="4"
+                                onclick="App.switchLeaderboardMetric('4')">
+                            記憶負荷
+                        </button>
+
+                    </div>
+
+                    <!-- 排行榜表格 -->
+                    <div style="
+                max-height:320px;
+                overflow-y:auto;
+                border:1px solid var(--kraft-border-light);
+                border-radius:10px;
+                background:white;
+            ">
+
+                        <table style="
+                    width:100%;
+                    border-collapse:collapse;
+                    text-align:center;
+                ">
+
+                            <thead style="
+                        position:sticky;
+                        top:0;
+                        background:var(--kraft-bg2);
+                        z-index:2;
+                    ">
+
+                                <tr>
+                                    <th style="padding:9px;">名次</th>
+                                    <th style="padding:9px;">暱稱</th>
+                                    <th style="padding:9px;">得分</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="leaderboardBody">
+
+                                <tr>
+                                    <td colspan="3"
+                                        style="padding:25px;color:var(--text-soft);">
+                                        排行榜載入中…
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- 我的排名 -->
+                    <div style="
+        margin-top:12px;
+        padding:12px 14px;
+        background:var(--kraft-bg2);
+        border-radius:10px;
+        display:flex;
+        justify-content:space-between;
+        flex-wrap:wrap;
+        gap:8px;
+        font-size:14px;
+    ">
+
+                        <span>
+                            我的目前名次：
+                            <b id="myLeaderboardRank">--</b>
+                        </span>
+
+                        <span>
+                            得分：
+                            <b id="myLeaderboardScore">--</b> 分
+                        </span>
+
+                    </div>
+
+                    <div id="leaderboardUpdateTime"
+                         style="
+            text-align:center;
+            margin-top:8px;
+            font-size:11px;
+            color:var(--text-soft);
+        ">
+                        尚未更新
+                    </div>
+
+                </div>
+                <!-- ==================== 即時排行榜結束 ==================== -->
                 <div class="btn-row"><button class="btn-primary" onclick="App.goToQuizEntry()">開始新的測驗</button></div>
             </div>
         </section>
@@ -2134,6 +2306,9 @@
         function showPage(name){
             if (isQuizPageActive() && name !== 'quiz' && !allowQuizExitOnce){ showFocusWarning(); return; }
             allowQuizExitOnce = false; // 用掉就重置，避免之後被濫用
+        if (name !== 'results-zone') {
+        stopLeaderboardAutoRefresh();
+        }
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const target = document.getElementById('page-' + name);
         if (target) target.classList.add('active');
@@ -2148,6 +2323,7 @@
         if (name === 'results-zone'){
         document.getElementById('nav-results').classList.add('active');
         renderHistory();
+        startLeaderboardAutoRefresh();
         }
         if (name === 'room-manage'){
         document.getElementById('nav-room').classList.add('active');
@@ -2549,6 +2725,16 @@
 
         const SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbx07C9pJSP_d4V4TjZNvZAiPQFzaYevHWRvdUCuFSedklWMfXq1YsU005JaFQOYr3uq/exec";
 
+        /* ==================== 即時排行榜設定 ==================== */
+        let leaderboardScope = 'room';
+        let leaderboardMetric = 'overall';
+
+        let leaderboardTimer = null;
+        let leaderboardLoading = false;
+
+        const LEADERBOARD_REFRESH_MS = 3000;
+        /* ==================== 即時排行榜設定結束 ================ */
+
         function sendToSheet(record){
         if (!SHEET_WEBHOOK_URL) return; 
         try{
@@ -2575,6 +2761,335 @@
         }catch(e){}
 
         sendToSheet(record);
+        }
+
+        /* =========================================================
+        即時排行榜
+        ========================================================= */
+
+        /* ---------- 切換：房間 / 全體 ---------- */
+
+        function switchLeaderboardScope(scope){
+        leaderboardScope = scope;
+        const roomBtn = document.getElementById('btn-scope-room');
+        const allBtn = document.getElementById('btn-scope-all');
+        if (roomBtn && allBtn){
+        if (scope === 'room'){
+        roomBtn.className = 'btn-primary';
+        allBtn.className = 'btn-outline';
+        }else{
+        roomBtn.className = 'btn-outline';
+        allBtn.className = 'btn-primary';
+        }
+        }
+        loadLeaderboard();
+        }
+        /* ---------- 切換：總分 / 四小關 ---------- */
+        function switchLeaderboardMetric(metric){
+        leaderboardMetric = metric;
+        document.querySelectorAll('.leaderboard-metric').forEach(btn => {
+        if (btn.dataset.metric === metric){
+        btn.classList.remove('btn-outline');
+        btn.classList.add('btn-primary');
+        }else{
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline');
+        }
+        });
+        renderLeaderboard(window._leaderboardRecords || []);
+        }
+        /* ---------- 取得目前排行榜分數 ---------- */
+        function getLeaderboardScore(record){
+        if (!record) return 0;
+        if (leaderboardMetric === 'overall'){
+        if (record.overallScore !== undefined){
+        return Number(record.overallScore) || 0;
+        }
+        const s1 = Number(record.scores?.['1'] || 0);
+        const s2 = Number(record.scores?.['2'] || 0);
+        const s3 = Number(record.scores?.['3'] || 0);
+        const s4 = Number(record.scores?.['4'] || 0);
+        return (s1 + s2 + s3 + s4) / 4;
+        }
+        return Number(
+        record.scores?.[leaderboardMetric] || 0
+        );
+        }
+        /* ---------- 取得排行榜 ---------- */
+        async function loadLeaderboard(){
+        if (!SHEET_WEBHOOK_URL) return;
+        if (leaderboardLoading) return;
+        const body = document.getElementById('leaderboardBody');
+        if (!body) return;
+        leaderboardLoading = true;
+        try{
+        const params = new URLSearchParams();
+        params.set('action', 'getLeaderboard');
+        params.set('scope', leaderboardScope);
+        if (
+        leaderboardScope === 'room' &&
+        joinedRoom &&
+        joinedRoom.code
+        ){
+        params.set(
+        'roomCode',
+        joinedRoom.code
+        );
+        }
+        const response = await fetch(
+        `${SHEET_WEBHOOK_URL}?${params.toString()}`,
+        {
+        method: 'GET',
+        cache: 'no-store'
+        }
+        );
+        if (!response.ok){
+        throw new Error(
+        `HTTP ${response.status}`
+        );
+        }
+        const data = await response.json();
+        if (data.status !== 'ok'){
+        throw new Error(
+        data.message || '排行榜資料取得失敗'
+        );
+        }
+        window._leaderboardRecords =
+        Array.isArray(data.records)
+        ? data.records
+        : [];
+        renderLeaderboard(
+        window._leaderboardRecords
+        );
+        const timeEl =
+        document.getElementById(
+        'leaderboardUpdateTime'
+        );
+        if (timeEl){
+        timeEl.textContent =
+        '最後更新：' +
+        new Date().toLocaleTimeString(
+        'zh-TW'
+        );
+        }
+        }catch(error){
+        console.error(
+        '排行榜載入失敗：',
+        error
+        );
+        body.innerHTML = `
+        <tr>
+        <td
+        colspan="3"
+        style="
+        padding:25px;
+        color:var(--accent-red);
+        "
+        >
+        排行榜暫時無法取得資料
+        </td>
+        </tr>
+        `;
+        }finally{
+        leaderboardLoading = false;
+        }
+        }
+        /* ---------- 排序 + 顯示排行榜 ---------- */
+
+        function renderLeaderboard(records){
+        const body =
+        document.getElementById(
+        'leaderboardBody'
+        );
+        if (!body) return;
+        if (!Array.isArray(records) ||
+        records.length === 0){
+        body.innerHTML = `
+        <tr>
+        <td
+        colspan="3"
+        style="
+        padding:25px;
+        color:var(--text-soft);
+        "
+        >
+        目前沒有排行榜資料
+        </td>
+        </tr>
+        `;
+        const rankEl =
+        document.getElementById(
+        'myLeaderboardRank'
+        );
+        const scoreEl =
+        document.getElementById(
+        'myLeaderboardScore'
+        );
+        if (rankEl) rankEl.textContent = '--';
+        if (scoreEl) scoreEl.textContent = '--';
+        return;
+        }
+        /* 依目前選擇的項目排序 */
+        const sortedRecords =
+        records
+        .map((record, index) => ({
+        ...record,
+        _originalIndex: index,
+        _score: getLeaderboardScore(record)
+        }))
+        .sort((a, b) => {
+        if (b._score !== a._score){
+        return b._score - a._score;
+        }
+        /* 同分時，較早完成者優先 */
+        const ta =
+        Number(
+        a.timestamp ||
+        a.time ||
+        0
+        );
+        const tb =
+        Number(
+        b.timestamp ||
+        b.time ||
+        0
+        );
+        return ta - tb;
+        });
+        /* 產生排行榜 HTML */
+        body.innerHTML =
+        sortedRecords.map((record, index) => {
+        const rank = index + 1;
+        const name =
+        record.name ||
+        record.nickname ||
+        record.player?.name ||
+        '匿名玩家';
+        const score =
+        Number(record._score)
+        .toFixed(1)
+        .replace('.0','');
+        let medal = rank;
+        if (rank === 1) medal = '🥇';
+        else if (rank === 2) medal = '🥈';
+        else if (rank === 3) medal = '🥉';
+        return `
+        <tr
+        style="
+        border-bottom:
+        1px solid
+        var(--kraft-border-light);
+        "
+        >
+        <td style="padding:8px;">
+        ${medal}
+        </td>
+        <td style="padding:8px;">
+        ${escapeLeaderboardText(name)}
+        </td>
+        <td style="
+        padding:8px;
+        font-weight:bold;
+        ">
+        ${score}
+        </td>
+        </tr>
+        `;
+        }).join('');
+
+        /* 找出目前使用者 */
+        const myEmail =
+        currentUser?.email || '';
+        const myName =
+        playerInfo?.name ||
+        currentUser?.name ||
+        '';
+        let myIndex =
+        sortedRecords.findIndex(record => {
+        if (
+        myEmail &&
+        record.email &&
+        record.email === myEmail
+        ){
+        return true;
+        }
+        if (
+        record.player?.email &&
+        record.player.email === myEmail
+        ){
+        return true;
+        }
+        return (
+        !myEmail &&
+        record.name === myName
+        );
+        });
+        const myRankEl =
+        document.getElementById(
+        'myLeaderboardRank'
+        );
+        const myScoreEl =
+        document.getElementById(
+        'myLeaderboardScore'
+        );
+        if (myIndex >= 0){
+        if (myRankEl){
+        myRankEl.textContent =
+        `第 ${myIndex + 1} 名`;
+        }
+        if (myScoreEl){
+        myScoreEl.textContent =
+        Number(
+        sortedRecords[myIndex]._score
+        )
+        .toFixed(1)
+        .replace('.0','');
+        }
+        }else{
+        if (myRankEl)
+        myRankEl.textContent = '--';
+        if (myScoreEl)
+        myScoreEl.textContent = '--';
+        }
+        }
+
+        /* ---------- 防止玩家暱稱直接插入 HTML ---------- */
+
+        function escapeLeaderboardText(text){
+        const div =
+        document.createElement('div');
+        div.textContent =
+        String(text ?? '');
+        return div.innerHTML;
+        }
+        /* ---------- 啟動排行榜自動更新 ---------- */
+
+        function startLeaderboardAutoRefresh(){
+        stopLeaderboardAutoRefresh();
+        loadLeaderboard();
+        leaderboardTimer =
+        setInterval(() => {
+        const resultPage =
+        document.getElementById(
+        'page-results-zone'
+        );
+        if (
+        resultPage &&
+        resultPage.classList.contains('active')
+        ){
+        loadLeaderboard();
+        }
+        }, LEADERBOARD_REFRESH_MS);
+        }
+        /* ---------- 停止自動更新 ---------- */
+
+        function stopLeaderboardAutoRefresh(){
+        if (leaderboardTimer){
+        clearInterval(
+        leaderboardTimer
+        );
+        leaderboardTimer = null;
+        }
         }
 
         function renderHistory(){
@@ -3239,7 +3754,7 @@
         downloadRadar, shareResult, restartWholeQuiz, viewHistoryDetail,
         openLoginModal, logout, createRoom, joinRoom, leaveRoom, viewRoomDashboard,
         showRoomManageChoice, showRoomManageForm, backToRoomList, deleteRoom, viewJoinedRoomDetail,
-        onQuizRoomSelectChange
+        onQuizRoomSelectChange, switchLeaderboardScope, switchLeaderboardMetric
         };
         })();
     </script>
